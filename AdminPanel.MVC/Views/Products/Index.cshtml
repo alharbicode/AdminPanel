@@ -1,0 +1,34 @@
+﻿@model List<AdminPanel.MVC.Models.ProductViewModel>
+
+<h2>Product List</h2>
+
+<a class="btn btn-primary mb-3" asp-controller="Products" asp-action="Create">Add New Product</a>
+
+<table class="table table-bordered">
+    <thead>
+        <tr>
+            <th>Name</th>
+            <th>Price</th>
+            <th>Stock</th>
+            <th>Unit</th>
+            <th>Available</th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model)
+        {
+            <tr>
+                <td>@item.Name</td>
+                <td>@item.Price</td>
+                <td>@item.StockQuantity</td>
+                <td>@item.Unit</td>
+                <td>@(item.IsAvailable ? "Yes" : "No")</td>
+                <td>
+                    <a class="btn btn-sm btn-warning" asp-action="Edit" asp-route-id="@item.Id">Edit</a>
+                    <a class="btn btn-sm btn-danger" asp-action="Delete" asp-route-id="@item.Id">Delete</a>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>

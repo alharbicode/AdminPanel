@@ -1,0 +1,31 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.13.35617.110 d17.13
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AdminPanel.API", "AdminPanel\AdminPanel.API.csproj", "{3A8EB2B9-DE8A-46A9-B6BD-F637A8C57477}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AdminPanel.MVC", "AdminPanel.MVC\AdminPanel.MVC.csproj", "{E4471347-82CB-4C54-B510-882982C5A8C8}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{3A8EB2B9-DE8A-46A9-B6BD-F637A8C57477}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{3A8EB2B9-DE8A-46A9-B6BD-F637A8C57477}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{3A8EB2B9-DE8A-46A9-B6BD-F637A8C57477}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{3A8EB2B9-DE8A-46A9-B6BD-F637A8C57477}.Release|Any CPU.Build.0 = Release|Any CPU
+		{E4471347-82CB-4C54-B510-882982C5A8C8}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{E4471347-82CB-4C54-B510-882982C5A8C8}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{E4471347-82CB-4C54-B510-882982C5A8C8}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{E4471347-82CB-4C54-B510-882982C5A8C8}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {BB5D0B3B-667C-4753-9B1E-CA7BFA970D18}
+	EndGlobalSection
+EndGlobal
