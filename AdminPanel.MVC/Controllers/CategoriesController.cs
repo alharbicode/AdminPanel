@@ -5,12 +5,10 @@ using Microsoft.AspNetCore.Mvc;
 public class CategoriesController : Controller
 {
     private readonly ApiClient _apiClient;
-    private readonly IHttpContextAccessor _accessor;
 
-    public CategoriesController(ApiClient apiClient, IHttpContextAccessor accessor)
+    public CategoriesController(ApiClient apiClient)
     {
         _apiClient = apiClient;
-        _accessor = accessor;
     }
 
 
@@ -84,8 +82,10 @@ public class CategoriesController : Controller
         if (response.IsSuccessStatusCode)
             return RedirectToAction(nameof(Index));
 
-        ModelState.AddModelError("", "Failed to delete category.");
+        ModelState.AddModelError("", "Could not delete category. Remove or reassign its products first.");
         var category = await _apiClient.GetAsync<CategoryViewModel>($"categories/{id}");
         return View(category);
     }
 }
+
+

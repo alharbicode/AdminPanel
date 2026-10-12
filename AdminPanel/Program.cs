@@ -10,7 +10,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 
-var builder = WebApplication.CreateBuilder(args);
+var builder = WebApplication.CreateBuilder(args.Where(a => a is not ("--bootstrap-admin" or "--reset-password")).ToArray());
 var secret = builder.Configuration["JwtSettings:SecretKey"];
 if (string.IsNullOrWhiteSpace(secret) || Encoding.UTF8.GetByteCount(secret) < 32)
     throw new InvalidOperationException("Configure JwtSettings:SecretKey with a random secret of at least 32 bytes.");
@@ -101,3 +101,4 @@ app.MapControllers();
 app.Run();
 
 public partial class Program { }
+

@@ -43,7 +43,6 @@ public class ProductsController(ApplicationDbContext context, ProductImageStore 
             try { newImage = await images.SaveAsync(dto.ImageFile); }
             catch (InvalidDataException exception) { return BadRequest(new { message = exception.Message }); }
         }
-        var oldImage = product.ImageUrl;
         product.Name = dto.Name; product.Description = dto.Description ?? "";
         product.Price = dto.Price; product.StockQuantity = dto.StockQuantity;
         product.Unit = dto.Unit; product.IsAvailable = dto.IsAvailable; product.CategoryId = dto.CategoryId;
@@ -67,3 +66,4 @@ public class ProductsController(ApplicationDbContext context, ProductImageStore 
         return NoContent();
     }
 }
+
