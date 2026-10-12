@@ -1,47 +1,18 @@
-﻿@model List<AdminPanel.MVC.Models.OrderViewModel>
-
-@{
-    ViewData["Title"] = "Orders";
-}
-
-<h2>Orders</h2>
-
-@if (TempData["Message"] != null)
+@model PagedList<OrderViewModel>
+@{ ViewData["Title"] = "Orders"; }
+<h1>Orders</h1>
+@if (TempData["Message"] is string message) { <div class="alert alert-info" role="status">@message</div> }
+<partial name="_ListFilters" model="Model.Query" />
+@if (!Model.Items.Any()) { <p class="alert alert-info">No orders found. Adjust the filters.</p> }
+else
 {
-    <div class="alert alert-info">@TempData["Message"]</div>
+    <div class="table-responsive"><table class="table table-striped align-middle">
+        <caption>Stored order amounts; currency is not configured. Dates are UTC.</caption>
+        <thead><tr><th scope="col">Order</th><th scope="col">Customer</th><th scope="col">Status</th><th scope="col">Date (UTC)</th><th scope="col">Total</th><th scope="col">Actions</th></tr></thead>
+        <tbody>@foreach (var order in Model.Items)
+        {
+            <tr><td>@order.Id</td><td>@order.CustomerName</td><td>@order.Status</td><td>@order.OrderDate.ToString("yyyy-MM-dd HH:mm")</td><td>@order.TotalPrice.ToString("N2")</td><td><a asp-action="Details" asp-route-id="@order.Id" aria-label="Details for order @order.Id">Details</a></td></tr>
+        }</tbody>
+    </table></div>
 }
-
-<table class="table table-bordered table-striped align-middle">
-    <thead class="table-dark">
-        <tr>
-            <th>#</th>
-            <th>Customer</th>
-            <th>Status</th>
-            <th>Date</th>
-            <th>Total</th>
-            <th></th>
-        </tr>
-    </thead>
-    <tbody>
-        @if (Model == null || Model.Count == 0)
-        {
-            <tr><td colspan="6" class="text-center">No orders.</td></tr>
-        }
-        else
-        {
-            foreach (var order in Model)
-            {
-                <tr>
-                    <td>@order.Id</td>
-                    <td>@order.CustomerName</td>
-                    <td>@order.Status</td>
-                    <td>@order.OrderDate.ToString("yyyy-MM-dd")</td>
-                    <td>@order.TotalToDisplay.ToString("C")</td>
-                    <td>
-                        <a class="btn btn-sm btn-primary" asp-action="Details" asp-route-id="@order.Id">Details</a>
-                    </td>
-                </tr>
-            }
-        }
-    </tbody>
-</table>
+<partial name="_Pagination" model="Model" />

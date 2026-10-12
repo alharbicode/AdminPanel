@@ -1,6 +1,7 @@
 @model AdminPanel.MVC.Models.CategoryViewModel
 
-<h2>Edit Category</h2>
+@{ ViewData["Title"] = "Edit Category"; }
+<h1>Edit Category</h1>
 
 <form asp-action="Edit" method="post">
     <div asp-validation-summary="All" class="text-danger"></div>

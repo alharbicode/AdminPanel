@@ -9,7 +9,7 @@ public class ProductViewModel
     [Range(0, int.MaxValue)] public int StockQuantity { get; set; }
     [Required, StringLength(50)] public string Unit { get; set; } = "Piece";
     public bool IsAvailable { get; set; } = true;
-    [Range(1, int.MaxValue, ErrorMessage = "Category is required")] public int CategoryId { get; set; }
+    [Display(Name = "Category"), Range(1, int.MaxValue, ErrorMessage = "Category is required")] public int CategoryId { get; set; }
     public IFormFile? ImageFile { get; set; }
     public string? ImageUrl { get; set; }
 }

@@ -4,21 +4,17 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace AdminPanel.MVC.Controllers;
 
-public class CategoriesController : Controller
+public class CategoriesController : ManagementController
 {
     private readonly ApiClient _apiClient;
 
-    public CategoriesController(ApiClient apiClient)
+    public CategoriesController(ApiClient apiClient) : base(apiClient)
     {
         _apiClient = apiClient;
     }
 
 
-    public async Task<IActionResult> Index()
-    {
-        var categories = await _apiClient.GetAsync<List<CategoryViewModel>>("categories");
-        return View(categories ?? new List<CategoryViewModel>());
-    }
+    public async Task<IActionResult> Index([FromQuery] AdminListQuery query) => View(await List<CategoryViewModel>("categories", query));
 
     [HttpGet]
     public IActionResult Create()

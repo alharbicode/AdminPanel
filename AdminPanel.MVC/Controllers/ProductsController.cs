@@ -5,13 +5,20 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 
 namespace AdminPanel.MVC.Controllers;
 
-public class ProductsController(ApiClient api) : Controller
+public class ProductsController(ApiClient api) : ManagementController(api)
 {
-    public async Task<IActionResult> Index() => View(await api.GetAsync<List<ProductViewModel>>("products") ?? new());
+    public async Task<IActionResult> Index([FromQuery] AdminListQuery query) { await LoadCategories(); return View(await List<ProductViewModel>("products", query)); }
 
     private async Task LoadCategories() => ViewBag.Categories =
         (await api.GetAsync<List<CategoryViewModel>>("categories") ?? new())
         .Select(c => new SelectListItem(c.Name, c.Id.ToString())).ToList();
+
+    [HttpGet]
+    public async Task<IActionResult> Lookup([FromQuery] AdminListQuery query)
+    {
+        if (!ModelState.IsValid) return BadRequest(new { message = "Check the product search values." });
+        return Json(await api.GetAsync<PagedList<ProductOptionViewModel>>(query.Url("products/admin/lookup")));
+    }
 
     [HttpGet]
     public async Task<IActionResult> Create() { await LoadCategories(); return View(new ProductViewModel()); }

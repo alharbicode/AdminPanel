@@ -4,10 +4,10 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace AdminPanel.MVC.Controllers;
 
-public class OrdersController(ApiClient api) : Controller
+public class OrdersController(ApiClient api) : ManagementController(api)
 {
-    public async Task<IActionResult> Index() =>
-        View(await api.GetAsync<List<OrderViewModel>>("orders") ?? new());
+    public async Task<IActionResult> Index([FromQuery] AdminListQuery query) =>
+        View(await List<OrderViewModel>("orders", query));
 
     public async Task<IActionResult> Details(int id)
     {

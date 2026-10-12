@@ -2,7 +2,6 @@ using System.Net;
 using AdminPanel.MVC.Models;
 using AdminPanel.MVC.Services;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.Rendering;
 
 namespace AdminPanel.MVC.Controllers;
 
@@ -11,7 +10,7 @@ public sealed class DiscountsController(ApiClient api) : ManagementController(ap
     [HttpGet]
     public async Task<IActionResult> Index([FromQuery] AdminListQuery query)
     {
-        await Products();
+        await Product(query.ProductId);
         return View(await List<DiscountViewModel>("discounts", query));
     }
 
@@ -25,14 +24,14 @@ public sealed class DiscountsController(ApiClient api) : ManagementController(ap
     [HttpGet]
     public async Task<IActionResult> Create()
     {
-        await Products();
+        await Product(null);
         return View(new DiscountViewModel());
     }
 
     [HttpPost]
     public async Task<IActionResult> Create(DiscountViewModel model)
     {
-        await Products(model.ProductId);
+        await Product(model.ProductId, validate: true);
         if (!ModelState.IsValid) return View(model);
         SetUtc(model);
         using var response = await Api.PostAsync("discounts", model);
@@ -46,14 +45,14 @@ public sealed class DiscountsController(ApiClient api) : ManagementController(ap
     {
         var model = await Api.GetAsync<DiscountViewModel>($"discounts/{id}");
         if (model is null) return NotFound();
-        await Products();
+        await Product(model.ProductId);
         return View(model);
     }
 
     [HttpPost]
     public async Task<IActionResult> Edit(DiscountViewModel model)
     {
-        await Products(model.ProductId);
+        await Product(model.ProductId, validate: true);
         if (!ModelState.IsValid) return View(model);
         SetUtc(model);
         using var response = await Api.PutAsync($"discounts/{model.Id}", model);
@@ -81,11 +80,12 @@ public sealed class DiscountsController(ApiClient api) : ManagementController(ap
         return model is null ? NotFound() : View(model);
     }
 
-    private async Task Products(int? selectedId = null)
+    private async Task Product(int? selectedId, bool validate = false)
     {
-        var products = await Api.GetAsync<List<ProductViewModel>>("products") ?? new();
-        ViewBag.Products = new SelectList(products.OrderBy(x => x.Name), "Id", "Name");
-        if (selectedId.HasValue && !products.Any(x => x.Id == selectedId.Value))
+        var product = selectedId > 0 ? await Api.GetAsync<ProductViewModel>($"products/{selectedId}") : null;
+        ViewBag.SelectedProductId = selectedId;
+        ViewBag.SelectedProductName = product?.Name;
+        if (validate && product is null)
             ModelState.AddModelError(nameof(DiscountViewModel.ProductId), "Choose an existing product.");
     }
 

@@ -1,0 +1,15 @@
+<div class="product-picker mb-3" data-lookup-url="@Url.Action("Lookup", "Products")">
+    <label for="ProductId" class="form-label">Product ID</label>
+    @Html.TextBox("ProductId", (object?)ViewBag.SelectedProductId, new { type = "number", min = "1", @class = "form-control", aria_describedby = "product-help" })
+    @Html.ValidationMessage("ProductId", null, new { @class = "text-danger" })
+    <p id="product-help" class="form-text">Enter a product ID, or search below. Leave blank for all products when filtering.</p>
+    <p class="product-selection text-muted" role="status">@(ViewBag.SelectedProductName is string name ? "Selected: " + name : "")</p>
+    <div class="product-search" hidden>
+        <label for="ProductSearch" class="form-label">Find product</label>
+        <div class="input-group"><input id="ProductSearch" type="search" maxlength="200" class="form-control" placeholder="Name or description" /><button class="btn btn-outline-secondary product-search-button" type="button">Search products</button></div>
+        <label for="ProductMatches" class="form-label mt-2">Product search results</label>
+        <select id="ProductMatches" class="form-select"><option value="">Search to find a product</option></select>
+        <div class="d-flex gap-2 mt-2"><button type="button" class="btn btn-sm btn-outline-secondary product-previous" disabled>Previous matches</button><button type="button" class="btn btn-sm btn-outline-secondary product-next" disabled>Next matches</button></div>
+        <p class="product-search-status form-text" role="status" aria-live="polite"></p>
+    </div>
+</div>

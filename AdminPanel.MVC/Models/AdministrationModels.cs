@@ -4,7 +4,7 @@ using Microsoft.AspNetCore.WebUtilities;
 
 namespace AdminPanel.MVC.Models;
 
-public sealed class AdminListQuery
+public sealed class AdminListQuery : IValidatableObject
 {
     [Range(1, int.MaxValue)] public int Page { get; set; } = 1;
     [Range(1, 100)] public int PageSize { get; set; } = 10;
@@ -12,12 +12,28 @@ public sealed class AdminListQuery
     [StringLength(200)] public string? Area { get; set; }
     [Range(1, int.MaxValue)] public int? ProductId { get; set; }
     [RegularExpression("^(upcoming|current|ended)$")] public string? Period { get; set; }
+    [RegularExpression("^(id|name|name-desc|newest|oldest|stock|stock-desc)$")] public string? Sort { get; set; }
+    [Range(1, int.MaxValue)] public int? CategoryId { get; set; }
+    public bool? Available { get; set; }
+    public bool? HasProducts { get; set; }
+    [RegularExpression("^(in-stock|out-of-stock)$")] public string? Stock { get; set; }
+    [RegularExpression("^(Pending|Confirmed|Shipped|Delivered)$")] public string? Status { get; set; }
+    [DataType(DataType.Date)] public DateTime? From { get; set; }
+    [DataType(DataType.Date)] public DateTime? To { get; set; }
+    public IEnumerable<ValidationResult> Validate(ValidationContext context)
+    {
+        if (From.HasValue && To.HasValue && From.Value.Date > To.Value.Date)
+            yield return new ValidationResult("End date must be on or after start date.", new[] { nameof(To) });
+    }
 
     public string Url(string path, int? page = null) => QueryHelpers.AddQueryString(path, new Dictionary<string, string?>
     {
         ["Page"] = (page ?? Page).ToString(CultureInfo.InvariantCulture),
         ["PageSize"] = PageSize.ToString(CultureInfo.InvariantCulture),
-        ["Search"] = Search, ["Area"] = Area, ["ProductId"] = ProductId?.ToString(CultureInfo.InvariantCulture), ["Period"] = Period
+        ["Search"] = Search, ["Area"] = Area, ["ProductId"] = ProductId?.ToString(CultureInfo.InvariantCulture), ["Period"] = Period,
+        ["Sort"] = Sort, ["CategoryId"] = CategoryId?.ToString(CultureInfo.InvariantCulture),
+        ["Available"] = Available?.ToString(), ["HasProducts"] = HasProducts?.ToString(),
+        ["Stock"] = Stock, ["Status"] = Status, ["From"] = From?.ToString("yyyy-MM-dd"), ["To"] = To?.ToString("yyyy-MM-dd")
     });
 }
 
@@ -88,4 +104,5 @@ public sealed class DashboardViewModel
     public List<RecentOrder> RecentOrders { get; set; } = new();
 }
 public sealed record OrderStatusCount(string Status, int Count);
+public sealed record ProductOptionViewModel(int Id, string Name);
 public sealed record RecentOrder(int Id, string CustomerName, DateTime OrderDate, string Status, decimal TotalPrice);

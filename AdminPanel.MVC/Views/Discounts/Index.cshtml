@@ -4,7 +4,7 @@
 <div asp-validation-summary="All" class="text-danger" role="alert"></div>
 <form method="get" asp-action="Index" class="row g-3 mb-4">
     <div class="col-md-4"><label for="Search" class="form-label">Search</label><input id="Search" name="Search" value="@Model.Query.Search" maxlength="200" class="form-control" placeholder="Name or product" /></div>
-    <div class="col-md-3"><label for="ProductId" class="form-label">Product</label><select id="ProductId" name="ProductId" class="form-select"><option value="">All products</option>@foreach (Microsoft.AspNetCore.Mvc.Rendering.SelectListItem product in ViewBag.Products) { <option value="@product.Value" selected="@(product.Value == Model.Query.ProductId?.ToString())">@product.Text</option> }</select></div>
+    <div class="col-md-6"><partial name="_ProductPicker" /></div>
 <div class="col-md-3"><label for="Period" class="form-label">Date window (UTC)</label><select id="Period" name="Period" class="form-select"><option value="">All dates</option><option value="upcoming" selected="@(Model.Query.Period == "upcoming")">Upcoming</option><option value="current" selected="@(Model.Query.Period == "current")">Includes now</option><option value="ended" selected="@(Model.Query.Period == "ended")">Ended</option></select></div>
     <div class="col-md-2"><label for="PageSize" class="form-label">Per page</label><select id="PageSize" name="PageSize" class="form-select">
         @foreach (var size in new[] { 10, 25, 50, 100 }.Append(Model.Query.PageSize).Where(x => x >= 1 && x <= 100).Distinct().OrderBy(x => x))

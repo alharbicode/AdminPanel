@@ -1,0 +1,31 @@
+@model AdminListQuery
+@{ var area = ViewContext.RouteData.Values["controller"]?.ToString(); }
+<div asp-validation-summary="All" class="text-danger" role="alert"></div>
+<form method="get" asp-action="Index" class="row g-3 mb-4">
+    <div class="col-md-4"><label asp-for="Search" class="form-label">Search</label><input asp-for="Search" class="form-control" maxlength="200" placeholder="@(area == "Orders" ? "Order ID, customer or email" : "Name or description")" /></div>
+    @if (area == "Categories")
+    {
+        <div class="col-md-3"><label asp-for="HasProducts" class="form-label">Products</label><select asp-for="HasProducts" class="form-select"><option value="">All categories</option><option value="true">With products</option><option value="false">Without products</option></select></div>
+    }
+    @if (area == "Products")
+    {
+        <div class="col-md-3"><label asp-for="CategoryId" class="form-label">Category</label><select asp-for="CategoryId" asp-items="ViewBag.Categories" class="form-select"><option value="">All categories</option></select></div>
+        <div class="col-md-2"><label asp-for="Available" class="form-label">Availability</label><select asp-for="Available" class="form-select"><option value="">All</option><option value="true">Available</option><option value="false">Unavailable</option></select></div>
+        <div class="col-md-2"><label asp-for="Stock" class="form-label">Stock</label><select asp-for="Stock" class="form-select"><option value="">All</option><option value="in-stock">In stock</option><option value="out-of-stock">Zero stock</option></select></div>
+    }
+    @if (area == "Orders")
+    {
+        <div class="col-md-3"><label asp-for="Status" class="form-label"></label><select asp-for="Status" class="form-select"><option value="">All statuses</option>@foreach (var status in new[] { "Pending", "Confirmed", "Shipped", "Delivered" }) { <option value="@status">@status</option> }</select></div>
+        <div class="col-md-2"><label asp-for="From" class="form-label">From (UTC)</label><input asp-for="From" type="date" class="form-control" /></div>
+        <div class="col-md-2"><label asp-for="To" class="form-label">Through (UTC)</label><input asp-for="To" type="date" class="form-control" /></div>
+    }
+    <div class="col-md-3"><label asp-for="Sort" class="form-label">Sort by</label><select asp-for="Sort" class="form-select">
+        @if (area == "Orders") { <option value="newest">Newest first</option><option value="oldest">Oldest first</option><option value="id">ID</option> }
+        else { <option value="id">ID</option><option value="name">Name A–Z</option><option value="name-desc">Name Z–A</option> }
+        @if (area == "Products") { <option value="stock">Stock, lowest first</option><option value="stock-desc">Stock, highest first</option> }
+    </select></div>
+    <div class="col-md-2"><label asp-for="PageSize" class="form-label">Per page</label><select asp-for="PageSize" class="form-select">
+        @foreach (var size in new[] { 10, 25, 50, 100 }.Append(Model.PageSize).Where(x => x >= 1 && x <= 100).Distinct().OrderBy(x => x)) { <option value="@size">@size</option> }
+    </select></div>
+    <div class="col-12 d-flex gap-2"><button class="btn btn-outline-primary" type="submit">Apply filters</button><a asp-action="Index" class="btn btn-outline-secondary">Reset</a></div>
+</form>
