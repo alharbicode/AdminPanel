@@ -13,8 +13,9 @@ public static class AccountProvisioner
         var username = configuration["BootstrapAdmin:Username"];
         var password = configuration["BootstrapAdmin:Password"];
         var email = configuration["BootstrapAdmin:Email"];
-        if (string.IsNullOrWhiteSpace(username) || string.IsNullOrWhiteSpace(email) ||
-            string.IsNullOrWhiteSpace(password) || password.Length < 12)
+        if (string.IsNullOrWhiteSpace(username) || username.Length > 256 ||
+            string.IsNullOrWhiteSpace(email) || !new System.ComponentModel.DataAnnotations.EmailAddressAttribute().IsValid(email) ||
+            string.IsNullOrWhiteSpace(password) || password.Length < 12 || password.Length > 1024)
             throw new InvalidOperationException("Set BootstrapAdmin:Username, Email and Password (at least 12 characters).");
 
         using var scope = services.CreateScope();
@@ -33,3 +34,4 @@ public static class AccountProvisioner
         await db.SaveChangesAsync();
     }
 }
+

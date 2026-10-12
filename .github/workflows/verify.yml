@@ -9,11 +9,30 @@ permissions:
 jobs:
   verify:
     runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        database: [sqlite, sqlserver]
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-dotnet@v4
         with:
           dotnet-version: '8.0.x'
+      - name: Start disposable SQL Server
+        if: matrix.database == 'sqlserver'
+        run: |
+          password="$(openssl rand -hex 24)_aA1!"
+          echo "::add-mask::$password"
+          echo "ADMINPANEL_TEST_SQLSERVER=Server=localhost,1433;User ID=sa;Password=$password;Encrypt=false" >> "$GITHUB_ENV"
+          docker run -d --name adminpanel-test-db -p 127.0.0.1:1433:1433 -e ACCEPT_EULA=Y -e MSSQL_SA_PASSWORD="$password" mcr.microsoft.com/mssql/server:2022-latest
+          for attempt in $(seq 1 60); do
+            if docker exec -e SQLCMDPASSWORD="$password" adminpanel-test-db /opt/mssql-tools18/bin/sqlcmd -S localhost -U sa -C -Q "SELECT 1" > /dev/null 2>&1; then
+              exit 0
+            fi
+            sleep 2
+          done
+          echo "SQL Server did not become ready."
+          exit 1
       - run: dotnet restore AdminPanel.sln
       - run: dotnet build AdminPanel.sln --no-restore --configuration Release
       - run: dotnet test AdminPanel.sln --no-build --configuration Release --logger "trx;LogFileName=tests.trx"
@@ -30,7 +49,10 @@ jobs:
       - uses: actions/upload-artifact@v4
         if: always()
         with:
-          name: verification-results
+          name: verification-results-${{ matrix.database }}
           path: |
             **/TestResults/*.trx
             migrations.sql
+      - name: Stop disposable SQL Server
+        if: always() && matrix.database == 'sqlserver'
+        run: docker rm -f adminpanel-test-db

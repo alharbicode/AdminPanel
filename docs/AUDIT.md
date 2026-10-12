@@ -13,7 +13,7 @@ Development branch: `codex/audit-repair-adminpanel`.
 
 ## Product decisions and boundaries
 
-- Administration defaults to **Admin only** pending a Staff permission matrix. Customer self-service is not implemented or inferred.
+- The user confirmed **Admin only** administration for this repair; Staff permissions remain unspecified. Customer self-service is not implemented or inferred.
 - Existing order creation totals product line prices only. Applying discounts/shipping, currency/tax rules, and fulfillment transition rules require product decisions.
 - Preserve the existing DELETE cancellation contract (remove the order and restore stock). A retained audit/history cancellation workflow is a separate product decision.
 - Preserve the status values already offered in the MVC screen: Pending, Confirmed, Shipped, Delivered, Cancelled. Cancelled must use cancellation so stock cannot silently diverge.
@@ -28,3 +28,4 @@ Reviewed both project/solution configurations, startup/configuration/launch sett
 ## Verification
 
 Results will be recorded after execution. Do not interpret static analysis as successful runtime verification.
+

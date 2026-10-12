@@ -1,4 +1,4 @@
-namespace AdminPanel.API.DTOs;
+﻿namespace AdminPanel.API.DTOs;
 
 public class DiscountDto
 {

@@ -9,6 +9,7 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.Data.Sqlite;
+using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.Extensions.Configuration;
@@ -21,6 +22,17 @@ namespace AdminPanel.Tests;
 public class ApiFactory : WebApplicationFactory<Program>
 {
     private readonly SqliteConnection _connection = new("Data Source=:memory:");
+    private readonly string? _sqlServerConnection = CreateSqlServerConnection();
+    private static string? CreateSqlServerConnection()
+    {
+        var template = Environment.GetEnvironmentVariable("ADMINPANEL_TEST_SQLSERVER");
+        if (string.IsNullOrWhiteSpace(template)) return null;
+        var settings = new SqlConnectionStringBuilder(template);
+        if (settings.DataSource is not ("localhost,1433" or "127.0.0.1,1433"))
+            throw new InvalidOperationException("SQL integration tests only accept a disposable loopback server on port 1433.");
+        settings.InitialCatalog = "AdminPanel_Test_" + Guid.NewGuid().ToString("N");
+        return settings.ConnectionString;
+    }
     public string Secret { get; } = Convert.ToBase64String(RandomNumberGenerator.GetBytes(48));
     public string Password { get; } = Convert.ToBase64String(RandomNumberGenerator.GetBytes(24));
     public string UploadRoot { get; } = Path.Combine(Path.GetTempPath(), "AdminPanel-tests-" + Guid.NewGuid().ToString("N"));
@@ -44,8 +56,12 @@ public class ApiFactory : WebApplicationFactory<Program>
         {
             services.RemoveAll<DbContextOptions<ApplicationDbContext>>();
             services.RemoveAll<IDbContextOptionsConfiguration<ApplicationDbContext>>();
-            _connection.Open();
-            services.AddDbContext<ApplicationDbContext>(options => options.UseSqlite(_connection));
+            if (_sqlServerConnection is null)
+            {
+                _connection.Open();
+                services.AddDbContext<ApplicationDbContext>(options => options.UseSqlite(_connection));
+            }
+            else services.AddDbContext<ApplicationDbContext>(options => options.UseSqlServer(_sqlServerConnection));
         });
     }
     public HttpClient Client() => CreateClient(new WebApplicationFactoryClientOptions { BaseAddress = new Uri("https://localhost"), AllowAutoRedirect = false });
@@ -54,7 +70,8 @@ public class ApiFactory : WebApplicationFactory<Program>
     {
         using var scope = Services.CreateScope();
         var db = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
-        db.Database.EnsureCreated();
+        if (_sqlServerConnection is null) db.Database.EnsureCreated();
+        else db.Database.Migrate();
         if (db.Users.Any()) return;
         var hasher = new PasswordHasher<User>();
         foreach (var role in new[] { "Admin", "Staff", "Customer" })
@@ -85,6 +102,11 @@ public class ApiFactory : WebApplicationFactory<Program>
     }
     protected override void Dispose(bool disposing)
     {
+        if (disposing && _sqlServerConnection is not null)
+        {
+            using var db = new ApplicationDbContext(new DbContextOptionsBuilder<ApplicationDbContext>().UseSqlServer(_sqlServerConnection).Options);
+            db.Database.EnsureDeleted();
+        }
         base.Dispose(disposing);
         if (!disposing) return;
         _connection.Dispose();
@@ -92,7 +114,7 @@ public class ApiFactory : WebApplicationFactory<Program>
     }
 }
 
-public sealed class MvcFactory(ApiFactory api) : WebApplicationFactory<mvc::Program>
+public sealed class MvcFactory(ApiFactory api, Func<HttpMessageHandler>? handler = null) : WebApplicationFactory<mvc::Program>
 {
     protected override void ConfigureWebHost(IWebHostBuilder builder)
     {
@@ -100,7 +122,9 @@ public sealed class MvcFactory(ApiFactory api) : WebApplicationFactory<mvc::Prog
         builder.ConfigureAppConfiguration((_, config) => config.AddInMemoryCollection(new Dictionary<string, string?>
         { ["ApiSettings:BaseUrl"] = "https://localhost/api/" }));
         builder.ConfigureServices(services => services.AddHttpClient<mvc::AdminPanel.MVC.Services.ApiClient>()
-            .ConfigurePrimaryHttpMessageHandler(() => api.Server.CreateHandler()));
+            .ConfigurePrimaryHttpMessageHandler(() => handler?.Invoke() ?? api.Server.CreateHandler()));
     }
     public HttpClient Client() => CreateClient(new WebApplicationFactoryClientOptions { BaseAddress = new Uri("https://localhost"), AllowAutoRedirect = false });
 }
+
+
