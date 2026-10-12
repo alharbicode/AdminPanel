@@ -11,6 +11,7 @@ $connection = "Server=(localdb)\$instance;Database=$instance;Integrated Security
 $processes = @()
 $certificate = $null
 $certificatePath = Join-Path $env:RUNNER_TEMP ($instance + '.pfx')
+$publicCertificatePath = Join-Path $env:RUNNER_TEMP ($instance + '.cer')
 $logs = Join-Path $repo 'artifacts/windows-smoke'
 New-Item -ItemType Directory -Force -Path $logs | Out-Null
 $localdb = (Get-Command SqlLocalDB.exe -ErrorAction SilentlyContinue).Source
@@ -62,9 +63,12 @@ try {
     Invoke-Dotnet @bootstrapArguments
 
     $certificate = New-SelfSignedCertificate -DnsName localhost -CertStoreLocation Cert:\CurrentUser\My -NotAfter (Get-Date).AddHours(2) -KeyExportPolicy Exportable
-    $rootStore = [Security.Cryptography.X509Certificates.X509Store]::new('Root', 'CurrentUser')
-    $rootStore.Open('ReadWrite')
-    try { $rootStore.Add($certificate) } finally { $rootStore.Close() }
+    # X509Store.Add on Windows can display a root-trust dialog. Certutil's explicit
+    # force switch makes this generated, CI-only certificate import unattended.
+    [IO.File]::WriteAllBytes($publicCertificatePath, $certificate.Export([Security.Cryptography.X509Certificates.X509ContentType]::Cert))
+    & certutil -user -f -addstore Root $publicCertificatePath
+    if ($LASTEXITCODE -ne 0) { throw 'Could not trust the temporary CI localhost certificate.' }
+    Write-Output 'WINDOWS SMOKE: migrations and bootstrap complete; temporary HTTPS certificate trusted.'
     $certificatePassword = [Convert]::ToBase64String([Security.Cryptography.RandomNumberGenerator]::GetBytes(32))
     Write-Output "::add-mask::$certificatePassword"
     [IO.File]::WriteAllBytes($certificatePath, $certificate.Export([Security.Cryptography.X509Certificates.X509ContentType]::Pfx, $certificatePassword))
@@ -111,10 +115,12 @@ try {
         }
         $certificate.Dispose()
     }
-    $resolvedCertificate = [IO.Path]::GetFullPath($certificatePath)
     $resolvedTemp = [IO.Path]::GetFullPath($env:RUNNER_TEMP).TrimEnd('\') + '\'
-    if ($resolvedCertificate.StartsWith($resolvedTemp, [StringComparison]::OrdinalIgnoreCase) -and (Test-Path -LiteralPath $resolvedCertificate)) {
-        Remove-Item -LiteralPath $resolvedCertificate
+    foreach ($temporaryFile in @($certificatePath, $publicCertificatePath)) {
+        $resolvedCertificate = [IO.Path]::GetFullPath($temporaryFile)
+        if ($resolvedCertificate.StartsWith($resolvedTemp, [StringComparison]::OrdinalIgnoreCase) -and (Test-Path -LiteralPath $resolvedCertificate)) {
+            Remove-Item -LiteralPath $resolvedCertificate
+        }
     }
     foreach ($setting in @('JwtSettings__SecretKey','ConnectionStrings__DefaultConnection','BootstrapAdmin__Username','BootstrapAdmin__Email','BootstrapAdmin__Password','ASPNETCORE_Kestrel__Certificates__Default__Password','ASPNETCORE_Kestrel__Certificates__Default__Path','ASPNETCORE_URLS','ASPNETCORE_ENVIRONMENT','ApiSettings__BaseUrl')) {
         [Environment]::SetEnvironmentVariable($setting, $null, 'Process')

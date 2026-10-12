@@ -106,3 +106,13 @@ document.querySelectorAll(".product-picker").forEach(picker => {
     });
     id.addEventListener("input", () => { selected.textContent = ""; });
 });
+
+// Clear errors while correcting a previously invalid field. Waiting until focusout
+// can move the submit button between pointerdown and pointerup and swallow the click.
+document.addEventListener("input", event => {
+    const field = event.target;
+    if (!field.form || !window.jQuery?.validator) return;
+    const validator = window.jQuery(field.form).data("validator");
+    if (validator && (validator.invalid[field.name] || validator.submitted[field.name]))
+        validator.element(field);
+});
