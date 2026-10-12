@@ -24,7 +24,7 @@ internal static class BrowserRunner
         var failed = false;
         foreach (var browserType in new[] { playwright.Chromium, playwright.Firefox })
         {
-            var output = Path.GetFullPath(Path.Combine("AdminPanel.BrowserTests", "TestResults", browserType.Name));
+            var output = Path.Combine(AdminPanel.Tests.TestPaths.RepositoryRoot, "AdminPanel.BrowserTests", "TestResults", browserType.Name);
             Directory.CreateDirectory(output);
             _checks = 0;
             await using var host = new BrowserHost();
@@ -106,7 +106,14 @@ internal static class BrowserRunner
         catch (Exception error)
         {
             var safeError = error.Message.Replace(host.Api.Password, "[REDACTED]");
-            var diagnostics = await page.EvaluateAsync<string>("JSON.stringify({path:location.pathname,jquery:!!window.jQuery,validator:!!window.jQuery?.validator,errors:document.querySelectorAll('.field-validation-error').length})");
+            var diagnostics = await page.EvaluateAsync<string>(@"() => {
+                const form = document.querySelector('main form');
+                const validator = window.jQuery?.(form).data('validator');
+                return JSON.stringify({path:location.pathname, jquery:!!window.jQuery, validator:!!validator,
+                    submitting:form?.dataset.submitting, invalid:validator?.errorList.map(x => ({name:x.element.name,message:x.message})),
+                    names:[...form.elements].map(x=>({name:x.name,disabled:x.disabled,filled:!!x.value})),
+                    nativeValid:form?.checkValidity()});
+            }");
             throw new InvalidOperationException($"Browser login failed at {stage}; {diagnostics}; {safeError}");
         }
     }

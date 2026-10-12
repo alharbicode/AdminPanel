@@ -35,6 +35,13 @@ internal sealed class BrowserHost : IAsyncDisposable
         _bridge = builder.Build();
         _bridge.Run(async context =>
         {
+            if (context.Request.HasFormContentType)
+            {
+                context.Request.EnableBuffering();
+                var form = await context.Request.ReadFormAsync(context.RequestAborted);
+                Console.WriteLine($"BROWSER TRANSPORT: {context.Request.Method} {context.Request.Path}; populated field names: {string.Join(",", form.Where(x => !string.IsNullOrEmpty(x.Value)).Select(x => x.Key))}");
+                context.Request.Body.Position = 0;
+            }
             using var upstream = new HttpRequestMessage(new HttpMethod(context.Request.Method),
                 "https://localhost" + context.Request.PathBase + context.Request.Path + context.Request.QueryString);
             if (context.Request.Method is not ("GET" or "HEAD"))
@@ -47,6 +54,7 @@ internal sealed class BrowserHost : IAsyncDisposable
             }
             using var response = await _pipeline.SendAsync(upstream, HttpCompletionOption.ResponseHeadersRead, context.RequestAborted);
             context.Response.StatusCode = (int)response.StatusCode;
+            if (context.Request.Method == "POST") Console.WriteLine($"BROWSER TRANSPORT: response {(int)response.StatusCode} for {context.Request.Path}");
             foreach (var header in response.Headers) context.Response.Headers[header.Key] = header.Value.ToArray();
             foreach (var header in response.Content.Headers) context.Response.Headers[header.Key] = header.Value.ToArray();
             context.Response.Headers.Remove("transfer-encoding");
