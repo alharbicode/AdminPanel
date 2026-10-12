@@ -49,6 +49,7 @@ public class ApiFactory : WebApplicationFactory<Program>
     }
     protected override void ConfigureWebHost(IWebHostBuilder builder)
     {
+        builder.UseContentRoot(Path.Combine(TestPaths.RepositoryRoot, "AdminPanel"));
         builder.UseEnvironment("Testing");
         Directory.CreateDirectory(UploadRoot);
         builder.UseWebRoot(UploadRoot);
@@ -118,6 +119,7 @@ public sealed class MvcFactory(ApiFactory api, Func<HttpMessageHandler>? handler
 {
     protected override void ConfigureWebHost(IWebHostBuilder builder)
     {
+        builder.UseContentRoot(Path.Combine(TestPaths.RepositoryRoot, "AdminPanel.MVC"));
         builder.UseEnvironment("Testing");
         builder.ConfigureAppConfiguration((_, config) => config.AddInMemoryCollection(new Dictionary<string, string?>
         { ["ApiSettings:BaseUrl"] = "https://localhost/api/" }));
@@ -125,4 +127,18 @@ public sealed class MvcFactory(ApiFactory api, Func<HttpMessageHandler>? handler
             .ConfigurePrimaryHttpMessageHandler(() => handler?.Invoke() ?? api.Server.CreateHandler()));
     }
     public HttpClient Client() => CreateClient(new WebApplicationFactoryClientOptions { BaseAddress = new Uri("https://localhost"), AllowAutoRedirect = false });
+}
+
+public static class TestPaths
+{
+    public static string RepositoryRoot
+    {
+        get
+        {
+            var directory = new DirectoryInfo(AppContext.BaseDirectory);
+            while (directory is not null && !File.Exists(Path.Combine(directory.FullName, "AdminPanel.sln")))
+                directory = directory.Parent;
+            return directory?.FullName ?? throw new InvalidOperationException("Run tests from an AdminPanel checkout.");
+        }
+    }
 }

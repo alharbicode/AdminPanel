@@ -61,3 +61,21 @@ jobs:
       - name: Stop disposable SQL Server
         if: always() && matrix.database == 'sqlserver'
         run: docker rm -f adminpanel-test-db
+
+  windows-setup:
+    runs-on: windows-2025
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '8.0.x'
+      - run: dotnet restore AdminPanel.sln
+      - run: dotnet build AdminPanel.sln --no-restore --configuration Release
+      - name: Verify Windows LocalDB and two HTTPS applications
+        shell: pwsh
+        run: ./scripts/Test-WindowsSetup.ps1
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: windows-local-setup-results
+          path: artifacts/windows-smoke/**
