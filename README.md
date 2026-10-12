@@ -6,7 +6,7 @@ ASP.NET Core **.NET 8** Web API and MVC administration client, using **EF Core 9
 
 - `AdminPanel/`: API, JWT authentication, EF models/migrations, category and product CRUD, product image uploads, order creation/list/details/status/cancellation, shipping options, discounts and content page CRUD.
 - `AdminPanel.MVC/`: administrator login/logout, navigation, category/product CRUD, order list/details/status/cancellation.
-- `AdminPanel.Tests/`: xUnit integration tests. Both ASP.NET request pipelines run in-process with a disposable relational SQLite database; tests never use your configured SQL Server.
+- `AdminPanel.Tests/`: xUnit integration tests. Both ASP.NET request pipelines run in-process with disposable relational databases. SQLite is the default; CI also runs the full suite against SQL Server 2022 with all migrations. Tests never use the application connection string.
 - `docs/AUDIT.md`: findings, prioritized acceptance criteria, assumptions and verification record.
 
 Administration is **Admin only**. Staff and Customer credentials do not authorize administration. There is no public registration, customer checkout UI, or customer-facing API policy.
@@ -118,10 +118,12 @@ Login returns a short-lived JWT to the MVC server. MVC stores it inside its encr
 
 ## Verification and remaining scope
 
-CI runs restore, Release build, all integration tests, EF model/migration checks, SQL script generation and a dependency vulnerability audit. See the branch's GitHub Actions run and `docs/AUDIT.md` for actual results.
+CI runs restore, Release build, all integration tests on SQLite and SQL Server 2022, EF model/migration checks, SQL script generation and a dependency vulnerability audit. The verified suite contains 33 tests per provider. See `docs/AUDIT.md` for run links and results.
 
 The integration suite covers authentication, token validation, Admin-only authorization, CSRF protection, MVC-to-API category/product/order flows, uploads, input validation, reference constraints, and stock/cancellation concurrency.
 
 Outstanding product decisions: Staff permissions, customer onboarding/checkout, discount/shipping/tax calculation, currency, fulfillment transition rules, retained cancellation history, and UI screens for shipping/discount/content management. Dashboard analytics and pagination are not implemented. Old/replaced image files are deliberately retained to avoid deleting shared legacy assets; an explicit orphan cleanup policy remains future work. Images have size/type/signature checks, not malware scanning or image decoding. Multi-instance hosting requires shared MVC Data Protection keys and distributed rate limiting.
 
-Run the database migration against an isolated SQL Server and review the generated script before using a real environment. Neither a production migration nor deployment is part of this change.
+For optional local SQL Server integration runs, `ADMINPANEL_TEST_SQLSERVER` must point to a disposable server at `localhost,1433` or `127.0.0.1,1433`, with permission to create/drop databases. The fixture ignores the supplied database name, generates a unique `AdminPanel_Test_` database per test, applies migrations and deletes that database afterwards. CI generates ephemeral credentials and stops its container after verification. Keep this variable unset for normal SQLite tests.
+
+Review the generated migration script and existing data before using a real environment. Neither a production migration nor deployment is part of this change.

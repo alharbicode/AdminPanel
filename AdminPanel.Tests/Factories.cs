@@ -126,5 +126,3 @@ public sealed class MvcFactory(ApiFactory api, Func<HttpMessageHandler>? handler
     }
     public HttpClient Client() => CreateClient(new WebApplicationFactoryClientOptions { BaseAddress = new Uri("https://localhost"), AllowAutoRedirect = false });
 }
-
-

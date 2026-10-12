@@ -13,5 +13,3 @@ public class ProductDto
     [Range(1, int.MaxValue)] public int CategoryId { get; set; }
     public IFormFile? ImageFile { get; set; }
 }
-
-

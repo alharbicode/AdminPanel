@@ -34,4 +34,3 @@ public static class AccountProvisioner
         await db.SaveChangesAsync();
     }
 }
-

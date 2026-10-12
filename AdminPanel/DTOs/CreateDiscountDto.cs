@@ -13,4 +13,3 @@ public class CreateDiscountDto : IValidatableObject
             yield return new ValidationResult("End date must be after a valid start date.", new[] { nameof(EndDate) });
     }
 }
-

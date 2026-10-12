@@ -27,5 +27,20 @@ Reviewed both project/solution configurations, startup/configuration/launch sett
 
 ## Verification
 
-Results will be recorded after execution. Do not interpret static analysis as successful runtime verification.
+Verified on 2026-10-12 in [GitHub Actions run 38305307485](https://github.com/alharbicode/AdminPanel/actions/runs/38305307485), commit `3dcb035`:
 
+| Check | Result |
+| --- | --- |
+| `dotnet restore AdminPanel.sln` | Passed on both CI jobs |
+| Release build | Passed; 0 compiler warnings, 0 errors |
+| Integration tests with relational SQLite | 33 passed, 0 failed, 0 skipped |
+| Same suite with disposable SQL Server 2022 | 33 passed, 0 failed, 0 skipped; full migration chain applied |
+| EF pending model changes | None |
+| Idempotent SQL migration script | Generated successfully; saved as CI artifact |
+| NuGet vulnerability audit, including transitive packages | No vulnerable packages reported by configured sources |
+
+The first CI test run found optional descriptions incorrectly rejected by implicit API validation; this was corrected and the same tests passed. Added coverage also verifies null order lines, decimal precision, unavailable products, safe upstream failure handling, and explicit hashed account provisioning/reset.
+
+The host has no usable `dotnet` on PATH. A workspace-only SDK download was attempted but its transfer stalled/reset, so all .NET verification above was actually executed on GitHub's Ubuntu runners with SDK 8.0.425. No local or production database was touched. SQL Server test databases use unique names and are dropped on disposal; the ephemeral container is removed by CI.
+
+P0/P1 repairs and the P2 reproducibility work listed above are implemented. Remaining scope is the product decisions and missing secondary MVC screens described above and in README. No browser-driven visual QA, live deployment, or migration against existing production data is claimed. Image signatures are checked but files are not fully decoded or malware-scanned; old assets remain pending an explicit cleanup policy.

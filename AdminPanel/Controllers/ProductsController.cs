@@ -66,4 +66,3 @@ public class ProductsController(ApplicationDbContext context, ProductImageStore 
         return NoContent();
     }
 }
-

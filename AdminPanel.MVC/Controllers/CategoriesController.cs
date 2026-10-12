@@ -2,6 +2,8 @@ using AdminPanel.MVC.Models;
 using AdminPanel.MVC.Services;
 using Microsoft.AspNetCore.Mvc;
 
+namespace AdminPanel.MVC.Controllers;
+
 public class CategoriesController : Controller
 {
     private readonly ApiClient _apiClient;
@@ -60,6 +62,7 @@ public class CategoriesController : Controller
         if (response.IsSuccessStatusCode)
             return RedirectToAction(nameof(Index));
 
+        if (response.StatusCode == System.Net.HttpStatusCode.NotFound) return NotFound();
         ModelState.AddModelError("", "Failed to update category.");
         return View(model);
     }
@@ -82,10 +85,9 @@ public class CategoriesController : Controller
         if (response.IsSuccessStatusCode)
             return RedirectToAction(nameof(Index));
 
+        if (response.StatusCode == System.Net.HttpStatusCode.NotFound) return NotFound();
         ModelState.AddModelError("", "Could not delete category. Remove or reassign its products first.");
         var category = await _apiClient.GetAsync<CategoryViewModel>($"categories/{id}");
         return View(category);
     }
 }
-
-

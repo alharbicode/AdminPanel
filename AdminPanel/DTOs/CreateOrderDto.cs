@@ -11,4 +11,3 @@ public class CreateOrderDto : IValidatableObject
             yield return new ValidationResult("Order lines cannot be null.", new[] { nameof(Items) });
     }
 }
-
