@@ -275,45 +275,36 @@ internal static class BrowserRunner
         await Expect(page.Locator("#request-progress")).ToBeHiddenAsync();
         await Expect(page.GetByRole(AriaRole.Button, new() { Name = "Add Category", Exact = true })).ToBeEnabledAsync();
         await page.GetByLabel("Name", new() { Exact = true }).FillAsync("Submission guard");
-        var release = new TaskCompletionSource(TaskCreationOptions.RunContinuationsAsynchronously);
-        var intercepted = new TaskCompletionSource(TaskCreationOptions.RunContinuationsAsynchronously);
         var requests = 0;
-        await page.RouteAsync("**/Categories/Create", async route =>
+        page.Request += (_, request) =>
         {
-            if (route.Request.Method == "POST")
-            {
+            if (request.Method == "POST" && new Uri(request.Url).AbsolutePath == "/Categories/Create")
                 Interlocked.Increment(ref requests);
-                intercepted.TrySetResult();
-                await release.Task;
-            }
-            await route.ContinueAsync();
-        });
-        var submit = page.GetByRole(AriaRole.Button, new() { Name = "Add Category", Exact = true }).ClickAsync();
-        try
-        {
-            await intercepted.Task.WaitAsync(TimeSpan.FromSeconds(15));
-            // Locator assertions wait for pending navigation, which this test deliberately
-            // holds open. Inspect the current document directly while the POST is gated.
-            await page.WaitForFunctionAsync(@"() => {
-                const progress = document.querySelector('#request-progress');
-                return !progress.hidden && progress.getBoundingClientRect().height > 0
-                    && document.querySelector('main form button[type=submit]').disabled;
-            }", options: new() { PollingInterval = 50 });
-            await page.EvaluateAsync("document.querySelector('main form').requestSubmit()");
-        }
-        catch
-        {
-            Console.Error.WriteLine("BROWSER SUBMISSION STATE: " + await page.EvaluateAsync<string>(@"() => JSON.stringify({
-                progressHidden:document.querySelector('#request-progress').hidden,
-                submitting:document.querySelector('main form')?.dataset.submitting,
-                submitDisabled:document.querySelector('main form button[type=submit]')?.disabled,
-                ready:document.readyState
-            })"));
-            throw;
-        }
-        finally { release.TrySetResult(); }
-        await submit;
-        await page.UnrouteAllAsync();
+        };
+        // Hold only the browser's default navigation after the application's normal
+        // submit handlers. A paused network navigation prevents Chromium from inspecting
+        // the outgoing document. No validation, DOM state or API response is mocked here.
+        await page.EvaluateAsync(@"() => {
+            window.holdTestSubmission = event => {
+                if (event.target === document.querySelector('main form')) event.preventDefault();
+            };
+            document.addEventListener('submit', window.holdTestSubmission);
+        }");
+        await page.GetByRole(AriaRole.Button, new() { Name = "Add Category", Exact = true }).ClickAsync();
+        await Expect(page.Locator("#request-progress")).ToBeVisibleAsync();
+        await Expect(page.GetByRole(AriaRole.Button, new() { Name = "Add Category", Exact = true })).ToBeDisabledAsync();
+        var duplicatePrevented = await page.EvaluateAsync<bool>(@"() => {
+            document.removeEventListener('submit', window.holdTestSubmission);
+            let prevented = false;
+            document.addEventListener('submit', event => { prevented = event.defaultPrevented; }, { once: true });
+            document.querySelector('main form').requestSubmit();
+            return prevented;
+        }");
+        Check(duplicatePrevented && requests == 0, "The application must prevent a second submission while saving.");
+        // Resume the first, already validated default submission against the real MVC/API.
+        var navigation = page.WaitForURLAsync("**/Categories");
+        await page.EvaluateAsync("HTMLFormElement.prototype.submit.call(document.querySelector('main form'))");
+        await navigation;
         Check(requests == 1, "Duplicate submission reached the server.");
         Check((await api.GetFromJsonAsync<JsonElement[]>("/api/categories"))!.Count(x => x.GetProperty("name").GetString() == "Submission guard") == 1, "Duplicate record created.");
         await page.GoBackAsync();
