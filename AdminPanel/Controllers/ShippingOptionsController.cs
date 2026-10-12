@@ -1,4 +1,4 @@
-﻿using AdminPanel.API.Data;
+using AdminPanel.API.Data;
 using AdminPanel.API.DTOs;
 using AdminPanel.API.Models;
 using Microsoft.AspNetCore.Mvc;
@@ -69,6 +69,8 @@ public class ShippingOptionsController : ControllerBase
         var option = await _context.ShippingOptions.FindAsync(id);
         if (option == null) return NotFound();
 
+        if (await _context.Orders.AnyAsync(o => o.ShippingOptionId == id))
+            return Conflict(new { message = "Shipping option is used by orders." });
         _context.ShippingOptions.Remove(option);
         await _context.SaveChangesAsync();
 

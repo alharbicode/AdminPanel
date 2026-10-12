@@ -1,4 +1,4 @@
-﻿namespace AdminPanel.API.Models;
+namespace AdminPanel.API.Models;
 
 public class OrderItem
 {

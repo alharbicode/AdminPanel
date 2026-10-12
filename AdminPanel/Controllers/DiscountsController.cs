@@ -1,4 +1,4 @@
-﻿using AdminPanel.API.Data;
+using AdminPanel.API.Data;
 using AdminPanel.API.DTOs;
 using AdminPanel.API.Models;
 using Microsoft.AspNetCore.Mvc;
@@ -63,6 +63,8 @@ public class DiscountsController : ControllerBase
         var discount = await _context.Discounts.FindAsync(id);
         if (discount == null) return NotFound();
 
+        if (!await _context.Products.AnyAsync(p => p.Id == dto.ProductId))
+            return BadRequest(new { message = "Invalid product ID." });
         discount.Name = dto.Name;
         discount.Percentage = dto.Percentage;
         discount.StartDate = dto.StartDate;

@@ -1,4 +1,4 @@
-﻿@model AdminPanel.MVC.Models.CategoryViewModel
+@model AdminPanel.MVC.Models.CategoryViewModel
 
 <h2>Confirm Delete</h2>
 
@@ -14,6 +14,7 @@
     </dl>
 
     <form asp-action="Delete" method="post">
+    <div asp-validation-summary="All" class="text-danger"></div>
         <input type="hidden" asp-for="Id" />
         <button type="submit" class="btn btn-danger">Delete</button>
         <a asp-action="Index" class="btn btn-secondary ms-2">Cancel</a>

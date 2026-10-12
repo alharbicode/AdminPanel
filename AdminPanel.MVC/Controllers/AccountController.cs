@@ -1,60 +1,61 @@
-﻿using AdminPanel.MVC.Models;
+using System.Security.Claims;
+using AdminPanel.MVC.Models;
 using AdminPanel.MVC.Services;
+using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Newtonsoft.Json.Linq;
 
 namespace AdminPanel.MVC.Controllers;
 
-public class AccountController : Controller
+public class AccountController(ApiClient api) : Controller
 {
-    private readonly ApiClient _apiClient;
+    [AllowAnonymous, HttpGet]
+    public IActionResult Login() => View();
 
-    public AccountController(ApiClient apiClient)
-    {
-        _apiClient = apiClient;
-    }
-
-    [HttpGet]
-    public IActionResult Login()
-    {
-        return View();
-    }
-
-    [HttpPost]
+    [AllowAnonymous, HttpPost]
     public async Task<IActionResult> Login(LoginViewModel model)
     {
-        if (!ModelState.IsValid)
-            return View(model);
-
-        var response = await _apiClient.PostAsync("auth/login", model);
+        if (!ModelState.IsValid) return View(model);
+        using var response = await api.PostAsync("auth/login", new { model.Username, model.Password });
         if (!response.IsSuccessStatusCode)
         {
-            ModelState.AddModelError("", "Invalid login.");
+            ModelState.AddModelError("", response.StatusCode == System.Net.HttpStatusCode.TooManyRequests
+                ? "Too many login attempts. Try again in a minute." : "Login failed. Check your credentials or try again later.");
             return View(model);
         }
-
-        var json = await response.Content.ReadAsStringAsync();
-        var obj = JObject.Parse(json);
-
-        var token = obj["token"]?.ToString();
-        var username = obj["user"]?["username"]?.ToString();
-        var role = obj["user"]?["role"]?.ToString();
-
-        if (string.IsNullOrEmpty(token)) return View(model);
-
-        // حفظ التوكن مؤقتًا في الكوكيز
-        HttpContext.Response.Cookies.Append("jwt_token", token!, new CookieOptions
+        var login = await response.Content.ReadFromJsonAsync<LoginResponse>();
+        if (login is null || string.IsNullOrEmpty(login.Token) || login.User.Role != "Admin" || login.ExpiresInSeconds <= 0)
         {
-            HttpOnly = true,
-            Expires = model.RememberMe ? DateTimeOffset.UtcNow.AddDays(7) : DateTimeOffset.UtcNow.AddHours(1)
-        });
-
+            ModelState.AddModelError("", "An administrator account is required.");
+            return View(model);
+        }
+        var identity = new ClaimsIdentity(new[]
+        {
+            new Claim(ClaimTypes.NameIdentifier, login.User.Id.ToString()),
+            new Claim(ClaimTypes.Name, login.User.Username),
+            new Claim(ClaimTypes.Role, login.User.Role)
+        }, CookieAuthenticationDefaults.AuthenticationScheme);
+        var properties = new AuthenticationProperties
+        {
+            IsPersistent = model.RememberMe,
+            ExpiresUtc = DateTimeOffset.UtcNow.AddSeconds(login.ExpiresInSeconds),
+            AllowRefresh = false
+        };
+        properties.StoreTokens(new[] { new AuthenticationToken { Name = "access_token", Value = login.Token } });
+        await HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, new ClaimsPrincipal(identity), properties);
         return RedirectToAction("Index", "Dashboard");
     }
 
-    public IActionResult Logout()
+    [HttpPost]
+    public async Task<IActionResult> Logout()
     {
-        Response.Cookies.Delete("jwt_token");
-        return RedirectToAction("Login");
+        await HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
+        return RedirectToAction(nameof(Login));
     }
+    [AllowAnonymous, HttpGet]
+    public IActionResult AccessDenied() => StatusCode(403, "Administrator access is required.");
+
+    public sealed record LoginResponse(string Token, int ExpiresInSeconds, LoginUser User);
+    public sealed record LoginUser(int Id, string Username, string Role);
 }

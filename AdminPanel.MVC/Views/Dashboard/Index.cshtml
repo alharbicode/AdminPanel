@@ -1,2 +1,8 @@
-﻿<h2>Welcome to Admin Dashboard</h2>
-<p>أنت الآن داخل لوحة التحكم 🎉</p>
+@{ ViewData["Title"] = "Dashboard"; }
+<h1>Administration</h1>
+<p>Signed in as @User.Identity?.Name.</p>
+<div class="d-flex gap-3">
+    <a class="btn btn-primary" asp-controller="Categories" asp-action="Index">Manage categories</a>
+    <a class="btn btn-primary" asp-controller="Products" asp-action="Index">Manage products</a>
+    <a class="btn btn-primary" asp-controller="Orders" asp-action="Index">Manage orders</a>
+</div>

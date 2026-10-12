@@ -1,4 +1,4 @@
-﻿using AdminPanel.API.Data;
+using AdminPanel.API.Data;
 using AdminPanel.API.DTOs;
 using AdminPanel.API.Models;
 using Microsoft.AspNetCore.Mvc;
@@ -53,7 +53,7 @@ public class ContentPagesController : ControllerBase
         var page = new ContentPage
         {
             Title = dto.Title,
-            Slug = dto.Slug.ToLower().Replace(" ", "-"),
+            Slug = dto.Slug.ToLowerInvariant().Replace(" ", "-"),
             Content = dto.Content
         };
 
@@ -70,7 +70,7 @@ public class ContentPagesController : ControllerBase
         if (page == null) return NotFound();
 
         page.Title = dto.Title;
-        page.Slug = dto.Slug.ToLower().Replace(" ", "-");
+        page.Slug = dto.Slug.ToLowerInvariant().Replace(" ", "-");
         page.Content = dto.Content;
 
         await _context.SaveChangesAsync();

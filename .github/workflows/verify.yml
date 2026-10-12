@@ -1,0 +1,36 @@
+name: Verify solution
+on:
+  push:
+    branches: [master, 'codex/**']
+  pull_request:
+    branches: [master]
+permissions:
+  contents: read
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '8.0.x'
+      - run: dotnet restore AdminPanel.sln
+      - run: dotnet build AdminPanel.sln --no-restore --configuration Release
+      - run: dotnet test AdminPanel.sln --no-build --configuration Release --logger "trx;LogFileName=tests.trx"
+      - run: dotnet tool restore
+      - name: Check migration model and generate SQL
+        env:
+          JwtSettings__SecretKey: ci-only-configuration-not-a-deployed-signing-key-0000
+          ConnectionStrings__DefaultConnection: Server=localhost;Database=AdminPanelVerification;Integrated Security=true;TrustServerCertificate=true
+        run: |
+          dotnet ef migrations has-pending-model-changes --project AdminPanel --no-build --configuration Release
+          dotnet ef migrations script --idempotent --project AdminPanel --no-build --configuration Release --output migrations.sql
+      - name: Dependency vulnerability audit
+        run: dotnet list AdminPanel.sln package --vulnerable --include-transitive
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: verification-results
+          path: |
+            **/TestResults/*.trx
+            migrations.sql

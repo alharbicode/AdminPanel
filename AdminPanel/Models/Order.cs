@@ -1,30 +1,14 @@
-﻿// موجود مسبقًا في مشروع الـ API
+namespace AdminPanel.API.Models;
+
 public class Order
 {
     public int Id { get; set; }
-    public string CustomerName { get; set; }
-    public string CustomerEmail { get; set; }
-    public DateTime OrderDate { get; set; }
-    public decimal TotalAmount { get; set; }
-
-    public OrderStatus Status { get; set; }
-
-    public ICollection<OrderItem> Items { get; set; }
-}
-
-public enum OrderStatus
-{
-    Pending,
-    Processing,
-    Shipped,
-    Completed,
-    Cancelled
-}
-
-public class OrderItem
-{
-    public int Id { get; set; }
-    public string ProductName { get; set; }
-    public decimal Price { get; set; }
-    public int Quantity { get; set; }
+    public int CustomerId { get; set; }
+    public User? Customer { get; set; }
+    public DateTime OrderDate { get; set; } = DateTime.UtcNow;
+    public decimal TotalPrice { get; set; }
+    public string Status { get; set; } = "Pending";
+    public int? ShippingOptionId { get; set; }
+    public ShippingOption? ShippingOption { get; set; }
+    public ICollection<OrderItem> OrderItems { get; set; } = new List<OrderItem>();
 }

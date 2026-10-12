@@ -1,8 +1,8 @@
-﻿namespace AdminPanel.API.DTOs;
-
+using System.ComponentModel.DataAnnotations;
+namespace AdminPanel.API.DTOs;
 public class CategoryDto
 {
     public int Id { get; set; }
-    public string Name { get; set; } = "";
-    public string Description { get; set; } = "";
+    [Required, StringLength(200)] public string Name { get; set; } = "";
+    [StringLength(4000)] public string Description { get; set; } = "";
 }

@@ -1,15 +1,15 @@
-﻿namespace AdminPanel.API.DTOs;
-
+using System.ComponentModel.DataAnnotations;
+namespace AdminPanel.API.DTOs;
 public class ProductDto
 {
     public int Id { get; set; }
-    public string Name { get; set; } = "";
-    public string Description { get; set; } = "";
-    public decimal Price { get; set; }
+    [Required, StringLength(200)] public string Name { get; set; } = "";
+    [StringLength(4000)] public string Description { get; set; } = "";
+    [Range(typeof(decimal), "0", "9999999999999999.99")] public decimal Price { get; set; }
     public string ImageUrl { get; set; } = "";
-    public int StockQuantity { get; set; }
-    public string Unit { get; set; } = "Piece";
+    [Range(0, int.MaxValue)] public int StockQuantity { get; set; }
+    [Required, StringLength(50)] public string Unit { get; set; } = "Piece";
     public bool IsAvailable { get; set; }
-    public int CategoryId { get; set; }
+    [Range(1, int.MaxValue)] public int CategoryId { get; set; }
     public IFormFile? ImageFile { get; set; }
 }

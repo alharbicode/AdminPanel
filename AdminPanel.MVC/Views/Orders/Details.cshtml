@@ -1,4 +1,4 @@
-﻿@model AdminPanel.MVC.Models.OrderViewModel
+@model AdminPanel.MVC.Models.OrderViewModel
 
 @{
     ViewData["Title"] = $"Order #{Model.Id}";
@@ -17,14 +17,6 @@
         @if (!string.IsNullOrEmpty(Model.CustomerEmail))
         {
             <p><strong>Email:</strong> @Model.CustomerEmail</p>
-        }
-        @if (!string.IsNullOrEmpty(Model.CustomerPhone))
-        {
-            <p><strong>Phone:</strong> @Model.CustomerPhone</p>
-        }
-        @if (!string.IsNullOrEmpty(Model.CustomerAddress))
-        {
-            <p><strong>Address:</strong> @Model.CustomerAddress</p>
         }
         <p><strong>Status:</strong> @Model.Status</p>
         <p><strong>Date:</strong> @Model.OrderDate.ToString("yyyy-MM-dd HH:mm")</p>
@@ -71,7 +63,6 @@
             <option value="Confirmed" selected="@(Model.Status == "Confirmed")">Confirmed</option>
             <option value="Shipped" selected="@(Model.Status == "Shipped")">Shipped</option>
             <option value="Delivered" selected="@(Model.Status == "Delivered")">Delivered</option>
-            <option value="Cancelled" selected="@(Model.Status == "Cancelled")">Cancelled</option>
         </select>
     </div>
     <div class="col-auto">
