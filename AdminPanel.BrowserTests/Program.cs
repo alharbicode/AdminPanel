@@ -65,7 +65,7 @@ internal static class BrowserRunner
                 failed = true;
                 // Never record login form state, credentials, cookies or authentication traces.
                 if (!page.Url.Contains("/Account/Login")) await page.ScreenshotAsync(new() { Path = Path.Combine(output, "failure.png"), FullPage = true });
-                var safeError = error.Message.Replace(host.Api.Password, "[REDACTED]");
+                var safeError = error.ToString().Replace(host.Api.Password, "[REDACTED]");
                 Console.Error.WriteLine($"BROWSER FAIL: {browserType.Name}: {safeError}");
                 await File.WriteAllTextAsync(Path.Combine(output, "result.json"), JsonSerializer.Serialize(new { browser = browserType.Name, status = "failed", error = safeError }));
             }
@@ -298,8 +298,18 @@ internal static class BrowserRunner
                 const progress = document.querySelector('#request-progress');
                 return !progress.hidden && progress.getBoundingClientRect().height > 0
                     && document.querySelector('main form button[type=submit]').disabled;
-            }");
+            }", options: new() { PollingInterval = 50 });
             await page.EvaluateAsync("document.querySelector('main form').requestSubmit()");
+        }
+        catch
+        {
+            Console.Error.WriteLine("BROWSER SUBMISSION STATE: " + await page.EvaluateAsync<string>(@"() => JSON.stringify({
+                progressHidden:document.querySelector('#request-progress').hidden,
+                submitting:document.querySelector('main form')?.dataset.submitting,
+                submitDisabled:document.querySelector('main form button[type=submit]')?.disabled,
+                ready:document.readyState
+            })"));
+            throw;
         }
         finally { release.TrySetResult(); }
         await submit;

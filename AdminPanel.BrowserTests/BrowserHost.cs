@@ -36,7 +36,7 @@ internal sealed class BrowserHost : IAsyncDisposable
         _bridge.Run(async context =>
         {
             using var upstream = new HttpRequestMessage(new HttpMethod(context.Request.Method),
-                "https://localhost" + context.Request.PathBase + context.Request.Path + context.Request.QueryString);
+                "https://" + context.Request.Host + context.Request.PathBase + context.Request.Path + context.Request.QueryString);
             if (context.Request.Method is not ("GET" or "HEAD"))
                 upstream.Content = new StreamContent(context.Request.Body);
             foreach (var header in context.Request.Headers)
