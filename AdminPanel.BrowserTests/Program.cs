@@ -89,17 +89,26 @@ internal static class BrowserRunner
 
     private static async Task Login(IPage page, BrowserHost host)
     {
+        var stage = "open login";
         try
         {
             await page.GotoAsync("/Account/Login");
+            stage = "validate empty login";
             await page.GetByRole(AriaRole.Button, new() { Name = "Login", Exact = true }).ClickAsync();
             await Expect(page.Locator(".field-validation-error").First).ToBeVisibleAsync();
+            stage = "fill credentials";
             await page.GetByLabel("Username", new() { Exact = true }).FillAsync("admin");
             await page.GetByLabel("Password", new() { Exact = true }).FillAsync(host.Api.Password);
+            stage = "submit login";
             await page.GetByRole(AriaRole.Button, new() { Name = "Login", Exact = true }).ClickAsync();
             await Expect(page.GetByRole(AriaRole.Heading, new() { Name = "Dashboard", Exact = true })).ToBeVisibleAsync();
         }
-        catch { throw new InvalidOperationException("Browser login/validation failed; credential values redacted."); }
+        catch (Exception error)
+        {
+            var safeError = error.Message.Replace(host.Api.Password, "[REDACTED]");
+            var diagnostics = await page.EvaluateAsync<string>("JSON.stringify({path:location.pathname,jquery:!!window.jQuery,validator:!!window.jQuery?.validator,errors:document.querySelectorAll('.field-validation-error').length})");
+            throw new InvalidOperationException($"Browser login failed at {stage}; {diagnostics}; {safeError}");
+        }
     }
 
     private static async Task Screens(IPage page, string output)

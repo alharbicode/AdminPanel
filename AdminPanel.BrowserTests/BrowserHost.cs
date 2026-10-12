@@ -37,7 +37,7 @@ internal sealed class BrowserHost : IAsyncDisposable
         {
             using var upstream = new HttpRequestMessage(new HttpMethod(context.Request.Method),
                 "https://localhost" + context.Request.PathBase + context.Request.Path + context.Request.QueryString);
-            if (context.Request.ContentLength > 0 || context.Request.Headers.ContainsKey("Transfer-Encoding"))
+            if (context.Request.Method is not ("GET" or "HEAD"))
                 upstream.Content = new StreamContent(context.Request.Body);
             foreach (var header in context.Request.Headers)
             {

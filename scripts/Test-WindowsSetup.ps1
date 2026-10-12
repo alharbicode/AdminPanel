@@ -57,7 +57,8 @@ try {
     Write-Output "::add-mask::$env:BootstrapAdmin__Password"
     Invoke-Dotnet tool restore
     Invoke-Dotnet ef database update --project AdminPanel --no-build --configuration Release
-    Invoke-Dotnet run --project AdminPanel --no-build --configuration Release --no-launch-profile -- --bootstrap-admin
+    # Splat an array to preserve the literal "--"; PowerShell otherwise consumes it at a function boundary.
+    Invoke-Dotnet @('run', '--project', 'AdminPanel', '--no-build', '--configuration', 'Release', '--no-launch-profile', '--', '--bootstrap-admin')
 
     $certificate = New-SelfSignedCertificate -DnsName localhost -CertStoreLocation Cert:\CurrentUser\My -NotAfter (Get-Date).AddHours(2) -KeyExportPolicy Exportable
     $rootStore = [Security.Cryptography.X509Certificates.X509Store]::new('Root', 'CurrentUser')
