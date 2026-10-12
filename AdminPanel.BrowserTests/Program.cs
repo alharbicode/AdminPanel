@@ -341,7 +341,9 @@ internal static class BrowserRunner
         await page.GetByLabel("Percentage", new() { Exact = true }).FillAsync("10");
         await page.GetByLabel("Start date (UTC)").FillAsync("2030-01-01T10:00");
         await page.GetByLabel("End date (UTC)").FillAsync("2030-02-01T10:00");
-        await page.Locator("main form button[type=submit]").ClickAsync();
+        // Exercise native keyboard submission with scripting disabled, including
+        // forms taller than the phone viewport, without animation-frame click polling.
+        await page.Locator("main form button[type=submit]").PressAsync("Enter");
         await Expect(page.Locator("main .alert-success")).ToBeVisibleAsync();
         Check((await api.GetFromJsonAsync<JsonElement[]>("/api/discounts"))!.Any(x => x.GetProperty("name").GetString() == "No script discount" && x.GetProperty("productId").GetInt32() == 1), "Numeric product selection must work without JavaScript.");
         await page.GetByRole(AriaRole.Button, new() { Name = "Sign out admin" }).ClickAsync();

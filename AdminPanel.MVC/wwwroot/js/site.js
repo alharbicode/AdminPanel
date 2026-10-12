@@ -1,4 +1,16 @@
 // Progressive enhancement: every management workflow also works without JavaScript.
+document.addEventListener("DOMContentLoaded", () => {
+    if (!window.jQuery?.validator) return;
+    const originalStep = window.jQuery.validator.methods.step;
+    // jQuery Validate 1.19 does not support datetime-local's step attribute.
+    // Preserve millisecond values and let the native control check its step.
+    window.jQuery.validator.methods.step = function (value, element, parameter) {
+        return element.type === "datetime-local"
+            ? this.optional(element) || !element.validity.stepMismatch
+            : originalStep.call(this, value, element, parameter);
+    };
+});
+
 (() => {
     const reset = () => {
         document.getElementById("request-progress").hidden = true;
