@@ -1,0 +1,7 @@
+@model DiscountViewModel
+@{ ViewData["Title"] = "Discount details"; }
+<h1>@ViewData["Title"]</h1>
+<partial name="_Details" model="Model" />
+<a asp-action="Edit" asp-route-id="@Model.Id" class="btn btn-primary">Edit</a>
+<a asp-action="Delete" asp-route-id="@Model.Id" class="btn btn-outline-danger">Delete</a>
+<a asp-action="Index" class="btn btn-outline-secondary">Back to list</a>

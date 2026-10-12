@@ -1,185 +1,68 @@
-﻿using AdminPanel.MVC.Models;
+using AdminPanel.MVC.Models;
 using AdminPanel.MVC.Services;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 
-public class ProductsController : Controller
+namespace AdminPanel.MVC.Controllers;
+
+public class ProductsController(ApiClient api) : ManagementController(api)
 {
-    private readonly ApiClient _apiClient;
-    private readonly IHttpContextAccessor _accessor;
+    public async Task<IActionResult> Index([FromQuery] AdminListQuery query) { await LoadCategories(); return View(await List<ProductViewModel>("products", query)); }
 
-    public ProductsController(ApiClient apiClient, IHttpContextAccessor accessor)
-    {
-        _apiClient = apiClient;
-        _accessor = accessor;
-    }
+    private async Task LoadCategories() => ViewBag.Categories =
+        (await Api.GetAsync<List<CategoryViewModel>>("categories") ?? new())
+        .Select(c => new SelectListItem(c.Name, c.Id.ToString())).ToList();
 
-    private void LoadToken()
+    [HttpGet]
+    public async Task<IActionResult> Lookup([FromQuery] AdminListQuery query)
     {
-        var token = _accessor.HttpContext?.Request.Cookies["jwt_token"];
-        if (!string.IsNullOrEmpty(token))
-            _apiClient.SetToken(token);
-    }
-
-    public async Task<IActionResult> Index()
-    {
-        LoadToken();
-        var products = await _apiClient.GetAsync<List<ProductViewModel>>("products");
-        return View(products ?? new List<ProductViewModel>());
+        if (!ModelState.IsValid) return BadRequest(new { message = "Check the product search values." });
+        return Json(await Api.GetAsync<PagedList<ProductOptionViewModel>>(query.Url("products/admin/lookup")));
     }
 
     [HttpGet]
-    public async Task<IActionResult> Create()
-    {
-        LoadToken();
-
-        var categories = await _apiClient.GetAsync<List<CategoryViewModel>>("categories");
-        ViewBag.Categories = categories?.Select(c => new SelectListItem
-        {
-            Value = c.Id.ToString(),
-            Text = c.Name
-        }).ToList();
-
-        return View();
-    }
-
+    public async Task<IActionResult> Create() { await LoadCategories(); return View(new ProductViewModel()); }
     [HttpPost]
-    public async Task<IActionResult> Create(ProductViewModel model)
-    {
-        LoadToken();
-
-        if (!ModelState.IsValid)
-        {
-            var categories = await _apiClient.GetAsync<List<CategoryViewModel>>("categories");
-            ViewBag.Categories = categories?.Select(c => new SelectListItem
-            {
-                Value = c.Id.ToString(),
-                Text = c.Name
-            }).ToList();
-
-            return View(model);
-        }
-
-        var productToSend = new
-        {
-            model.Name,
-            model.Description,
-            model.Price,
-            model.StockQuantity,
-            model.Unit,
-            model.IsAvailable,
-            model.CategoryId,
-            ImageUrl = model.ImageUrl ?? ""
-        };
-
-        var response = await _apiClient.PostAsync("products", productToSend);
-
-        if (response.IsSuccessStatusCode)
-            return RedirectToAction(nameof(Index));
-
-        ModelState.AddModelError("", "Failed to create product.");
-
-        var categories2 = await _apiClient.GetAsync<List<CategoryViewModel>>("categories");
-        ViewBag.Categories = categories2?.Select(c => new SelectListItem
-        {
-            Value = c.Id.ToString(),
-            Text = c.Name
-        }).ToList();
-
-        return View(model);
-    }
-
+    [RequestSizeLimit(6 * 1024 * 1024)]
+    public async Task<IActionResult> Create(ProductViewModel model) => await Save(model, false);
     [HttpGet]
     public async Task<IActionResult> Edit(int id)
     {
-        LoadToken();
-
-        var product = await _apiClient.GetAsync<ProductViewModel>($"products/{id}");
-        if (product == null)
-            return NotFound();
-
-        var categories = await _apiClient.GetAsync<List<CategoryViewModel>>("categories");
-        ViewBag.Categories = categories?.Select(c => new SelectListItem
-        {
-            Value = c.Id.ToString(),
-            Text = c.Name
-        }).ToList();
-
+        var product = await Api.GetAsync<ProductViewModel>($"products/{id}");
+        if (product is null) return NotFound();
+        await LoadCategories();
         return View(product);
     }
-
     [HttpPost]
-    public async Task<IActionResult> Edit(ProductViewModel model)
+    [RequestSizeLimit(6 * 1024 * 1024)]
+    public async Task<IActionResult> Edit(ProductViewModel model) => await Save(model, true);
+
+    private async Task<IActionResult> Save(ProductViewModel model, bool update)
     {
-        LoadToken();
-
-        if (!ModelState.IsValid)
+        if (model.ImageFile?.Length > 5 * 1024 * 1024) ModelState.AddModelError(nameof(model.ImageFile), "Image must be at most 5 MiB.");
+        if (ModelState.IsValid)
         {
-            var categories = await _apiClient.GetAsync<List<CategoryViewModel>>("categories");
-            ViewBag.Categories = categories?.Select(c => new SelectListItem
-            {
-                Value = c.Id.ToString(),
-                Text = c.Name
-            }).ToList();
-
-            return View(model);
+            using var response = await Api.SaveProductAsync(model, update);
+            if (response.IsSuccessStatusCode) return RedirectToAction(nameof(Index));
+            if (response.StatusCode == System.Net.HttpStatusCode.NotFound) return NotFound();
+            ModelState.AddModelError("", "Could not save product. Check the category, values and image (JPEG, PNG or WebP).");
         }
-
-        var productToSend = new
-        {
-            model.Id,
-            model.Name,
-            model.Description,
-            model.Price,
-            model.StockQuantity,
-            model.Unit,
-            model.IsAvailable,
-            model.CategoryId,
-            ImageUrl = model.ImageUrl ?? ""
-        };
-
-        var response = await _apiClient.PutAsync($"products/{model.Id}", productToSend);
-
-        if (response.IsSuccessStatusCode)
-            return RedirectToAction(nameof(Index));
-
-        ModelState.AddModelError("", "Failed to update product.");
-
-        var categoriesReload = await _apiClient.GetAsync<List<CategoryViewModel>>("categories");
-        ViewBag.Categories = categoriesReload?.Select(c => new SelectListItem
-        {
-            Value = c.Id.ToString(),
-            Text = c.Name
-        }).ToList();
-
-        return View(model);
+        await LoadCategories();
+        return View(update ? "Edit" : "Create", model);
     }
-
     [HttpGet]
     public async Task<IActionResult> Delete(int id)
     {
-        LoadToken();
-
-        var product = await _apiClient.GetAsync<ProductViewModel>($"products/{id}");
-        if (product == null)
-            return NotFound();
-
-        return View(product);
+        var product = await Api.GetAsync<ProductViewModel>($"products/{id}");
+        return product is null ? NotFound() : View(product);
     }
-
     [HttpPost, ActionName("Delete")]
     public async Task<IActionResult> DeleteConfirmed(int id)
     {
-        LoadToken();
-
-        var response = await _apiClient.DeleteAsync($"products/{id}");
-
-        if (response.IsSuccessStatusCode)
-            return RedirectToAction(nameof(Index));
-
-        ModelState.AddModelError("", "Failed to delete product.");
-
-        var product = await _apiClient.GetAsync<ProductViewModel>($"products/{id}");
-        return View(product);
+        using var response = await Api.DeleteAsync($"products/{id}");
+        if (response.IsSuccessStatusCode) return RedirectToAction(nameof(Index));
+        if (response.StatusCode == System.Net.HttpStatusCode.NotFound) return NotFound();
+        ModelState.AddModelError("", "Could not delete product. Products referenced by orders or discounts must be retained.");
+        return View(await Api.GetAsync<ProductViewModel>($"products/{id}"));
     }
 }

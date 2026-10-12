@@ -1,4 +1,4 @@
-﻿using System.IdentityModel.Tokens.Jwt;
+using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
 using AdminPanel.API.Models;
@@ -6,14 +6,9 @@ using Microsoft.IdentityModel.Tokens;
 
 namespace AdminPanel.API.Services;
 
-public class JwtTokenService
+public class JwtTokenService(IConfiguration configuration)
 {
-    private readonly IConfiguration _configuration;
-
-    public JwtTokenService(IConfiguration configuration)
-    {
-        _configuration = configuration;
-    }
+    public int LifetimeMinutes => configuration.GetValue<int>("JwtSettings:LifetimeMinutes", 60);
 
     public string GenerateToken(User user)
     {
@@ -23,16 +18,13 @@ public class JwtTokenService
             new Claim(ClaimTypes.Name, user.Username),
             new Claim(ClaimTypes.Role, user.Role)
         };
-
-        var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration["JwtSettings:SecretKey"]!));
-        var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
-
+        var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(configuration["JwtSettings:SecretKey"]!));
         var token = new JwtSecurityToken(
+            issuer: configuration["JwtSettings:Issuer"],
+            audience: configuration["JwtSettings:Audience"],
             claims: claims,
-            expires: DateTime.Now.AddDays(7),
-            signingCredentials: creds
-        );
-
+            expires: DateTime.UtcNow.AddMinutes(LifetimeMinutes),
+            signingCredentials: new SigningCredentials(key, SecurityAlgorithms.HmacSha256));
         return new JwtSecurityTokenHandler().WriteToken(token);
     }
 }

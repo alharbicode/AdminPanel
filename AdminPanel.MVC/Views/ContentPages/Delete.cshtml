@@ -1,0 +1,11 @@
+@model ContentPageViewModel
+@{ ViewData["Title"] = "Delete content page"; }
+<h1>@ViewData["Title"]</h1>
+<p class="alert alert-warning">Delete this content page? This action cannot be undone.</p>
+<div asp-validation-summary="All" class="text-danger" role="alert"></div>
+<partial name="_Details" model="Model" />
+<form asp-action="Delete" method="post">
+    <input type="hidden" asp-for="Id" />
+    <button class="btn btn-danger" type="submit">Delete content page</button>
+    <a asp-action="Index" class="btn btn-outline-secondary">Cancel</a>
+</form>

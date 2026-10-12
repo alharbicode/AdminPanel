@@ -1,31 +1,20 @@
-﻿using AdminPanel.MVC.Models;
+using AdminPanel.MVC.Models;
 using AdminPanel.MVC.Services;
 using Microsoft.AspNetCore.Mvc;
 
-public class CategoriesController : Controller
+namespace AdminPanel.MVC.Controllers;
+
+public class CategoriesController : ManagementController
 {
     private readonly ApiClient _apiClient;
-    private readonly IHttpContextAccessor _accessor;
 
-    public CategoriesController(ApiClient apiClient, IHttpContextAccessor accessor)
+    public CategoriesController(ApiClient apiClient) : base(apiClient)
     {
         _apiClient = apiClient;
-        _accessor = accessor;
     }
 
-    private void LoadToken()
-    {
-        var token = _accessor.HttpContext?.Request.Cookies["jwt_token"];
-        if (!string.IsNullOrEmpty(token))
-            _apiClient.SetToken(token);
-    }
 
-    public async Task<IActionResult> Index()
-    {
-        LoadToken();
-        var categories = await _apiClient.GetAsync<List<CategoryViewModel>>("categories");
-        return View(categories ?? new List<CategoryViewModel>());
-    }
+    public async Task<IActionResult> Index([FromQuery] AdminListQuery query) => View(await List<CategoryViewModel>("categories", query));
 
     [HttpGet]
     public IActionResult Create()
@@ -36,11 +25,10 @@ public class CategoriesController : Controller
     [HttpPost]
     public async Task<IActionResult> Create(CategoryViewModel model)
     {
-        LoadToken();
         if (!ModelState.IsValid)
             return View(model);
 
-        var response = await _apiClient.PostAsync("categories", model);
+        using var response = await _apiClient.PostAsync("categories", model);
 
         if (response.IsSuccessStatusCode)
             return RedirectToAction(nameof(Index));
@@ -52,7 +40,6 @@ public class CategoriesController : Controller
     [HttpGet]
     public async Task<IActionResult> Edit(int id)
     {
-        LoadToken();
         var category = await _apiClient.GetAsync<CategoryViewModel>($"categories/{id}");
         if (category == null)
             return NotFound();
@@ -63,15 +50,15 @@ public class CategoriesController : Controller
     [HttpPost]
     public async Task<IActionResult> Edit(CategoryViewModel model)
     {
-        LoadToken();
         if (!ModelState.IsValid)
             return View(model);
 
-        var response = await _apiClient.PutAsync($"categories/{model.Id}", model);
+        using var response = await _apiClient.PutAsync($"categories/{model.Id}", model);
 
         if (response.IsSuccessStatusCode)
             return RedirectToAction(nameof(Index));
 
+        if (response.StatusCode == System.Net.HttpStatusCode.NotFound) return NotFound();
         ModelState.AddModelError("", "Failed to update category.");
         return View(model);
     }
@@ -79,7 +66,6 @@ public class CategoriesController : Controller
     [HttpGet]
     public async Task<IActionResult> Delete(int id)
     {
-        LoadToken();
         var category = await _apiClient.GetAsync<CategoryViewModel>($"categories/{id}");
         if (category == null)
             return NotFound();
@@ -90,13 +76,13 @@ public class CategoriesController : Controller
     [HttpPost, ActionName("Delete")]
     public async Task<IActionResult> DeleteConfirmed(int id)
     {
-        LoadToken();
-        var response = await _apiClient.DeleteAsync($"categories/{id}");
+        using var response = await _apiClient.DeleteAsync($"categories/{id}");
 
         if (response.IsSuccessStatusCode)
             return RedirectToAction(nameof(Index));
 
-        ModelState.AddModelError("", "Failed to delete category.");
+        if (response.StatusCode == System.Net.HttpStatusCode.NotFound) return NotFound();
+        ModelState.AddModelError("", "Could not delete category. Remove or reassign its products first.");
         var category = await _apiClient.GetAsync<CategoryViewModel>($"categories/{id}");
         return View(category);
     }

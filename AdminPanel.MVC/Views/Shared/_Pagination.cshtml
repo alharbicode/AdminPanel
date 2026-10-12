@@ -1,0 +1,33 @@
+@model PagedList
+@{
+    var path = Url.Action("Index")!;
+    var start = Math.Max(1, Model.Page - 2);
+    var end = Math.Min(Model.TotalPages, Model.Page + 2);
+}
+<div class="d-flex flex-wrap align-items-center justify-content-between gap-2 mt-3">
+    <p class="text-muted mb-0" role="status">@Model.TotalCount record(s) · Page @Model.Page of @Model.TotalPages</p>
+    @if (Model.TotalPages > 1)
+    {
+        <nav aria-label="List pages">
+            <ul class="pagination mb-0">
+                @if (Model.Page > 1)
+                {
+                    <li class="page-item"><a class="page-link" href="@Model.Query.Url(path, 1)">First</a></li>
+                    <li class="page-item"><a class="page-link" href="@Model.Query.Url(path, Model.Page - 1)">Previous</a></li>
+                }
+                @for (var page = start; page <= end; page++)
+                {
+                    <li class="page-item @(page == Model.Page ? "active" : "")">
+                        @if (page == Model.Page) { <span class="page-link" aria-current="page">@(page)</span> }
+                        else { <a class="page-link" aria-label="Page @(page)" href="@Model.Query.Url(path, page)">@(page)</a> }
+                    </li>
+                }
+                @if (Model.Page < Model.TotalPages)
+                {
+                    <li class="page-item"><a class="page-link" href="@Model.Query.Url(path, Model.Page + 1)">Next</a></li>
+                    <li class="page-item"><a class="page-link" href="@Model.Query.Url(path, Model.TotalPages)">Last</a></li>
+                }
+            </ul>
+        </nav>
+    }
+</div>

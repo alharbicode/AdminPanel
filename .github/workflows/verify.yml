@@ -1,0 +1,117 @@
+name: Verify solution
+on:
+  push:
+    branches: [master, 'codex/**']
+  pull_request:
+    branches: [master]
+permissions:
+  contents: read
+concurrency:
+  group: verify-${{ github.workflow }}-${{ github.ref }}-${{ github.sha }}
+  cancel-in-progress: true
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    strategy:
+      fail-fast: false
+      matrix:
+        database: [sqlite, sqlserver]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '8.0.x'
+      - name: Start disposable SQL Server
+        if: matrix.database == 'sqlserver'
+        run: |
+          password="$(openssl rand -hex 24)_aA1!"
+          echo "::add-mask::$password"
+          echo "ADMINPANEL_TEST_SQLSERVER=Server=localhost,1433;User ID=sa;Password=$password;Encrypt=false" >> "$GITHUB_ENV"
+          docker run -d --name adminpanel-test-db -p 127.0.0.1:1433:1433 -e ACCEPT_EULA=Y -e MSSQL_SA_PASSWORD="$password" mcr.microsoft.com/mssql/server:2022-latest
+          for attempt in $(seq 1 60); do
+            if docker exec -e SQLCMDPASSWORD="$password" adminpanel-test-db /opt/mssql-tools18/bin/sqlcmd -S localhost -U sa -C -Q "SELECT 1" > /dev/null 2>&1; then
+              exit 0
+            fi
+            sleep 2
+          done
+          echo "SQL Server did not become ready."
+          exit 1
+      - run: dotnet restore AdminPanel.sln
+      - run: dotnet build AdminPanel.sln --no-restore --configuration Release
+      - run: dotnet test AdminPanel.sln --no-build --configuration Release --logger "trx;LogFileName=tests.trx"
+      - name: Install Playwright Chromium and Firefox
+        run: dotnet run --project AdminPanel.BrowserTests --no-build --configuration Release -- --install-browsers
+      - name: Browser administrator workflows
+        run: dotnet run --project AdminPanel.BrowserTests --no-build --configuration Release
+      - run: dotnet tool restore
+      - name: Check migration model and generate SQL
+        env:
+          JwtSettings__SecretKey: ci-only-configuration-not-a-deployed-signing-key-0000
+          ConnectionStrings__DefaultConnection: Server=localhost;Database=AdminPanelVerification;Integrated Security=true;TrustServerCertificate=true
+        run: |
+          dotnet ef migrations has-pending-model-changes --project AdminPanel --no-build --configuration Release
+          dotnet ef migrations script --idempotent --project AdminPanel --no-build --configuration Release --output migrations.sql
+      - name: Dependency vulnerability audit
+        run: dotnet list AdminPanel.sln package --vulnerable --include-transitive
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: verification-results-${{ matrix.database }}
+          path: |
+            **/TestResults/*.trx
+            AdminPanel.BrowserTests/TestResults/**
+            migrations.sql
+      - name: Stop disposable SQL Server
+        if: always() && matrix.database == 'sqlserver'
+        run: docker rm -f adminpanel-test-db
+
+  windows-setup:
+    runs-on: windows-2025
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '8.0.x'
+      - run: dotnet restore AdminPanel.sln
+      - run: dotnet build AdminPanel.sln --no-restore --configuration Release
+      - name: Verify Windows LocalDB and two HTTPS applications
+        shell: pwsh
+        run: ./scripts/Test-WindowsSetup.ps1
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: windows-local-setup-results
+          path: artifacts/windows-smoke/**
+
+  retire-superseded:
+    if: github.event_name == 'push'
+    runs-on: ubuntu-latest
+    timeout-minutes: 2
+    permissions:
+      actions: write
+    steps:
+      - name: Stop older verification runs for this branch
+        env:
+          GH_TOKEN: ${{ github.token }}
+          HEAD_SHA: ${{ github.sha }}
+          HEAD_BRANCH: ${{ github.ref_name }}
+        run: |
+          python - <<'PY'
+          import json, os, urllib.request, urllib.parse, urllib.error
+          base = "https://api.github.com/repos/" + os.environ["GITHUB_REPOSITORY"]
+          headers = {"Authorization": "Bearer " + os.environ["GH_TOKEN"], "Accept": "application/vnd.github+json"}
+          query = urllib.parse.urlencode({"branch": os.environ["HEAD_BRANCH"], "per_page": 30})
+          with urllib.request.urlopen(urllib.request.Request(base + "/actions/workflows/verify.yml/runs?" + query, headers=headers), timeout=30) as response:
+              runs = json.load(response)["workflow_runs"]
+          for run in runs:
+              if run["id"] < int(os.environ["GITHUB_RUN_ID"]) and run["head_sha"] != os.environ["HEAD_SHA"] and run["status"] in ("queued", "pending", "in_progress"):
+                  try:
+                      request = urllib.request.Request(base + "/actions/runs/" + str(run["id"]) + "/cancel", data=b"", headers=headers, method="POST")
+                      with urllib.request.urlopen(request, timeout=30):
+                          print("Cancelled superseded verification run", run["id"])
+                  except urllib.error.HTTPError as error:
+                      if error.code != 409:
+                          raise
+          PY

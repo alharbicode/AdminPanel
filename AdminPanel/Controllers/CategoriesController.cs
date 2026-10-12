@@ -1,4 +1,4 @@
-﻿using AdminPanel.API.Data;
+using AdminPanel.API.Data;
 using AdminPanel.API.DTOs;
 using AdminPanel.API.Models;
 using Microsoft.AspNetCore.Mvc;
@@ -51,7 +51,7 @@ public class CategoriesController : ControllerBase
         var category = new Category
         {
             Name = dto.Name,
-            Description = dto.Description
+            Description = dto.Description ?? ""
         };
 
         _context.Categories.Add(category);
@@ -67,7 +67,7 @@ public class CategoriesController : ControllerBase
         if (category == null) return NotFound();
 
         category.Name = dto.Name;
-        category.Description = dto.Description;
+        category.Description = dto.Description ?? "";
 
         await _context.SaveChangesAsync();
         return Ok(new { message = "Category updated successfully." });
@@ -79,6 +79,8 @@ public class CategoriesController : ControllerBase
         var category = await _context.Categories.FindAsync(id);
         if (category == null) return NotFound();
 
+        if (await _context.Products.AnyAsync(p => p.CategoryId == id))
+            return Conflict(new { message = "Category contains products." });
         _context.Categories.Remove(category);
         await _context.SaveChangesAsync();
 

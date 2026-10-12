@@ -1,7 +1,7 @@
-﻿namespace AdminPanel.API.DTOs;
-
+using System.ComponentModel.DataAnnotations;
+namespace AdminPanel.API.DTOs;
 public class LoginDto
 {
-    public string Username { get; set; } = "";
-    public string Password { get; set; } = "";
+    [Required, StringLength(256)] public string Username { get; set; } = "";
+    [Required, StringLength(1024)] public string Password { get; set; } = "";
 }

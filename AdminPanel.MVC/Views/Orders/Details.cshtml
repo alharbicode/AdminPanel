@@ -1,10 +1,10 @@
-﻿@model AdminPanel.MVC.Models.OrderViewModel
+@model AdminPanel.MVC.Models.OrderViewModel
 
 @{
     ViewData["Title"] = $"Order #{Model.Id}";
 }
 
-<h2>Order #@Model.Id</h2>
+<h1>Order #@Model.Id</h1>
 
 @if (TempData["Message"] != null)
 {
@@ -18,21 +18,13 @@
         {
             <p><strong>Email:</strong> @Model.CustomerEmail</p>
         }
-        @if (!string.IsNullOrEmpty(Model.CustomerPhone))
-        {
-            <p><strong>Phone:</strong> @Model.CustomerPhone</p>
-        }
-        @if (!string.IsNullOrEmpty(Model.CustomerAddress))
-        {
-            <p><strong>Address:</strong> @Model.CustomerAddress</p>
-        }
         <p><strong>Status:</strong> @Model.Status</p>
-        <p><strong>Date:</strong> @Model.OrderDate.ToString("yyyy-MM-dd HH:mm")</p>
+        <p><strong>Date (UTC):</strong> @Model.OrderDate.ToString("yyyy-MM-dd HH:mm")</p>
     </div>
 </div>
 
-<h4>Items</h4>
-<table class="table table-bordered">
+<h2 class="h4">Items</h2>
+<div class="table-responsive" role="region" aria-label="Scrollable records" tabindex="0"><table class="table table-bordered">
     <thead>
         <tr>
             <th>Product</th>
@@ -46,32 +38,31 @@
         {
             <tr>
                 <td>@item.ProductName</td>
-                <td class="text-end">@item.Price.ToString("C")</td>
+                <td class="text-end">@item.Price.ToString("N2")</td>
                 <td class="text-end">@item.Quantity</td>
-                <td class="text-end">@item.LineTotal.ToString("C")</td>
+                <td class="text-end">@item.LineTotal.ToString("N2")</td>
             </tr>
         }
     </tbody>
     <tfoot>
         <tr>
             <th colspan="3" class="text-end">Total</th>
-            <th class="text-end">@Model.TotalToDisplay.ToString("C")</th>
+            <th class="text-end">@Model.TotalToDisplay.ToString("N2")</th>
         </tr>
     </tfoot>
-</table>
+</table></div>
 
 <hr />
 
-<h5>Update Status</h5>
+<h2 class="h5">Update Status</h2>
 <form asp-action="UpdateStatus" method="post" class="row g-2 align-items-center">
     <input type="hidden" name="id" value="@Model.Id" />
     <div class="col-auto">
-        <select name="newStatus" class="form-select">
+        <label for="newStatus" class="visually-hidden">New status</label><select id="newStatus" name="newStatus" class="form-select">
             <option value="Pending" selected="@(Model.Status == "Pending")">Pending</option>
             <option value="Confirmed" selected="@(Model.Status == "Confirmed")">Confirmed</option>
             <option value="Shipped" selected="@(Model.Status == "Shipped")">Shipped</option>
             <option value="Delivered" selected="@(Model.Status == "Delivered")">Delivered</option>
-            <option value="Cancelled" selected="@(Model.Status == "Cancelled")">Cancelled</option>
         </select>
     </div>
     <div class="col-auto">

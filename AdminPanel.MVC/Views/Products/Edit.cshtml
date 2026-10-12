@@ -1,8 +1,10 @@
-﻿@model AdminPanel.MVC.Models.ProductViewModel
+@model AdminPanel.MVC.Models.ProductViewModel
 
-<h2>Edit Product</h2>
+@{ ViewData["Title"] = "Edit Product"; }
+<h1>Edit Product</h1>
 
 <form asp-action="Edit" method="post" enctype="multipart/form-data">
+    <div asp-validation-summary="All" class="text-danger"></div>
     <input type="hidden" asp-for="Id" />
 
     <div class="form-group mb-2">
@@ -37,7 +39,7 @@
 
     <div class="form-group mb-2">
         <label asp-for="CategoryId"></label>
-        <select asp-for="CategoryId" class="form-select" asp-items="@(new SelectList(ViewBag.Categories, "Id", "Name"))">
+        <select asp-for="CategoryId" class="form-select" asp-items="ViewBag.Categories">
             <option value="">-- Select Category --</option>
         </select>
         <span asp-validation-for="CategoryId" class="text-danger"></span>

@@ -1,2 +1,49 @@
-﻿<h2>Welcome to Admin Dashboard</h2>
-<p>أنت الآن داخل لوحة التحكم 🎉</p>
+@model DashboardViewModel
+@{ ViewData["Title"] = "Dashboard"; }
+<h1>Dashboard</h1>
+<p class="text-muted">Current records in your administration system. Refresh this page to update the counts.</p>
+<div class="row g-3 mb-4">
+    @foreach (var card in new[] {
+        new { Label = "Products", Count = Model.ProductCount, Controller = "Products" },
+        new { Label = "Categories", Count = Model.CategoryCount, Controller = "Categories" },
+        new { Label = "Orders", Count = Model.OrderCount, Controller = "Orders" },
+        new { Label = "Shipping options", Count = Model.ShippingOptionCount, Controller = "ShippingOptions" },
+        new { Label = "Discounts", Count = Model.DiscountCount, Controller = "Discounts" },
+        new { Label = "Content pages", Count = Model.ContentPageCount, Controller = "ContentPages" } })
+    {
+        <div class="col-sm-6 col-lg-4"><div class="card h-100"><div class="card-body">
+            <h2 class="h6"><a asp-controller="@card.Controller" asp-action="Index" class="stretched-link">@card.Label</a></h2>
+            <p class="display-6 mb-0">@card.Count.ToString("N0")</p>
+        </div></div></div>
+    }
+</div>
+<div class="row g-4 mb-4">
+    <section class="col-md-6" aria-labelledby="inventory-title">
+        <h2 id="inventory-title" class="h4">Inventory</h2>
+        <dl class="row"><dt class="col-8">Available products</dt><dd class="col-4">@Model.AvailableProductCount</dd>
+            <dt class="col-8">Unavailable products</dt><dd class="col-4">@(Model.ProductCount - Model.AvailableProductCount)</dd>
+            <dt class="col-8">Products with zero stock</dt><dd class="col-4">@Model.OutOfStockProductCount</dd></dl>
+    </section>
+    <section class="col-md-6" aria-labelledby="status-title">
+        <h2 id="status-title" class="h4">Orders by status</h2>
+        @if (Model.OrdersByStatus.Count == 0) { <p class="text-muted">No orders yet.</p> }
+        else
+        {
+            <dl class="row">@foreach (var status in Model.OrdersByStatus) { <dt class="col-8">@status.Status</dt><dd class="col-4">@status.Count</dd> }</dl>
+        }
+    </section>
+</div>
+<h2 class="h4">Recent orders</h2>
+@if (Model.RecentOrders.Count == 0) { <p class="text-muted">No orders yet.</p> }
+else
+{
+    <div class="table-responsive" role="region" aria-label="Scrollable records" tabindex="0"><table class="table table-striped">
+        <caption>Five most recent orders. Totals are stored order amounts; currency is not configured.</caption>
+        <thead><tr><th scope="col">Order</th><th scope="col">Customer</th><th scope="col">Date (UTC)</th><th scope="col">Status</th><th scope="col">Total</th></tr></thead>
+        <tbody>@foreach (var order in Model.RecentOrders)
+        {
+            <tr><td><a asp-controller="Orders" asp-action="Details" asp-route-id="@order.Id">#@order.Id</a></td>
+                <td>@order.CustomerName</td><td>@order.OrderDate.ToString("yyyy-MM-dd HH:mm")</td><td>@order.Status</td><td>@order.TotalPrice.ToString("N2")</td></tr>
+        }</tbody>
+    </table></div>
+}
