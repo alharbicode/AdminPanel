@@ -50,6 +50,7 @@ internal static class BrowserRunner
                 await Crud(page, api);
                 await SubmissionAndSecurity(page, api);
                 await Picker(page);
+                await WithoutJavaScript(browser, host, api);
                 await page.GotoAsync("/");
                 await page.GetByRole(AriaRole.Button, new() { Name = "Sign out admin" }).ClickAsync();
                 await Expect(page).ToHaveURLAsync(new System.Text.RegularExpressions.Regex("/Account/Login"));
@@ -64,8 +65,9 @@ internal static class BrowserRunner
                 failed = true;
                 // Never record login form state, credentials, cookies or authentication traces.
                 if (!page.Url.Contains("/Account/Login")) await page.ScreenshotAsync(new() { Path = Path.Combine(output, "failure.png"), FullPage = true });
-                Console.Error.WriteLine($"BROWSER FAIL: {browserType.Name}: {error.Message}");
-                await File.WriteAllTextAsync(Path.Combine(output, "result.json"), JsonSerializer.Serialize(new { browser = browserType.Name, status = "failed", error = error.Message }));
+                var safeError = error.Message.Replace(host.Api.Password, "[REDACTED]");
+                Console.Error.WriteLine($"BROWSER FAIL: {browserType.Name}: {safeError}");
+                await File.WriteAllTextAsync(Path.Combine(output, "result.json"), JsonSerializer.Serialize(new { browser = browserType.Name, status = "failed", error = safeError }));
             }
         }
         return failed ? 1 : 0;
@@ -149,6 +151,11 @@ internal static class BrowserRunner
             }
         }
         await page.SetViewportSizeAsync(1365, 900);
+        await page.GotoAsync("/");
+        await page.Keyboard.PressAsync("Tab");
+        await Expect(page.GetByRole(AriaRole.Link, new() { Name = "Skip to content" })).ToBeFocusedAsync();
+        await page.Keyboard.PressAsync("Enter");
+        await Expect(page.Locator("main")).ToBeFocusedAsync();
         Console.WriteLine("BROWSER: all administration screens rendered at 1365, 390 and 320 pixels; screenshots saved; labels, landmarks and overflow checked.");
     }
 
@@ -189,7 +196,7 @@ internal static class BrowserRunner
         await page.GotoAsync("/Products/Create");
         await page.GetByLabel("Name", new() { Exact = true }).FillAsync("Workflow product");
         await page.GetByLabel("Price", new() { Exact = true }).FillAsync("12.50");
-        await page.GetByLabel("StockQuantity").FillAsync("7");
+        await page.GetByLabel("Stock quantity").FillAsync("7");
         await page.GetByLabel("Category", new() { Exact = true }).SelectOptionAsync(categoryId.ToString());
         await page.GetByLabel("Product Image (optional)").SetInputFilesAsync(new FilePayload
         {
@@ -201,7 +208,7 @@ internal static class BrowserRunner
         var productId = product.GetProperty("id").GetInt32();
         Check(product.GetProperty("imageUrl").GetString()!.StartsWith("/images/products/"), "Browser multipart image upload failed.");
         await page.GotoAsync($"/Products/Edit/{productId}");
-        await page.GetByLabel("StockQuantity").FillAsync("9");
+        await page.GetByLabel("Stock quantity").FillAsync("9");
         await page.GetByRole(AriaRole.Button, new() { Name = "Save Changes", Exact = true }).ClickAsync();
         Check((await api.GetFromJsonAsync<JsonElement>($"/api/products/{productId}")).GetProperty("stockQuantity").GetInt32() == 9, "Product edit did not persist.");
 
@@ -269,18 +276,30 @@ internal static class BrowserRunner
         await Expect(page.GetByRole(AriaRole.Button, new() { Name = "Add Category", Exact = true })).ToBeEnabledAsync();
         await page.GetByLabel("Name", new() { Exact = true }).FillAsync("Submission guard");
         var release = new TaskCompletionSource(TaskCreationOptions.RunContinuationsAsynchronously);
+        var intercepted = new TaskCompletionSource(TaskCreationOptions.RunContinuationsAsynchronously);
         var requests = 0;
         await page.RouteAsync("**/Categories/Create", async route =>
         {
-            if (route.Request.Method == "POST") { Interlocked.Increment(ref requests); await release.Task; }
+            if (route.Request.Method == "POST")
+            {
+                Interlocked.Increment(ref requests);
+                intercepted.TrySetResult();
+                await release.Task;
+            }
             await route.ContinueAsync();
         });
         var submit = page.GetByRole(AriaRole.Button, new() { Name = "Add Category", Exact = true }).ClickAsync();
         try
         {
-            await Expect(page.Locator("#request-progress")).ToBeVisibleAsync();
-            await Expect(page.GetByRole(AriaRole.Button, new() { Name = "Add Category", Exact = true })).ToBeDisabledAsync();
-            await page.Locator("main form").EvaluateAsync("form => form.requestSubmit()");
+            await intercepted.Task.WaitAsync(TimeSpan.FromSeconds(15));
+            // Locator assertions wait for pending navigation, which this test deliberately
+            // holds open. Inspect the current document directly while the POST is gated.
+            await page.WaitForFunctionAsync(@"() => {
+                const progress = document.querySelector('#request-progress');
+                return !progress.hidden && progress.getBoundingClientRect().height > 0
+                    && document.querySelector('main form button[type=submit]').disabled;
+            }");
+            await page.EvaluateAsync("document.querySelector('main form').requestSubmit()");
         }
         finally { release.TrySetResult(); }
         await submit;
@@ -292,6 +311,40 @@ internal static class BrowserRunner
         var csrfStatus = await page.EvaluateAsync<int>(@"async () => (await fetch('/ShippingOptions/Create', { method:'POST', headers:{'Content-Type':'application/x-www-form-urlencoded'}, body:'Name=CSRF&Area=North&Price=1' })).status");
         Check(csrfStatus == 400, "A browser POST without an antiforgery token must fail.");
         Check(!(await api.GetFromJsonAsync<JsonElement[]>("/api/shippingoptions"))!.Any(x => x.GetProperty("name").GetString() == "CSRF"), "CSRF request wrote data.");
+    }
+
+    private static async Task WithoutJavaScript(IBrowser browser, BrowserHost host, HttpClient api)
+    {
+        await using var context = await browser.NewContextAsync(new()
+        {
+            BaseURL = host.Url, IgnoreHTTPSErrors = true, JavaScriptEnabled = false,
+            ViewportSize = new() { Width = 390, Height = 900 }
+        });
+        var page = await context.NewPageAsync();
+        await page.GotoAsync("/Account/Login");
+        await page.GetByLabel("Username", new() { Exact = true }).FillAsync("admin");
+        await page.GetByLabel("Password", new() { Exact = true }).FillAsync(host.Api.Password);
+        await page.GetByRole(AriaRole.Button, new() { Name = "Login", Exact = true }).ClickAsync();
+        await Expect(page.Locator("main h1")).ToHaveTextAsync("Dashboard");
+        await page.Locator("#admin-nav").GetByRole(AriaRole.Link, new() { Name = "Categories", Exact = true }).ClickAsync();
+        await page.GotoAsync("/Categories/Create");
+        await page.GetByRole(AriaRole.Button, new() { Name = "Add Category", Exact = true }).ClickAsync();
+        await Expect(page.Locator(".field-validation-error")).ToBeVisibleAsync();
+        await page.GetByLabel("Name", new() { Exact = true }).FillAsync("No script category");
+        await page.GetByRole(AriaRole.Button, new() { Name = "Add Category", Exact = true }).ClickAsync();
+        Check((await api.GetFromJsonAsync<JsonElement[]>("/api/categories"))!.Any(x => x.GetProperty("name").GetString() == "No script category"), "Server validation and submission must work without JavaScript.");
+        await page.GotoAsync("/Discounts/Create");
+        await Expect(page.Locator(".product-search")).ToBeHiddenAsync();
+        await page.GetByLabel("Name", new() { Exact = true }).FillAsync("No script discount");
+        await page.GetByLabel("Product ID", new() { Exact = true }).FillAsync("1");
+        await page.GetByLabel("Percentage", new() { Exact = true }).FillAsync("10");
+        await page.GetByLabel("Start date (UTC)").FillAsync("2030-01-01T10:00");
+        await page.GetByLabel("End date (UTC)").FillAsync("2030-02-01T10:00");
+        await page.Locator("main form button[type=submit]").ClickAsync();
+        await Expect(page.Locator("main .alert-success")).ToBeVisibleAsync();
+        Check((await api.GetFromJsonAsync<JsonElement[]>("/api/discounts"))!.Any(x => x.GetProperty("name").GetString() == "No script discount" && x.GetProperty("productId").GetInt32() == 1), "Numeric product selection must work without JavaScript.");
+        await page.GetByRole(AriaRole.Button, new() { Name = "Sign out admin" }).ClickAsync();
+        await Expect(page).ToHaveURLAsync(new System.Text.RegularExpressions.Regex("/Account/Login"));
     }
 
     private static async Task Picker(IPage page)

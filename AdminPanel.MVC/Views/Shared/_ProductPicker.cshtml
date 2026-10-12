@@ -2,7 +2,7 @@
     <label for="ProductId" class="form-label">Product ID</label>
     @Html.TextBox("ProductId", (object?)ViewBag.SelectedProductId, new { type = "number", min = "1", @class = "form-control", aria_describedby = "product-help" })
     @Html.ValidationMessage("ProductId", null, new { @class = "text-danger" })
-    <p id="product-help" class="form-text">Enter a product ID, or search below. Leave blank for all products when filtering.</p>
+    <p id="product-help" class="form-text">Enter a product ID, or search below.@(ViewData["ProductFilter"] is true ? " Leave blank for all products." : " Choose one existing product.")</p>
     <p class="product-selection text-muted" role="status">@(ViewBag.SelectedProductName is string name ? "Selected: " + name : "")</p>
     <div class="product-search" hidden>
         <label for="ProductSearch" class="form-label">Find product</label>

@@ -6,7 +6,7 @@
 @if (!Model.Items.Any()) { <p class="alert alert-info">No orders found. Adjust the filters.</p> }
 else
 {
-    <div class="table-responsive"><table class="table table-striped align-middle">
+    <div class="table-responsive" role="region" aria-label="Scrollable records" tabindex="0"><table class="table table-striped align-middle">
         <caption>Stored order amounts; currency is not configured. Dates are UTC.</caption>
         <thead><tr><th scope="col">Order</th><th scope="col">Customer</th><th scope="col">Status</th><th scope="col">Date (UTC)</th><th scope="col">Total</th><th scope="col">Actions</th></tr></thead>
         <tbody>@foreach (var order in Model.Items)

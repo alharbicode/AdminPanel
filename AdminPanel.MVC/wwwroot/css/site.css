@@ -5,6 +5,7 @@ body { margin-bottom: 40px; }
 }
 .management-form { max-width: 52rem; }
 .pagination { flex-wrap: wrap; gap: .2rem; }
+.table-responsive > table { min-width: 44rem; }
 .content-preview { white-space: pre-wrap; overflow-wrap: anywhere; }
 td, dd { overflow-wrap: anywhere; }
 .field-validation-error { display: block; margin-top: .25rem; }

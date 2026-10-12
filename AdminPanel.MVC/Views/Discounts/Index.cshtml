@@ -1,5 +1,5 @@
 @model PagedList<DiscountViewModel>
-@{ ViewData["Title"] = "Discounts"; }
+@{ ViewData["Title"] = "Discounts"; ViewData["ProductFilter"] = true; }
 <div class="d-flex flex-wrap justify-content-between align-items-center gap-2 mb-3"><h1>Discounts</h1><a asp-action="Create" class="btn btn-primary">Create discount</a></div>
 <div asp-validation-summary="All" class="text-danger" role="alert"></div>
 <form method="get" asp-action="Index" class="row g-3 mb-4">
@@ -18,7 +18,7 @@
 }
 else
 {
-    <div class="table-responsive"><table class="table table-striped align-middle">
+    <div class="table-responsive" role="region" aria-label="Scrollable records" tabindex="0"><table class="table table-striped align-middle">
         <caption class="visually-hidden">Discounts</caption><thead><tr><th scope="col">Name</th><th scope="col">Product</th><th scope="col">Percentage</th><th scope="col">Start (UTC)</th><th scope="col">End (UTC)</th><th scope="col">Actions</th></tr></thead>
         <tbody>@foreach (var item in Model.Items)
         {

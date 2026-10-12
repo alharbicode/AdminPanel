@@ -63,10 +63,11 @@ try {
     Invoke-Dotnet @bootstrapArguments
 
     $certificate = New-SelfSignedCertificate -DnsName localhost -CertStoreLocation Cert:\CurrentUser\My -NotAfter (Get-Date).AddHours(2) -KeyExportPolicy Exportable
-    # X509Store.Add on Windows can display a root-trust dialog. Certutil's explicit
-    # force switch makes this generated, CI-only certificate import unattended.
+    # CurrentUser Root imports display a trust dialog even with certutil -f.
+    # The disposable hosted runner is elevated: import this short-lived test root
+    # into LocalMachine, then remove that exact certificate in finally.
     [IO.File]::WriteAllBytes($publicCertificatePath, $certificate.Export([Security.Cryptography.X509Certificates.X509ContentType]::Cert))
-    & certutil -user -f -addstore Root $publicCertificatePath
+    & certutil -f -addstore Root $publicCertificatePath
     if ($LASTEXITCODE -ne 0) { throw 'Could not trust the temporary CI localhost certificate.' }
     Write-Output 'WINDOWS SMOKE: migrations and bootstrap complete; temporary HTTPS certificate trusted.'
     $certificatePassword = [Convert]::ToBase64String([Security.Cryptography.RandomNumberGenerator]::GetBytes(32))
@@ -108,8 +109,8 @@ try {
     & $localdb stop $instance -k
     & $localdb delete $instance
     if ($certificate) {
-        foreach ($storeName in @('Root', 'My')) {
-            $store = [Security.Cryptography.X509Certificates.X509Store]::new($storeName, 'CurrentUser')
+        foreach ($target in @(@{Name='Root'; Location='LocalMachine'}, @{Name='My'; Location='CurrentUser'})) {
+            $store = [Security.Cryptography.X509Certificates.X509Store]::new($target.Name, $target.Location)
             $store.Open('ReadWrite')
             try { $store.Remove($certificate) } finally { $store.Close() }
         }

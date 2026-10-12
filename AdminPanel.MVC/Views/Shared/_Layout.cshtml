@@ -43,7 +43,7 @@
     <div id="request-progress" class="container" role="status" aria-live="polite" hidden>
         <p class="alert alert-info"><span class="spinner-border spinner-border-sm me-2" aria-hidden="true"></span><span id="request-progress-text">Loading…</span></p>
     </div>
-    <div class="container"><main id="main-content" role="main" class="pb-3">
+    <div class="container"><main id="main-content" role="main" class="pb-3" tabindex="-1">
         @if (TempData["Success"] is string message) { <div class="alert alert-success" role="status">@message</div> }
         @RenderBody()
     </main></div>

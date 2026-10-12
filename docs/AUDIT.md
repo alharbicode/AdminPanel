@@ -63,9 +63,37 @@ Phase 2 passed [PR verification run 38308393672](https://github.com/alharbicode/
 - [x] Server-side pagination/search and relevant filters for the three new lists.
 - [x] Validation, encoded content preview, confirmation/success feedback, responsive navigation/tables, submit progress and duplicate-submit prevention.
 - [x] Record passing Phase 2 CI on SQLite and SQL Server (45 tests per provider).
-- [ ] Categories/products/orders list pagination and product-picker autocomplete for large catalogs (existing lists remain usable).
+- [x] Categories/products/orders database pagination, search/filter/sort and bounded searchable product selection (Phase 3).
 - [ ] Product decisions: customer onboarding/checkout, shipping/discount/tax calculations, currency, Staff permissions, fulfillment transitions and retained cancellation history.
 - [ ] Operational follow-ups: orphan image cleanup policy, image decoding/malware scanning, shared Data Protection keys and distributed rate limiting for multiple instances.
-- [ ] Browser-driven visual/accessibility QA across supported browsers; current tests verify server-rendered behavior, not pixel layout.
+- [x] Add real Chromium/Firefox workflow and responsive-layout checks; Phase 3 records executed results below. Full manual accessibility certification and other browsers remain separate.
 
 No new schema migration or new secret/configuration is required for Phase 2. Existing production data was not accessed and deployment/merge are excluded.
+
+## Phase 3 implementation and acceptance
+
+| Feature | Implementation and verification criterion |
+| --- | --- |
+| Categories | Database paging, name/description search, has-products filter, ID/name sort with stable ID tie-breakers; filters survive paging. |
+| Products | Database paging, name/description search, category/availability/stock filters, ID/name/stock sort; invalid queries return 400 and extreme pages are bounded. |
+| Orders | Database paging; exact ID or customer username/email search; stored status and inclusive UTC date filters; newest/oldest/ID sorting. No checkout or transition rules added. |
+| Product selection | Discount forms and filters fetch at most 20 ID/name pairs; Enter/search, result pages, loading/empty/retry states, explicit selection and numeric-ID fallback. No new frontend dependency. |
+| Browser usability | Real Chromium/Firefox against both application request pipelines. Every administration route is rendered at 1365, 390 and 320 pixels; form labels, headings, language/main landmark and viewport overflow are checked. CRUD, uploads, filters, navigation, keyboard skip link, corrected validation, submit progress/duplicate prevention, back navigation, CSRF rejection and login/logout have executable checks. |
+| Progressive enhancement | Separate JavaScript-disabled browser context verifies mobile navigation, server validation, category creation and numeric product selection on discount creation. |
+| Windows readiness | Document SDK, LocalDB, private configuration, JWT generation, explicit migrations/bootstrap and both HTTPS projects. CI creates a unique LocalDB instance and runs actual API/MVC processes with a temporary trusted certificate, then checks login, shipping creation and missing-token rejection. |
+
+The browser runner uses the official Microsoft.Playwright package with Chromium and Firefox. Its HTTPS bridge forwards to the actual MVC TestServer and API TestServer pipelines; the separate Windows smoke job exercises two standalone HTTPS processes. Fixtures use random credentials and disposable databases only. Browser artifacts contain screenshots and result JSON, without authentication traces or credentials.
+
+Browser testing reproduced a corrected-field click being swallowed by validation layout changes; fields now revalidate while being corrected and reserve error-message space. Screenshot review also found unreadable compressed mobile table cells; tables now preserve readable width in keyboard-focusable scroll regions. Other repairs include semantic headings, a keyboard-focusable skip target, descriptive stock labels, and UTC dates and amount formatting without an assumed currency consistent with the existing data.
+
+### Phase 3 verification status
+
+Final verification is in progress. The latest completed integration runs pass **57 tests on SQLite and 57 on SQL Server**. The first complete browser pass through all screens and CRUD workflows succeeded, but its loading-state assertion blocked on its own deliberately held navigation; the harness was corrected and the complete suite is being rerun. Windows migrations and administrator insertion have executed; the standalone HTTPS smoke check is not yet declared passed. Final CI links and counts will replace this status after verification.
+
+### Remaining gaps
+
+- Staff permissions, customer onboarding/checkout, shipping/discount/tax calculations, currency, fulfillment transitions and retained cancellation history still require product decisions.
+- Category dropdowns still load all categories; product pickers are bounded. Legacy unpaged API collection endpoints remain for compatibility. Search follows each database's collation; no fuzzy search or large-scale performance claim is made.
+- Browser checks cover Chromium/Firefox and selected desktop/phone widths. WebKit/Safari, physical mobile devices, screen-reader testing, full contrast/WCAG review and production infrastructure are not verified.
+- Image decoding/malware scanning, orphan cleanup, shared Data Protection keys and distributed rate limiting remain operational follow-ups. Plan the separately scoped framework support upgrade.
+- The local agent host lacks a usable .NET SDK; builds and full application tests execute in GitHub Actions. No production data, master merge or deployment is involved.

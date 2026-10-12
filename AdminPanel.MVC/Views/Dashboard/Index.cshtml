@@ -37,7 +37,7 @@
 @if (Model.RecentOrders.Count == 0) { <p class="text-muted">No orders yet.</p> }
 else
 {
-    <div class="table-responsive"><table class="table table-striped">
+    <div class="table-responsive" role="region" aria-label="Scrollable records" tabindex="0"><table class="table table-striped">
         <caption>Five most recent orders. Totals are stored order amounts; currency is not configured.</caption>
         <thead><tr><th scope="col">Order</th><th scope="col">Customer</th><th scope="col">Date (UTC)</th><th scope="col">Status</th><th scope="col">Total</th></tr></thead>
         <tbody>@foreach (var order in Model.RecentOrders)
