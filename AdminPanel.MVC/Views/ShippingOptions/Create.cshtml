@@ -1,0 +1,9 @@
+@model ShippingOptionViewModel
+@{ ViewData["Title"] = "Create shipping option"; }
+<h1>@ViewData["Title"]</h1>
+<form asp-action="Create" method="post" class="management-form">
+    <partial name="_Form" model="Model" />
+    <button class="btn btn-primary" type="submit">Create</button>
+    <a asp-action="Index" class="btn btn-outline-secondary">Cancel</a>
+</form>
+@section Scripts { <partial name="_ValidationScriptsPartial" /> }

@@ -1,0 +1,10 @@
+@model DiscountViewModel
+<div asp-validation-summary="All" class="text-danger" role="alert"></div>
+<input type="hidden" asp-for="Id" />
+<p class="text-muted">This configures a discount record. Applying discounts to checkout is not implemented.</p>
+<div class="mb-3"><label asp-for="Name" class="form-label"></label><input asp-for="Name" class="form-control" maxlength="200" /><span asp-validation-for="Name" class="text-danger"></span></div>
+<div class="mb-3"><label asp-for="ProductId" class="form-label"></label><select asp-for="ProductId" asp-items="ViewBag.Products" class="form-select"><option value="">Choose a product</option></select><span asp-validation-for="ProductId" class="text-danger"></span><div class="form-text">Create a product first if the list is empty.</div></div>
+<div class="mb-3"><label asp-for="Percentage" class="form-label"></label><input asp-for="Percentage" type="number" min="0" max="100" step="0.01" class="form-control" /><span asp-validation-for="Percentage" class="text-danger"></span></div>
+<div class="mb-3"><label asp-for="StartDate" class="form-label"></label><input asp-for="StartDate" type="datetime-local" step="0.001" value="@(Model.StartDate == default ? "" : Model.StartDate.ToString("yyyy-MM-ddTHH:mm:ss.fff"))" class="form-control" aria-describedby="utc-help" /><span asp-validation-for="StartDate" class="text-danger"></span></div>
+<div class="mb-3"><label asp-for="EndDate" class="form-label"></label><input asp-for="EndDate" type="datetime-local" step="0.001" value="@(Model.EndDate == default ? "" : Model.EndDate.ToString("yyyy-MM-ddTHH:mm:ss.fff"))" class="form-control" aria-describedby="utc-help" /><span asp-validation-for="EndDate" class="text-danger"></span></div>
+<p id="utc-help" class="form-text">Enter both dates in UTC. The end must be after the start.</p>

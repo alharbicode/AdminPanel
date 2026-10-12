@@ -1,0 +1,6 @@
+@model ContentPageViewModel
+<div asp-validation-summary="All" class="text-danger" role="alert"></div>
+<input type="hidden" asp-for="Id" />
+<div class="mb-3"><label asp-for="Title" class="form-label"></label><input asp-for="Title" class="form-control" maxlength="200" /><span asp-validation-for="Title" class="text-danger"></span></div>
+<div class="mb-3"><label asp-for="Slug" class="form-label"></label><input asp-for="Slug" class="form-control" maxlength="200" aria-describedby="slug-help" /><span asp-validation-for="Slug" class="text-danger"></span><div id="slug-help" class="form-text">Unique page identifier. Letters, numbers, spaces and hyphens only. Saved in lowercase, with spaces replaced by hyphens.</div></div>
+<div class="mb-3"><label asp-for="Content" class="form-label"></label><textarea asp-for="Content" class="form-control font-monospace" rows="14" maxlength="100000" aria-describedby="content-help"></textarea><span asp-validation-for="Content" class="text-danger"></span><div id="content-help" class="form-text">Content is displayed as text in administration. Any markup is stored without executing it.</div></div>

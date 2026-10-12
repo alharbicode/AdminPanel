@@ -5,7 +5,7 @@ ASP.NET Core **.NET 8** Web API and MVC administration client, using **EF Core 9
 ## Projects and implemented features
 
 - `AdminPanel/`: API, JWT authentication, EF models/migrations, category and product CRUD, product image uploads, order creation/list/details/status/cancellation, shipping options, discounts and content page CRUD.
-- `AdminPanel.MVC/`: administrator login/logout, navigation, category/product CRUD, order list/details/status/cancellation.
+- `AdminPanel.MVC/`: administrator login/logout, responsive navigation, category/product CRUD, order list/details/status/cancellation, full shipping/discount/content management and a data-backed dashboard.
 - `AdminPanel.Tests/`: xUnit integration tests. Both ASP.NET request pipelines run in-process with disposable relational databases. SQLite is the default; CI also runs the full suite against SQL Server 2022 with all migrations. Tests never use the application connection string.
 - `docs/AUDIT.md`: findings, prioritized acceptance criteria, assumptions and verification record.
 
@@ -116,13 +116,25 @@ Login returns a short-lived JWT to the MVC server. MVC stores it inside its encr
 - Content slugs normalize to lowercase hyphenated values and are unique. Duplicate slugs/usernames are also blocked by database constraints.
 - Unknown IDs return 404; invalid input returns 400; authorization uses 401/403. Unexpected errors do not expose database details.
 
+## Administration UI (Phase 2)
+
+Use the Shipping, Discounts and Content pages navigation links after signing in as an Admin. Each area supports list, details, create, edit and a separate delete confirmation. Validation retains entered fields; conflicts explain what must change. POST forms use antiforgery tokens. Submission progress and duplicate-submit prevention are progressive enhancements.
+
+- Shipping: search name/area and filter by area. Referenced shipping options cannot be deleted.
+- Discounts: choose an existing product, enter a percentage with at most two decimal places and start/end dates in **UTC**. Filter by product or the stored date window (Upcoming, Includes now, Ended). These labels do not imply checkout eligibility or application.
+- Content pages: search title/slug; edit the body as text. The details preview encodes markup instead of executing stored HTML. Slugs follow the existing lowercase/space-to-hyphen normalization and uniqueness constraint.
+- All three lists page in the database with a stable ID ordering, ten records by default, and a maximum of 100 per page. Pagination retains search/filter values and clamps pages beyond the last result. Search case sensitivity follows the database collation.
+- Dashboard: catalog/administration counts, available/unavailable/zero-stock product counts, existing order statuses and five recent orders. Amounts are stored order totals; no currency, revenue recognition or checkout calculation is inferred. Counts refresh on page load and are not a transactional reporting snapshot.
+
+Existing mutation and collection API contracts remain unchanged. Additive reads: `GET /api/{shippingoptions|discounts|contentpages}/admin/list` accepts `Page`, `PageSize`, `Search`, with `Area` for shipping and `ProductId`/`Period` (`upcoming`, `current`, `ended`) for discounts. Responses contain `items`, `totalCount`, `page`, `pageSize`. Content list bodies are omitted. Individual reads are `/api/shippingoptions/{id}`, `/api/discounts/{id}`, `/api/contentpages/by-id/{id}`; the original content slug endpoint remains available. `/api/dashboard` returns dashboard statistics. All require Admin authentication.
+
 ## Verification and remaining scope
 
-CI runs restore, Release build, all integration tests on SQLite and SQL Server 2022, EF model/migration checks, SQL script generation and a dependency vulnerability audit. The verified suite contains 33 tests per provider. See `docs/AUDIT.md` for run links and results.
+CI runs restore, Release build, all integration tests on SQLite and SQL Server 2022, EF model/migration checks, SQL script generation and a dependency vulnerability audit. Phase 1 verified 33 tests per provider; Phase 2 extends this suite (see the acceptance record for the latest results). See `docs/AUDIT.md` for run links and results.
 
 The integration suite covers authentication, token validation, Admin-only authorization, CSRF protection, MVC-to-API category/product/order flows, uploads, input validation, reference constraints, and stock/cancellation concurrency.
 
-Outstanding product decisions: Staff permissions, customer onboarding/checkout, discount/shipping/tax calculation, currency, fulfillment transition rules, retained cancellation history, and UI screens for shipping/discount/content management. Dashboard analytics and pagination are not implemented. Old/replaced image files are deliberately retained to avoid deleting shared legacy assets; an explicit orphan cleanup policy remains future work. Images have size/type/signature checks, not malware scanning or image decoding. Multi-instance hosting requires shared MVC Data Protection keys and distributed rate limiting.
+Outstanding product decisions: Staff permissions, customer onboarding/checkout, discount/shipping/tax calculation, currency, fulfillment transition rules, retained cancellation history, and a retained order audit trail. Categories, products and orders still use their original unpaginated lists; the new three management areas use server-side pagination. Product pickers currently load the product catalog. Old/replaced image files are deliberately retained to avoid deleting shared legacy assets; an explicit orphan cleanup policy remains future work. Images have size/type/signature checks, not malware scanning or image decoding. Multi-instance hosting requires shared MVC Data Protection keys and distributed rate limiting.
 
 For optional local SQL Server integration runs, `ADMINPANEL_TEST_SQLSERVER` must point to a disposable server at `localhost,1433` or `127.0.0.1,1433`, with permission to create/drop databases. The fixture ignores the supplied database name, generates a unique `AdminPanel_Test_` database per test, applies migrations and deletes that database afterwards. CI generates ephemeral credentials and stops its container after verification. Keep this variable unset for normal SQLite tests.
 

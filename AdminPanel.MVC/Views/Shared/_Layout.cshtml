@@ -8,25 +8,44 @@
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
 </head>
 <body>
+    <a class="visually-hidden-focusable" href="#main-content">Skip to content</a>
     <header>
-        <nav class="navbar navbar-expand-sm navbar-light bg-white border-bottom mb-3">
+        <nav class="navbar navbar-expand-xl navbar-light bg-white border-bottom mb-3" aria-label="Main navigation">
             <div class="container">
                 <a class="navbar-brand" asp-controller="Dashboard" asp-action="Index">AdminPanel</a>
                 @if (User.Identity?.IsAuthenticated == true)
                 {
-                    <div class="navbar-nav flex-row gap-3">
-                        <a class="nav-link" asp-controller="Categories" asp-action="Index">Categories</a>
-                        <a class="nav-link" asp-controller="Products" asp-action="Index">Products</a>
-                        <a class="nav-link" asp-controller="Orders" asp-action="Index">Orders</a>
+                    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#admin-nav" aria-controls="admin-nav" aria-expanded="false" aria-label="Toggle navigation"><span class="navbar-toggler-icon"></span></button>
+                    <div id="admin-nav" class="collapse navbar-collapse">
+                        <div class="navbar-nav me-auto">
+                            @foreach (var entry in new[] {
+                                new { Controller = "Dashboard", Label = "Dashboard" },
+                                new { Controller = "Categories", Label = "Categories" },
+                                new { Controller = "Products", Label = "Products" },
+                                new { Controller = "Orders", Label = "Orders" },
+                                new { Controller = "ShippingOptions", Label = "Shipping" },
+                                new { Controller = "Discounts", Label = "Discounts" },
+                                new { Controller = "ContentPages", Label = "Content pages" } })
+                            {
+                                var active = ViewContext.RouteData.Values["controller"]?.ToString() == entry.Controller;
+                                <a class="nav-link @(active ? "active" : "")" asp-controller="@entry.Controller" asp-action="Index" aria-current="@(active ? "page" : null)">@entry.Label</a>
+                            }
+                        </div>
+                        <form asp-controller="Account" asp-action="Logout" method="post">
+                            <button class="btn btn-outline-secondary text-nowrap" type="submit">Sign out @User.Identity.Name</button>
+                        </form>
                     </div>
-                    <form asp-controller="Account" asp-action="Logout" method="post">
-                        <button class="btn btn-outline-secondary" type="submit">Sign out @User.Identity.Name</button>
-                    </form>
                 }
             </div>
         </nav>
     </header>
-    <div class="container"><main role="main" class="pb-3">@RenderBody()</main></div>
+    <div id="request-progress" class="container" role="status" aria-live="polite" hidden>
+        <p class="alert alert-info"><span class="spinner-border spinner-border-sm me-2" aria-hidden="true"></span><span id="request-progress-text">Loading…</span></p>
+    </div>
+    <div class="container"><main id="main-content" role="main" class="pb-3">
+        @if (TempData["Success"] is string message) { <div class="alert alert-success" role="status">@message</div> }
+        @RenderBody()
+    </main></div>
     <script src="~/lib/jquery/dist/jquery.min.js"></script>
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
     <script src="~/js/site.js" asp-append-version="true"></script>
