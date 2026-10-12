@@ -139,7 +139,9 @@ Discount create/edit/filter screens search products by name or description throu
 
 ## Verification and remaining scope
 
-CI runs restore, Release build, all integration tests on SQLite and SQL Server 2022, EF model/migration checks, SQL script generation and a dependency vulnerability audit. The integration suite contains **57 tests per provider**. Chromium/Firefox browser checks and a separate Windows LocalDB/HTTPS smoke check are also configured; see the audit for completed-run evidence. See `docs/AUDIT.md` for run links and results.
+CI runs restore, Release build, all integration tests on SQLite and SQL Server 2022, EF model/migration checks, SQL script generation and a dependency vulnerability audit. Phase 3 passed **57 integration tests per provider**, **329 explicit browser checks plus Playwright assertions per browser/provider** in Chromium and Firefox, and the standalone Windows LocalDB/HTTPS smoke check. See [docs/AUDIT.md](docs/AUDIT.md) for run links, screen coverage and results.
+
+Browser checks include 26 administration routes at desktop and phone widths, CRUD/uploads/order cancellation, filters and product search, validation, loading/duplicate prevention, CSRF, keyboard navigation and JavaScript-disabled forms. Screenshots/result artifacts are retained by CI. These are selected accessibility and layout checks, not a full WCAG audit; WebKit and physical devices remain unverified.
 
 The integration suite covers authentication, token validation, Admin-only authorization, CSRF protection, MVC-to-API category/product/order/shipping/discount/content flows, dashboard counts, search/filter/pagination, encoded content, uploads, input validation, reference constraints, and stock/cancellation concurrency.
 

@@ -43,7 +43,7 @@ The first CI test run found optional descriptions incorrectly rejected by implic
 
 The host has no usable `dotnet` on PATH. A workspace-only SDK download was attempted but its transfer stalled/reset, so all .NET verification above was actually executed on GitHub's Ubuntu runners with SDK 8.0.425. No local or production database was touched. SQL Server test databases use unique names and are dropped on disposal; the ephemeral container is removed by CI.
 
-P0/P1 repairs and the P2 reproducibility work listed above are implemented. Phase 2 implements the previously missing secondary screens; remaining scope is tracked below. No browser-driven visual QA, live deployment, or migration against existing production data is claimed. Image signatures are checked but files are not fully decoded or malware-scanned; old assets remain pending an explicit cleanup policy.
+P0/P1 repairs and the P2 reproducibility work listed above are implemented. Phase 2 implements the previously missing secondary screens; remaining scope is tracked below. Phase 1 did not include browser-driven QA; Phase 3 results appear below. No live deployment or migration against existing production data is claimed. Image signatures are checked but files are not fully decoded or malware-scanned; old assets remain pending an explicit cleanup policy.
 
 ## Phase 2 acceptance and remaining-work checklist
 
@@ -86,9 +86,33 @@ The browser runner uses the official Microsoft.Playwright package with Chromium 
 
 Browser testing reproduced a corrected-field click being swallowed by validation layout changes; fields now revalidate while being corrected and reserve error-message space. Screenshot review also found unreadable compressed mobile table cells; tables now preserve readable width in keyboard-focusable scroll regions. Other repairs include semantic headings, a keyboard-focusable skip target, descriptive stock labels, and UTC dates and amount formatting without an assumed currency consistent with the existing data.
 
-### Phase 3 verification status
+Browser JavaScript-error checks also exposed jQuery Validate's unsupported `step` rule on discount `datetime-local` fields. The adapter delegates that rule to native input validity while preserving millisecond values and all server validation. Browser fixtures preserve their real loopback host in authentication redirects. The submission test holds the default navigation after normal application handlers, checks loading/duplicate prevention, then resumes a real form POST and verifies the database record; it does not mock API responses.
 
-Final verification is in progress. The latest completed integration runs pass **57 tests on SQLite and 57 on SQL Server**. The first complete browser pass through all screens and CRUD workflows succeeded, but its loading-state assertion blocked on its own deliberately held navigation; the harness was corrected and the complete suite is being rerun. Windows migrations and administrator insertion have executed; the standalone HTTPS smoke check is not yet declared passed. Final CI links and counts will replace this status after verification.
+### Phase 3 verification results
+
+Verified on **2026-10-12**, commit `688dfe1`, in [PR run 38319499503](https://github.com/alharbicode/AdminPanel/actions/runs/38319499503):
+
+| Check | Executed result |
+| --- | --- |
+| Restore and Release build | Passed on SQLite, SQL Server and Windows; zero compiler warnings/errors. |
+| Integration tests | **57/57 SQLite and 57/57 SQL Server 2022**, zero failures or skips. |
+| Chromium browser workflows | **329 explicit checks plus Playwright assertions passed with each database.** |
+| Firefox browser workflows | **329 explicit checks plus Playwright assertions passed with each database.** |
+| Screen coverage | **26 administration routes at 1365, 390 and 320 pixels** per browser/provider; 312 screen renders across four combinations, plus login and interaction journeys. |
+| Browser interactions | CRUD across five management areas, multipart product upload, order status/cancellation/stock restoration, search/filter/paging, bounded picker/retry, client/server validation, stored markup encoding, loading/duplicate prevention, back navigation, CSRF rejection, keyboard skip link, mobile navigation, JavaScript-disabled forms and login/logout passed. No unexpected page JavaScript errors. |
+| Windows standalone smoke | Fresh LocalDB migrations and administrator bootstrap; two real HTTPS processes with trusted TLS; MVC/API login and shipping creation; missing-CSRF rejection; owned database/instance cleanup passed. |
+| SQL Server migrations | Full migration chain applied to isolated databases; no pending model changes; idempotent SQL generated as artifact. |
+| Dependency audit | No vulnerable NuGet packages reported by configured sources, including transitive dependencies in all four projects. |
+
+Screenshots and result JSON are in each database's verification artifact. Selected Chromium/Firefox desktop and phone screenshots were also inspected manually; the mobile-table fix was rechecked in screenshots. These layout and accessibility basics are not a full visual regression or WCAG certification. The agent host's minimal browser reproduction verified the corrected-validation click; the full .NET and browser suites ran in CI, not on that host.
+
+Windows CI initially stalled on an interactive CurrentUser root-certificate prompt. The CI-only script now trusts the short-lived localhost certificate in the disposable runner's machine store and removes that exact certificate during cleanup. Application TLS checks remain enabled. CI has bounded job timeouts and a push-only job that cancels older verification runs on the same branch; only this cleanup job has `actions: write`, while build/test jobs retain read-only repository permissions.
+
+- [x] Database paging/search/filter/sort for all requested lists and bounded product selection.
+- [x] Real browser workflows on both relational providers, including JavaScript and no-JavaScript paths.
+- [x] Isolated SQL Server migrations and standalone Windows HTTPS setup verification.
+- [x] Windows setup, verification evidence and remaining limitations documented.
+- [ ] Full manual accessibility review, WebKit/physical-device coverage and the product/operational decisions below.
 
 ### Remaining gaps
 
