@@ -3,9 +3,10 @@
 Baseline: `afdeda5208a2dc75bf410771e47b3ff7a55c5aef` on `master`.
 Development branch: `codex/audit-repair-adminpanel`.
 
-The administration repair results below are historical. The latest addition is **Storefront Phase 1**
-on `codex/storefront-phase-one`, based on `codex/premium-dashboard-ui`; its scope, verification and
-remaining work are recorded at the end of this document and in [STOREFRONT.md](STOREFRONT.md).
+The administration repair and Storefront Phase 1 results below are historical. The latest addition is
+**Storefront Phase 2** on `codex/storefront-phase-two`, based on `codex/storefront-phase-one`.
+Its customer accounts/cart scope, migration considerations and remaining work are recorded in
+[STOREFRONT-PHASE-2.md](STOREFRONT-PHASE-2.md). Final Phase 2 CI results will be recorded below.
 
 ## Priorities and acceptance criteria
 
@@ -17,7 +18,7 @@ remaining work are recorded at the end of this document and in [STOREFRONT.md](S
 
 ## Product decisions and boundaries
 
-- The user confirmed **Admin only** administration for this repair; Staff permissions remain unspecified. Customer self-service is not implemented or inferred.
+- The user confirmed **Admin only** administration for this repair; Staff permissions remain unspecified. Storefront Phase 2 now adds explicitly approved customer accounts and carts; customer checkout remains out of scope.
 - Existing order creation totals product line prices only. Applying discounts/shipping, currency/tax rules, and fulfillment transition rules require product decisions.
 - Preserve the existing DELETE cancellation contract (remove the order and restore stock). A retained audit/history cancellation workflow is a separate product decision.
 - Preserve the status values already offered in the MVC screen: Pending, Confirmed, Shipped, Delivered, Cancelled. Cancelled must use cancellation so stock cannot silently diverge.

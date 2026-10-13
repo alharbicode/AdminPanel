@@ -1,0 +1,31 @@
+@model CartPage
+@{ ViewData["Title"] = T["Cart"]; }
+<div class="container page-content">
+    <div class="page-heading"><h1>@T["Cart"]</h1><p>@T["CartEstimate"]</p></div>
+    @if (Model.MergePending) {
+        <div class="store-notice" role="status"><p>@T["MergePending"]</p><form asp-action="Merge" method="post"><button class="button">@T["RetryMerge"]</button></form></div>
+    }
+    @if (Model.Cart.Adjusted) { <p class="store-notice" role="status">@T["CartAdjusted"]</p> }
+    @if (Model.Cart.Items.Count == 0) {
+        <div class="empty-state"><h2>@T["CartEmpty"]</h2><a class="button" asp-controller="Catalog" asp-action="Index">@T["ContinueBrowsing"]</a></div>
+    } else {
+        <div class="cart-layout"><div class="cart-lines">
+        @foreach (var item in Model.Cart.Items) {
+            <article class="cart-line" data-product-id="@item.ProductId">
+                <a asp-controller="Catalog" asp-action="Details" asp-route-id="@item.ProductId"><img src="@(item.HasImage ? Url.Action("Image","Catalog",new { id = item.ProductId }) : Url.Content("~/images/product-placeholder.svg"))" alt="@item.Name" width="100" height="100" data-product-image /></a>
+                <div class="cart-line-copy"><h2><a asp-controller="Catalog" asp-action="Details" asp-route-id="@item.ProductId" dir="auto">@item.Name</a></h2><p><bdi>@T.Price(item.Price)</bdi> @T["YER"]</p>
+                    <form asp-action="Update" method="post" class="quantity-form">
+                        <input type="hidden" name="ProductId" value="@item.ProductId" /><input type="hidden" name="Version" value="@Model.Cart.Version" />
+                        <label for="qty-@item.ProductId">@T["Quantity"]</label><input id="qty-@item.ProductId" name="Quantity" type="number" inputmode="numeric" min="1" max="@item.MaximumQuantity" value="@item.Quantity" required />
+                        <button class="button button-compact">@T["UpdateCart"]</button>
+                    </form>
+                    <form asp-action="Remove" method="post"><input type="hidden" name="ProductId" value="@item.ProductId" /><input type="hidden" name="Version" value="@Model.Cart.Version" /><button class="text-button">@T["Remove"]</button></form>
+                </div><p class="cart-line-total"><bdi>@T.Price(item.LineTotal)</bdi> @T["YER"]</p>
+            </article>
+        }
+        </div><aside class="cart-summary"><h2>@T["EstimatedTotal"]</h2><p class="detail-price"><bdi>@T.Price(Model.Cart.Total)</bdi> @T["YER"]</p><p>@T["CartEstimate"]</p><a class="button" asp-controller="Catalog" asp-action="Index">@T["ContinueBrowsing"]</a>
+        @if (User.Identity?.IsAuthenticated != true) { <p><a asp-controller="Account" asp-action="Login">@T["SignInToSave"]</a></p> }
+        </aside></div>
+    }
+</div>
+

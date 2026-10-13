@@ -28,6 +28,13 @@ builder.Services.AddDbContext<ApplicationDbContext>(options => options.UseSqlSer
 builder.Services.AddScoped<JwtTokenService>();
 builder.Services.AddScoped<IPasswordHasher<User>, PasswordHasher<User>>();
 builder.Services.AddScoped<ProductImageStore>();
+builder.Services.AddSingleton(TimeProvider.System);
+builder.Services.AddScoped<CatalogVisibility>();
+builder.Services.AddScoped<CartService>();
+builder.Services.AddScoped<IPasswordResetEmail, PasswordResetEmail>();
+builder.Services.AddAuthentication().AddJwtBearer(CustomerSecurity.Scheme, options => CustomerSecurity.Configure(options, builder.Configuration));
+if (audience == CustomerSecurity.Audience)
+    throw new InvalidOperationException("Administrator and customer token audiences must be distinct.");
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme).AddJwtBearer(options =>
 {
     options.TokenValidationParameters = new TokenValidationParameters
@@ -56,6 +63,12 @@ builder.Services.AddAuthorization(options =>
 builder.Services.AddRateLimiter(options =>
 {
     options.RejectionStatusCode = StatusCodes.Status429TooManyRequests;
+    options.AddPolicy("customer-auth", context => RateLimitPartition.GetFixedWindowLimiter(
+        context.Connection.RemoteIpAddress?.ToString() ?? "unknown",
+        _ => new FixedWindowRateLimiterOptions { PermitLimit = 20, Window = TimeSpan.FromMinutes(1), QueueLimit = 0 }));
+    options.AddPolicy("guest-cart", context => RateLimitPartition.GetFixedWindowLimiter(
+        context.Connection.RemoteIpAddress?.ToString() ?? "unknown",
+        _ => new FixedWindowRateLimiterOptions { PermitLimit = 30, Window = TimeSpan.FromMinutes(1), QueueLimit = 0 }));
     options.AddPolicy("login", context => RateLimitPartition.GetFixedWindowLimiter(
         context.Connection.RemoteIpAddress?.ToString() ?? "unknown",
         _ => new FixedWindowRateLimiterOptions { PermitLimit = 10, Window = TimeSpan.FromMinutes(1), QueueLimit = 0 }));
@@ -75,6 +88,11 @@ app.UseExceptionHandler();
 app.Use(async (context, next) =>
 {
     try { await next(context); }
+    catch (CartProblem problem)
+    {
+        context.Response.StatusCode = problem.Status;
+        await context.Response.WriteAsJsonAsync(new { code = problem.Code });
+    }
     catch (DbUpdateConcurrencyException)
     {
         await Results.Problem(statusCode: 409, title: "Data changed. Reload and retry.").ExecuteAsync(context);

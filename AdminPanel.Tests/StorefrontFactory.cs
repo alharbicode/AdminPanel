@@ -18,6 +18,8 @@ public sealed class StorefrontFactory(ApiFactory api, Func<HttpMessageHandler>? 
         { ["ApiSettings:BaseUrl"] = "https://localhost/api/catalog/", ["Store:Name"] = "Alharbi Store" }));
         builder.ConfigureServices(services => services.AddHttpClient<storefront::AdminPanel.Storefront.Services.CatalogClient>()
             .ConfigurePrimaryHttpMessageHandler(() => handler?.Invoke() ?? api.Server.CreateHandler()));
+        builder.ConfigureServices(services => services.AddHttpClient<storefront::AdminPanel.Storefront.Services.CustomerClient>()
+            .ConfigurePrimaryHttpMessageHandler(() => handler?.Invoke() ?? api.Server.CreateHandler()));
     }
     public HttpClient Client() => CreateClient(new WebApplicationFactoryClientOptions { BaseAddress = new Uri("https://localhost"), AllowAutoRedirect = false });
 }

@@ -108,7 +108,25 @@ try {
     if ($storePage.Content -notmatch 'lang="ar" dir="rtl"' -or $storePage.Content -notmatch 'Windows catalog product') { throw 'Arabic storefront catalog failed.' }
     $english = Invoke-WebRequest 'https://localhost:17989/Language/Change' -Method Post -WebSession $storeSession -Body @{culture='en';returnUrl='/Catalog/Details/1';__RequestVerificationToken=(Get-Token $storePage.Content)}
     if ($english.Content -notmatch 'lang="en" dir="ltr"' -or $english.Content -notmatch 'Windows catalog product') { throw 'English storefront details failed.' }
-    Write-Output 'WINDOWS SMOKE PASS: isolated LocalDB migrations, bootstrap, three HTTPS processes, trusted TLS, admin CRUD/CSRF and bilingual public storefront with actual catalog data.'
+    $cartToken = Get-Token $english.Content
+    $cart = Invoke-WebRequest 'https://localhost:17989/Cart/Add' -Method Post -WebSession $storeSession -Body @{ProductId='1'; Quantity='1'; __RequestVerificationToken=$cartToken}
+    if ($cart.Content -notmatch 'data-product-id="1"') { throw 'Guest cart add failed.' }
+    $register = Invoke-WebRequest 'https://localhost:17989/Account/Register' -WebSession $storeSession
+    $customerPassword = [Convert]::ToBase64String([Security.Cryptography.RandomNumberGenerator]::GetBytes(24))
+    $merged = Invoke-WebRequest 'https://localhost:17989/Account/Register' -Method Post -WebSession $storeSession -Body @{
+        DisplayName='Windows customer'; Email='windows-customer@example.test'; Password=$customerPassword
+        ConfirmPassword=$customerPassword; __RequestVerificationToken=(Get-Token $register.Content)
+    }
+    if ($merged.Content -notmatch 'data-product-id="1"') { throw 'Customer registration and cart merge failed.' }
+    Invoke-WebRequest 'https://localhost:17989/Account/Logout' -Method Post -WebSession $storeSession -Body @{__RequestVerificationToken=(Get-Token $merged.Content)} | Out-Null
+    $customerLogin = Invoke-WebRequest 'https://localhost:17989/Account/Login' -WebSession $storeSession
+    Invoke-WebRequest 'https://localhost:17989/Account/Login' -Method Post -WebSession $storeSession -Body @{
+        Email='windows-customer@example.test'; Password=$customerPassword; __RequestVerificationToken=(Get-Token $customerLogin.Content)
+    } | Out-Null
+    $saved = Invoke-WebRequest 'https://localhost:17989/Cart' -WebSession $storeSession
+    if ($saved.Content -notmatch 'data-product-id="1"') { throw 'Saved customer cart did not persist.' }
+    Remove-Variable customerPassword
+    Write-Output 'WINDOWS SMOKE PASS: isolated migrations, three HTTPS apps, admin CRUD/CSRF, bilingual catalog, customer registration/login/logout and guest/saved cart merging.'
 } finally {
     foreach ($process in $processes) {
         if (!$process.HasExited) { $process.Kill($true); $process.WaitForExit() }

@@ -11,15 +11,13 @@ namespace AdminPanel.API.Controllers;
 // Explicitly public READ surface. Existing controllers retain the Admin fallback policy.
 [ApiController, AllowAnonymous, Route("api/catalog")]
 [ResponseCache(NoStore = true, Location = ResponseCacheLocation.None)]
-public sealed class PublicCatalogController(ApplicationDbContext db, IConfiguration configuration,
-    IWebHostEnvironment environment) : ControllerBase
+public sealed class PublicCatalogController(ApplicationDbContext db,
+    IWebHostEnvironment environment, AdminPanel.API.Services.CatalogVisibility visibility) : ControllerBase
 {
     private IQueryable<Product> VisibleProducts()
     {
         // Empty/missing allowlist publishes nothing. Availability and stock are additional gates.
-        var approved = configuration.GetSection("PublicCatalog:ProductIds").Get<int[]>() ?? [];
-        return db.Products.AsNoTracking().Where(p => approved.Contains(p.Id) &&
-            p.IsAvailable && p.StockQuantity > 0 && p.Price >= 0 && p.Category != null);
+        return visibility.Products();
     }
 
     private static IQueryable<PublicProduct> Project(IQueryable<Product> rows) => rows.Select(p =>

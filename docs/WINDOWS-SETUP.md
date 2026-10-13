@@ -1,6 +1,8 @@
 # Windows development setup and verification
 
-Use this guide from a checkout of `codex/audit-repair-adminpanel`. These steps create a **local development database**. They do not deploy the application.
+These steps configure a **local development database**; they do not deploy the application.
+For `codex/storefront-phase-two`, also review the [Phase 2 migration and email guide](STOREFRONT-PHASE-2.md)
+before applying any migration. The agent has not changed the owner's local database.
 
 ## Install prerequisites
 

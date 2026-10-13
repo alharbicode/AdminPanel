@@ -1,5 +1,14 @@
 # AdminPanel
 
+## Customer accounts and carts (Storefront Phase 2)
+
+The storefront now supports customer registration/login/logout, recovery, profile/password management,
+guest carts, persistent customer carts and safe merging in Arabic and English.
+See [the Phase 2 setup, migration and email guide](docs/STOREFRONT-PHASE-2.md).
+Review and apply the additive migration before running these features on an existing development
+database. It has not been applied to the owner's local database. Checkout, customer order placement,
+COD, shipping calculations and payments remain unavailable.
+
 ## Customer storefront (Phase 1)
 
 The solution also contains `AdminPanel.Storefront`, an Arabic-first/English MVC catalog at
@@ -7,7 +16,7 @@ The solution also contains `AdminPanel.Storefront`, an Arabic-first/English MVC 
 Products require explicit API publication configuration; the default public catalog is empty.
 See [docs/STOREFRONT.md](docs/STOREFRONT.md) for Windows/Visual Studio setup, publication,
 branding, YER display, language switching, verification and the future COD roadmap.
-The premium administration dashboard is preserved. Accounts, carts and checkout are future phases.
+The premium administration dashboard is preserved. Phase 2 adds accounts and carts; checkout remains a future phase.
 
 
 ASP.NET Core **.NET 8** Web API, MVC administration client and MVC public storefront, using **EF Core 9** and **SQL Server**. Both MVC applications call the API through HTTP clients; neither connects to the database.
@@ -16,12 +25,12 @@ ASP.NET Core **.NET 8** Web API, MVC administration client and MVC public storef
 
 - `AdminPanel/`: API, JWT authentication, EF models/migrations, category and product CRUD, product image uploads, order creation/list/details/status/cancellation, shipping options, discounts and content page CRUD.
 - `AdminPanel.MVC/`: administrator login/logout, responsive navigation, category/product CRUD, order list/details/status/cancellation, full shipping/discount/content management and a data-backed dashboard.
-- `AdminPanel.Storefront/`: Arabic/English public home, searchable/paged product catalog, category browsing, product details/images and YER prices. Public products require explicit publication configuration.
+- `AdminPanel.Storefront/`: Arabic/English public catalog, customer accounts/recovery/profile, guest and saved carts, safe merging and YER estimates. Public products require explicit publication configuration.
 - `AdminPanel.Tests/`: xUnit integration tests. The API and both MVC request pipelines run in-process with disposable relational databases. SQLite is the default; CI also runs the full suite against SQL Server 2022 with all migrations. Tests never use the application connection string.
 - `AdminPanel.BrowserTests/`: official Playwright Chromium/Firefox workflow runner; disposable fixtures, responsive-layout and basic accessibility checks, screenshots and result artifacts.
 - `docs/AUDIT.md`: findings, prioritized acceptance criteria, assumptions and verification record.
 
-Administration is **Admin only**. Staff and Customer credentials do not authorize administration. The separate anonymous catalog is read-only; public registration, customer sessions, cart and checkout are not implemented.
+Administration is **Admin only**. Customer and administrator authentication use separate audiences and cookies. The public catalog is read-only; accounts and carts have narrowly scoped APIs. Customer checkout and order placement are not implemented.
 
 For a complete Windows walkthrough, troubleshooting and local browser-test commands, see [docs/WINDOWS-SETUP.md](docs/WINDOWS-SETUP.md).
 

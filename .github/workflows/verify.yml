@@ -46,6 +46,8 @@ jobs:
         run: dotnet run --project AdminPanel.BrowserTests --no-build --configuration Release
       - name: Browser Arabic and English storefront workflows
         run: dotnet run --project AdminPanel.BrowserTests --no-build --configuration Release -- --storefront
+      - name: Browser customer accounts and carts
+        run: dotnet run --project AdminPanel.BrowserTests --no-build --configuration Release -- --customers
       - run: dotnet tool restore
       - name: Check migration model and generate SQL
         env:
