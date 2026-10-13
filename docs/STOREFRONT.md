@@ -124,8 +124,49 @@ data**, including an existing repository apple image. No sample data is inserted
 CI runs these suites with SQLite and SQL Server and the separate three-process Windows LocalDB smoke.
 The Windows smoke uses a uniquely named disposable instance, temporary credentials/certificate and cleanup.
 
-Initial local restore/build passed with zero compiler warnings/errors and 68 integration tests passed.
-Final verification results will be recorded after browser/CI execution.
+Verified on 2026-10-13 at commit `f0ed003` in
+[CI run 38433192498](https://github.com/alharbicode/AdminPanel/actions/runs/38433192498):
+
+| Check | Executed result |
+| --- | --- |
+| Restore / Release build | Passed on Linux and Windows; zero compiler warnings/errors. |
+| Integration tests | 70/70 with SQLite and 70/70 with isolated SQL Server; no failures or skips. |
+| Administration regression browsers | Chromium and Firefox each passed 329 explicit checks plus Playwright assertions with each provider. |
+| Storefront browsers | Chromium and Firefox each passed 251 explicit checks plus Playwright assertions with each provider; both languages and all five widths. |
+| Windows standalone setup | Fresh LocalDB migrations/bootstrap and three real HTTPS processes; admin login/write/CSRF and bilingual real-product browsing passed. |
+| Existing migrations | No model drift; SQL Server full migration chain and idempotent script generation passed. No new migration. |
+| Dependency audit | No vulnerable NuGet packages reported by configured sources, including transitive packages in all five projects. |
+| Local Windows checks | SDK 8.0.425 restore/build and 70 integration tests passed; installed Edge via Playwright passed 251 storefront checks. |
+
+Local browser log review exposed parallel requests sharing one SQLite test connection. Each test now
+has a unique shared-memory database and a separate connection per request, held alive by a keeper
+connection. A new integration test and browser check issue concurrent image reads and require actual
+JPEG responses, so a placeholder cannot hide that regression. The final local browser log has no
+application errors.
+
+Screenshots and result JSON are in the run's `verification-results-sqlite` and
+`verification-results-sqlserver` artifacts under `AdminPanel.BrowserTests/TestResults/`.
+For example: `storefront-chromium/ar-1440-Home.png`, `ar-390-Home.png`,
+`en-1440-Home.png`, `en-390-Catalog-Details-27.png`; equivalent Firefox captures are included.
+Selected desktop/mobile screenshots were visually inspected. These checks are not a full WCAG,
+screen-reader, WebKit/Safari, physical-device or load-testing certification.
+
+## Change map and remaining limitations
+
+- New `AdminPanel.Storefront/`: MVC controllers/client/models, Razor views, resource files, scoped
+  styling, image fallback script, neutral placeholder and local launch/configuration files.
+- New API `PublicCatalogController.cs` and `PublicCatalogDtos.cs`; `appsettings.json` adds the empty
+  publication allowlist. Existing administrator controllers/services/authentication are unchanged.
+- Solution and test project references, new storefront integration/browser fixtures and runner,
+  existing browser entry-point dispatch, CI storefront step and Windows three-process smoke.
+- README, this guide, `AUDIT.md` and `WINDOWS-SETUP.md` document setup, evidence and later phases.
+
+Publication and branding are operator configuration in Phase 1, not administration settings screens.
+There is one existing product image per product, original-language catalog text, ID-based recency and
+the bounded category dropdown described above. Legacy static images are not private media. Large-catalog
+load testing, full accessibility review and production infrastructure remain unverified. Phase 1 has no
+accounts, cart, addresses, checkout, shipping calculation, discounts, COD, online payments or currency
+conversion. Existing administrator shipping/discount/order records are not presented as customer rules.
 
 ## Approved future phases — plan only
 
@@ -141,6 +182,17 @@ Final verification results will be recorded after browser/CI execution.
   international destinations, additional currencies, operational/security and deployment readiness.
 - Before a public production release, separately review the supported-runtime upgrade, rate limiting,
   trusted reverse proxy configuration, durable image storage, backup recovery and full accessibility.
-  Current .NET 8/EF 9 support ends November 10, 2026. No deployment or merge is authorized by Phase 1.
+  Current [.NET 8](https://dotnet.microsoft.com/en-us/platform/support/policy/dotnet-core) and
+  [EF Core 9](https://learn.microsoft.com/en-us/ef/core/what-is-new/) support ends November 10, 2026.
+  No deployment or merge is authorized by Phase 1.
+
+| Future phase | Complexity | Acceptance gate before completion |
+| --- | --- | --- |
+| 2: accounts and carts | Medium–high | Customer-only sessions, tested recovery, guest/cart merge rules, persistent cart validation and address ownership; admin authentication remains separate. |
+| 3: Yemen COD checkout | High | Server totals and immutable snapshots, explicit shipping destinations/rates, duplicate submissions create one order, concurrent stock updates cannot oversell, cancellation retains history and tracking does not expose another customer's data. |
+| 4: payments/expansion | High; provider-dependent | Signed/replay-safe provider events, reconciliation/refunds, explicit international/currency policies, backup restoration and separately approved production readiness. |
+
+These are dependency estimates, not delivery-date promises. No later-phase schema, API or UI has
+been implemented. The existing administrator order API is not a customer checkout endpoint.
 
 Stop after Phase 1. Starting Phase 2 requires explicit owner approval.
