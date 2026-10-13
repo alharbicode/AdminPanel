@@ -68,7 +68,8 @@ internal static class CustomerRunner
                             await Expect(page.Locator("html")).ToHaveAttributeAsync("dir", language == "ar" ? "rtl" : "ltr");
                             Check(await page.EvaluateAsync<bool>("document.documentElement.scrollWidth <= innerWidth + 1"), "Customer page overflow");
                             Check(await page.EvaluateAsync<int>("() => [...document.querySelectorAll('input:not([type=hidden]),select')].filter(e => !e.labels?.length && !e.getAttribute('aria-label')).length") == 0, "Unlabelled customer control");
-                            await page.ScreenshotAsync(new() { Path = Path.Combine(output, language + "-" + width + "-" + route.Trim('/').Replace('/', '-') + ".png"), FullPage = true });
+                            await page.ScreenshotAsync(new() { Path = Path.Combine(output, language + "-" + width + "-" + route.Trim('/').Replace('/', '-') + ".png"), FullPage = true,
+                                Mask = [page.Locator("input[type=password], #Token")] });
                         }
                     }
                 }
@@ -128,7 +129,8 @@ internal static class CustomerRunner
             catch (Exception error)
             {
                 failed = true;
-                await page.ScreenshotAsync(new() { Path = Path.Combine(output, "failure.png"), FullPage = true });
+                await page.ScreenshotAsync(new() { Path = Path.Combine(output, "failure.png"), FullPage = true,
+                    Mask = [page.Locator("input[type=password], #Token")] });
                 var safe = error.ToString().Replace(host.Api.Password, "[test-password]");
                 foreach (var mail in host.Api.Emails.Messages) safe = safe.Replace(mail.Token, "[test-reset-code]");
                 Console.Error.WriteLine("CUSTOMER BROWSER FAIL: " + type.Name + ": " + safe);

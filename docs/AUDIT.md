@@ -6,7 +6,7 @@ Development branch: `codex/audit-repair-adminpanel`.
 The administration repair and Storefront Phase 1 results below are historical. The latest addition is
 **Storefront Phase 2** on `codex/storefront-phase-two`, based on `codex/storefront-phase-one`.
 Its customer accounts/cart scope, migration considerations and remaining work are recorded in
-[STOREFRONT-PHASE-2.md](STOREFRONT-PHASE-2.md). Final Phase 2 CI results will be recorded below.
+[STOREFRONT-PHASE-2.md](STOREFRONT-PHASE-2.md). Phase 2 verification is recorded below.
 
 ## Priorities and acceptance criteria
 
@@ -169,7 +169,8 @@ No production data was accessed or changed. Nothing was merged or deployed.
 - [x] Fail-closed publication policy, safe images, bounded queries, encoded content and antiforgery.
 - [x] SQL Server/SQLite integration and Chromium/Firefox regression/browser verification.
 - [x] Windows setup, screenshots, recorded evidence and explicit later-phase plan.
-- [ ] Phase 2 approval: separate customer accounts/recovery/sessions, guest/registered carts and addresses.
+- [x] Phase 2 approved: customer accounts/recovery/sessions and guest/registered carts (implemented below).
+- [ ] Addresses: excluded from the approved Phase 2 scope; revisit with checkout requirements.
 - [ ] Phase 3 approval and rules: Yemen governorate/city rates, guest/registered COD, server totals,
   snapshots, idempotency, concurrency, retained cancellations and private tracking.
 - [ ] Phase 4: provider evaluation, verified payment events/refunds, international/currency expansion
@@ -180,4 +181,52 @@ No production data was accessed or changed. Nothing was merged or deployed.
 The user has now approved single-vendor retail, Yemen/YER, guest and registered shopping, destination
 rates and future COD. Detailed tax/discount/COD/fulfillment rules and Staff permissions remain decisions.
 The [storefront guide](STOREFRONT.md) records limitations, acceptance gates and complexity for future
-phases. They are **plan only**; explicit owner approval is required before Phase 2 implementation.
+phases. Phase 2 was subsequently approved; later phases still require separate owner approval.
+
+## Storefront Phase 2
+
+Branch `codex/storefront-phase-two` starts at Phase 1 commit `7e3b70f`.
+[Draft PR #4](https://github.com/alharbicode/AdminPanel/pull/4) targets `codex/storefront-phase-one`.
+The owner approved accounts and carts only. No checkout, order placement, payment, COD, shipping
+calculation, stock reservation, currency conversion, Staff policy or visual redesign is included.
+
+| Feature | Implementation and acceptance |
+| --- | --- |
+| Customer identity | Registration creates only Customer users using ASP.NET password hashes; normalized email uniqueness, invalid credentials and temporary lockout tested. Existing users are preserved, not silently enrolled. |
+| Authorization | Separate customer JWT audience and protected storefront cookie; server checks current role/block/security stamp. Admin/customer tokens cannot cross their authorization boundaries. |
+| Profile and recovery | Name editing and current-password change; hashed random reset codes, 30-minute expiry, replacement/single-use and session revocation. Generic recovery responses, private development mail and configurable TLS SMTP. |
+| Guest cart | Secure, host-only, HttpOnly identifier with 30-day expiry; API stores only its hash. Add/update/remove and header quantity work; no public GET creates a cart. |
+| Saved cart | One database cart per enrolled customer; owner comes from authenticated claims. Logout/login preserves lines. Storefront has no SQL reference or administrator credentials. |
+| Merging | One transaction covers both cart versions, lines and consumed-guest marker. Repeated merge cannot double quantities. Conflicts return 409 and preserve the guest secret for explicit retry. |
+| Product integrity | Current catalog publication, stock and price rechecked. Quantity capped at 99/current stock; 100 distinct products; overflow-safe combining. Hidden/unavailable products excluded; localized adjustment message; YER estimates only. |
+| UI and security | Arabic/English account/cart pages retain existing styling, RTL/LTR and responsive forms. Every storefront write requires antiforgery. Reset secrets use URL fragments, never request query strings; screenshots mask password/code fields. |
+| Migration | Additive CustomerAccounts, ShoppingCarts and ShoppingCartItems tables only. Upgrade-preservation test compares existing users/password hashes and product stock. Migration generated without applying it to the owner's local database. |
+| Setup | Windows/Visual Studio, all three HTTPS apps, development/production email, migration review and destructive-rollback implications documented in STOREFRONT-PHASE-2.md. |
+
+The implementation at `9651ac4` passed [CI run 38464970518](https://github.com/alharbicode/AdminPanel/actions/runs/38464970518)
+on **2026-10-13**: restore and Release build, **87/87 integration tests on SQLite and SQL Server**,
+and **329 administration, 250 catalog and 176 customer explicit browser checks plus assertions**
+for each Chromium/Firefox and database combination. SQL Server applied the full migration chain
+and the upgrade-preservation test passed. Windows isolated LocalDB, bootstrap, all three HTTPS apps,
+admin CRUD/CSRF, bilingual catalog, customer registration/login/logout and guest/saved merge passed.
+No pending EF model changes; idempotent SQL generated; no vulnerable NuGet packages reported.
+
+Four additional production-email safety cases bring the current suite to **91 local passing tests**;
+restore/Release build have zero compiler warnings/errors. Follow-up commits receive the same CI
+matrix; see PR #4 checks for the latest commit's results. Installed Edge/Playwright also passed
+250 catalog and 176 customer checks. Customer pages were rendered at 1440/768/390/320 pixels in
+both languages; selected desktop/mobile screenshots were inspected. Screenshots and test results
+are retained as CI artifacts. Full accessibility or production email delivery is not claimed.
+
+- [x] Customer accounts, profile, recovery and secure administration boundary.
+- [x] Guest/saved carts, quantity controls and atomic, repeat-safe merging.
+- [x] Localized responsive forms, antiforgery and regression coverage.
+- [x] Additive migration generated; owner's database untouched; setup/rollback documentation.
+- [x] Implementation verified on SQL Server/SQLite, Chromium/Firefox and Windows LocalDB in CI.
+- [ ] Owner review before any merge, migration of an existing database or deployment.
+
+Remaining readiness work: production email configuration/delivery verification, email verification
+and address/change policies, MFA, session refresh, expired/consumed-cart retention, distributed rate
+limiting and shared Data Protection keys. API auth limits currently aggregate requests from the
+storefront host. Full accessibility, Safari/physical-device and load testing are not claimed.
+Framework support upgrade remains separate. Checkout and later business rules are deferred.

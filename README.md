@@ -9,6 +9,11 @@ Review and apply the additive migration before running these features on an exis
 database. It has not been applied to the owner's local database. Checkout, customer order placement,
 COD, shipping calculations and payments remain unavailable.
 
+The Phase 2 implementation passed SQLite/SQL Server integration tests, Chromium/Firefox admin,
+catalog and customer workflows, and Windows LocalDB setup in [CI](https://github.com/alharbicode/AdminPanel/actions/runs/38464970518).
+The local suite now has 91 passing tests including email-safety checks; current-commit results are
+available in [draft PR #4](https://github.com/alharbicode/AdminPanel/pull/4).
+
 ## Customer storefront (Phase 1)
 
 The solution also contains `AdminPanel.Storefront`, an Arabic-first/English MVC catalog at
