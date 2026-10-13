@@ -21,6 +21,7 @@ namespace AdminPanel.Tests;
 
 public class ApiFactory : WebApplicationFactory<Program>
 {
+    public int[] PublicProductIds { get; init; } = [];
     private readonly SqliteConnection _connection = new("Data Source=:memory:");
     private readonly string? _sqlServerConnection = CreateSqlServerConnection();
     private static string? CreateSqlServerConnection()
@@ -44,7 +45,8 @@ public class ApiFactory : WebApplicationFactory<Program>
             ["JwtSettings:SecretKey"] = Secret, ["JwtSettings:Issuer"] = "AdminPanel.API",
             ["JwtSettings:Audience"] = "AdminPanel.MVC", ["JwtSettings:LifetimeMinutes"] = "60",
             ["ConnectionStrings:DefaultConnection"] = "Server=unused;Database=unused"
-        }));
+        }.Concat(PublicProductIds.Select((id, index) => new KeyValuePair<string, string?>(
+            $"PublicCatalog:ProductIds:{index}", id.ToString(System.Globalization.CultureInfo.InvariantCulture))))));
         return base.CreateHost(builder);
     }
     protected override void ConfigureWebHost(IWebHostBuilder builder)

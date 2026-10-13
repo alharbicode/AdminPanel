@@ -1,0 +1,9 @@
+@model PaginationModel
+@if (Model.TotalPages > 1)
+{
+    <nav class="pagination" aria-label="@T["Pages"]">
+        @if (Model.Page > 1) { <a href="@Model.Query.Url(Model.Path, Model.Page - 1)" rel="prev">@T["Previous"]</a> }
+        <span>@T["Page"] @T.Number(Model.Page) @T["Of"] @T.Number(Model.TotalPages)</span>
+        @if (Model.Page < Model.TotalPages) { <a href="@Model.Query.Url(Model.Path, Model.Page + 1)" rel="next">@T["Next"]</a> }
+    </nav>
+}

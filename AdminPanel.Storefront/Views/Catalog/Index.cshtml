@@ -1,0 +1,19 @@
+@model CatalogModel
+@{ ViewData["Title"] = T["Catalog"]; }
+<div class="container page-content">
+    <nav class="breadcrumbs" aria-label="@T["Menu"]"><a asp-controller="Home" asp-action="Index">@T["Home"]</a><span aria-hidden="true">/</span><span>@T["Catalog"]</span></nav>
+    <div class="page-heading"><p class="eyebrow">@T["Catalog"]</p><h1>@T["CatalogTitle"]</h1><p>@T["CatalogIntro"]</p></div>
+    <form method="get" class="catalog-filters" role="search">
+        <div class="filter-search"><label for="catalog-search">@T["Search"]</label><input id="catalog-search" type="search" name="Search" value="@Model.Query.Search" maxlength="100" placeholder="@T["SearchPlaceholder"]" /></div>
+        <div><label for="category-filter">@T["Category"]</label><select id="category-filter" name="CategoryId"><option value="">@T["AllCategories"]</option>
+            @foreach (var category in Model.Categories) { <option value="@category.Id" selected="@(Model.Query.CategoryId == category.Id)">@category.Name</option> }
+            @if (Model.Query.CategoryId.HasValue && Model.Categories.All(c => c.Id != Model.Query.CategoryId)) { <option value="@Model.Query.CategoryId" selected>@T["Category"] #@Model.Query.CategoryId</option> }
+        </select></div>
+        <div><label for="catalog-sort">@T["Sort"]</label><select id="catalog-sort" name="Sort"><option value="newest" selected="@(Model.Query.Sort == "newest")">@T["Newest"]</option><option value="name" selected="@(Model.Query.Sort == "name")">@T["NameSort"]</option></select></div>
+        <button class="button" type="submit">@T["Apply"]</button><a class="reset-link" asp-action="Index">@T["Reset"]</a>
+    </form>
+    <p class="result-count" role="status">@T.Number(Model.Products.TotalCount) @T["Results"]</p>
+    @if (Model.Products.Items.Count > 0) { <div class="product-grid">@foreach (var product in Model.Products.Items) { <partial name="_ProductCard" model="product" /> }</div> }
+    else { <div class="empty-state"><partial name="_Icon" model='@("search")' /><h2>@T["EmptyTitle"]</h2><p>@T["EmptyBody"]</p><a class="button" asp-action="Index">@T["Reset"]</a></div> }
+    <partial name="_Pagination" model='new PaginationModel(Model.Products.Page, Model.Products.TotalPages, Model.Query, Url.Action("Index", "Catalog")!)' />
+</div>

@@ -1,0 +1,10 @@
+@model Product
+<article class="product-card">
+    <a class="product-image" asp-controller="Catalog" asp-action="Details" asp-route-id="@Model.Id" tabindex="-1" aria-hidden="true">
+        <img src="@(Model.HasImage ? Url.Action("Image", "Catalog", new { id = Model.Id }) : Url.Content("~/images/product-placeholder.svg"))" alt="" loading="lazy" width="440" height="400" data-product-image />
+        @if (!Model.HasImage) { <span class="image-caption">@T["NoImage"]</span> }
+        <span class="image-arrow"><partial name="_Icon" model='@("arrow")' /></span>
+    </a>
+    <div class="product-copy"><span class="product-category" dir="auto">@Model.CategoryName</span><h3><a asp-controller="Catalog" asp-action="Details" asp-route-id="@Model.Id" dir="auto">@Model.Name</a></h3>
+        <p class="product-price"><bdi>@T.Price(Model.Price)</bdi><span>@(Model.Currency == "YER" ? T["YER"] : Model.Currency)</span></p></div>
+</article>

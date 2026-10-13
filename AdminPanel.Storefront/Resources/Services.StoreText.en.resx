@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="utf-8"?>
+<root>
+<resheader name="resmimetype"><value>text/microsoft-resx</value></resheader>
+<resheader name="version"><value>2.0</value></resheader>
+<data name="Home" xml:space="preserve"><value>Home</value></data>
+<data name="Catalog" xml:space="preserve"><value>Browse products</value></data>
+<data name="Categories" xml:space="preserve"><value>Categories</value></data>
+<data name="Search" xml:space="preserve"><value>Search</value></data>
+<data name="SearchPlaceholder" xml:space="preserve"><value>Search products or categories…</value></data>
+<data name="CategorySearch" xml:space="preserve"><value>Find a category…</value></data>
+<data name="Menu" xml:space="preserve"><value>Menu</value></data>
+<data name="Skip" xml:space="preserve"><value>Skip to content</value></data>
+<data name="Language" xml:space="preserve"><value>Language</value></data>
+<data name="Welcome" xml:space="preserve"><value>A fresh perspective on everyday finds</value></data>
+<data name="HeroTitle" xml:space="preserve"><value>Discover your next everyday favorite.</value></data>
+<data name="HeroBody" xml:space="preserve"><value>Explore our catalog, find your category, and take a closer look at the details that matter.</value></data>
+<data name="Explore" xml:space="preserve"><value>Explore the catalog</value></data>
+<data name="BrowseCategories" xml:space="preserve"><value>Browse categories</value></data>
+<data name="HeroEyebrow" xml:space="preserve"><value>EVERYDAY DISCOVERIES</value></data>
+<data name="CatalogPick" xml:space="preserve"><value>From our catalog</value></data>
+<data name="SeeDetails" xml:space="preserve"><value>View product</value></data>
+<data name="NoImage" xml:space="preserve"><value>Image unavailable</value></data>
+<data name="CategoryHeading" xml:space="preserve"><value>Find your starting point</value></data>
+<data name="CategoryIntro" xml:space="preserve"><value>Different categories. One place to explore.</value></data>
+<data name="ViewAll" xml:space="preserve"><value>View all</value></data>
+<data name="Recent" xml:space="preserve"><value>Latest catalog additions</value></data>
+<data name="RecentIntro" xml:space="preserve"><value>A closer look at the latest products in our catalog.</value></data>
+<data name="Products" xml:space="preserve"><value>products</value></data>
+<data name="Product" xml:space="preserve"><value>Product</value></data>
+<data name="CatalogTitle" xml:space="preserve"><value>Explore the collection</value></data>
+<data name="CatalogIntro" xml:space="preserve"><value>Find what interests you. Explore every detail.</value></data>
+<data name="AllCategories" xml:space="preserve"><value>All categories</value></data>
+<data name="Sort" xml:space="preserve"><value>Sort by</value></data>
+<data name="Newest" xml:space="preserve"><value>Recently added</value></data>
+<data name="NameSort" xml:space="preserve"><value>Product name</value></data>
+<data name="Apply" xml:space="preserve"><value>Apply filters</value></data>
+<data name="Reset" xml:space="preserve"><value>Clear filters</value></data>
+<data name="Results" xml:space="preserve"><value>results</value></data>
+<data name="EmptyTitle" xml:space="preserve"><value>Nothing to show just yet</value></data>
+<data name="EmptyBody" xml:space="preserve"><value>Try another search or browse the available categories.</value></data>
+<data name="EmptyHome" xml:space="preserve"><value>Our catalog is taking shape. Check back for available products.</value></data>
+<data name="EmptyCategory" xml:space="preserve"><value>No matching categories</value></data>
+<data name="Pages" xml:space="preserve"><value>Catalog pages</value></data>
+<data name="Previous" xml:space="preserve"><value>Previous</value></data>
+<data name="Next" xml:space="preserve"><value>Next</value></data>
+<data name="Page" xml:space="preserve"><value>Page</value></data>
+<data name="Of" xml:space="preserve"><value>of</value></data>
+<data name="Available" xml:space="preserve"><value>Available in the catalog</value></data>
+<data name="Description" xml:space="preserve"><value>About this product</value></data>
+<data name="NoDescription" xml:space="preserve"><value>No additional description is available for this product.</value></data>
+<data name="Category" xml:space="preserve"><value>Category</value></data>
+<data name="Unit" xml:space="preserve"><value>Unit</value></data>
+<data name="Currency" xml:space="preserve"><value>Currency</value></data>
+<data name="Price" xml:space="preserve"><value>Price</value></data>
+<data name="YER" xml:space="preserve"><value>YER</value></data>
+<data name="BrowseOnly" xml:space="preserve"><value>Browse today. Ordering is not available yet.</value></data>
+<data name="BrowseNote" xml:space="preserve"><value>Catalog prices are shown in Yemeni Rial. Checkout, delivery charges, and payment options are not available in this phase.</value></data>
+<data name="Related" xml:space="preserve"><value>More in this category</value></data>
+<data name="BackCatalog" xml:space="preserve"><value>Back to the catalog</value></data>
+<data name="UnavailableTitle" xml:space="preserve"><value>This product is unavailable</value></data>
+<data name="UnavailableBody" xml:space="preserve"><value>It may no longer be part of the public catalog. Explore the products available now.</value></data>
+<data name="InvalidTitle" xml:space="preserve"><value>Please check your search</value></data>
+<data name="InvalidBody" xml:space="preserve"><value>Use up to 100 characters and a valid category, page and sort option.</value></data>
+<data name="ErrorTitle" xml:space="preserve"><value>The catalog is temporarily unavailable</value></data>
+<data name="ErrorBody" xml:space="preserve"><value>We could not load the catalog. Please try again shortly.</value></data>
+<data name="Retry" xml:space="preserve"><value>Try again</value></data>
+<data name="FooterText" xml:space="preserve"><value>Discover products. Explore possibilities.</value></data>
+<data name="FooterBrowse" xml:space="preserve"><value>Explore</value></data>
+<data name="FooterInfo" xml:space="preserve"><value>About the store</value></data>
+<data name="Yemen" xml:space="preserve"><value>Yemen · Yemeni Rial</value></data>
+<data name="OriginalContent" xml:space="preserve"><value>Product names and descriptions appear in their original language.</value></data>
+<data name="CategoryTitle" xml:space="preserve"><value>Explore by category</value></data>
+<data name="CategoryBody" xml:space="preserve"><value>A place for everything you are looking for.</value></data>
+<data name="DetailLabel" xml:space="preserve"><value>Product details</value></data>
+<data name="Featured" xml:space="preserve"><value>Catalog highlights</value></data>
+<data name="FeaturedNote" xml:space="preserve"><value>Discover a selection from the available catalog.</value></data>
+<data name="SearchSubmit" xml:space="preserve"><value>Search catalog</value></data>
+<data name="CountLabel" xml:space="preserve"><value>Available products</value></data>
+</root>

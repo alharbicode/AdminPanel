@@ -18,6 +18,7 @@ internal static class BrowserRunner
 
     public static async Task<int> Main(string[] args)
     {
+        if (args.Contains("--storefront")) return await StorefrontRunner.Run(args);
         if (args.Contains("--install-browsers"))
             return Microsoft.Playwright.Program.Main(new[] { "install", "--with-deps", "chromium", "firefox" });
         using var playwright = await Playwright.CreateAsync();

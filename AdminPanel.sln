@@ -11,6 +11,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AdminPanel.Tests", "AdminPa
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AdminPanel.BrowserTests", "AdminPanel.BrowserTests\AdminPanel.BrowserTests.csproj", "{E8D448A0-8DCF-4117-B985-E4435BE13B03}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AdminPanel.Storefront", "AdminPanel.Storefront\AdminPanel.Storefront.csproj", "{0E768577-53E1-455A-BD25-40943990A3A1}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -33,6 +35,10 @@ Global
 		{E4471347-82CB-4C54-B510-882982C5A8C8}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{E4471347-82CB-4C54-B510-882982C5A8C8}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{E4471347-82CB-4C54-B510-882982C5A8C8}.Release|Any CPU.Build.0 = Release|Any CPU
+		{0E768577-53E1-455A-BD25-40943990A3A1}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{0E768577-53E1-455A-BD25-40943990A3A1}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{0E768577-53E1-455A-BD25-40943990A3A1}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{0E768577-53E1-455A-BD25-40943990A3A1}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

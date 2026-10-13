@@ -1,0 +1,4 @@
+@model Category
+<a class="category-card" asp-controller="Catalog" asp-action="Index" asp-route-CategoryId="@Model.Id">
+    <span class="category-symbol"><partial name="_Icon" model='@("grid")' /></span><span class="category-copy"><strong dir="auto">@Model.Name</strong><span>@T.Number(Model.ProductCount) @T["Products"]</span></span><partial name="_Icon" model='@("arrow")' />
+</a>

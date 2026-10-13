@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="utf-8"?>
+<root>
+<resheader name="resmimetype"><value>text/microsoft-resx</value></resheader>
+<resheader name="version"><value>2.0</value></resheader>
+<data name="Home" xml:space="preserve"><value>الرئيسية</value></data>
+<data name="Catalog" xml:space="preserve"><value>تصفح المنتجات</value></data>
+<data name="Categories" xml:space="preserve"><value>الأقسام</value></data>
+<data name="Search" xml:space="preserve"><value>بحث</value></data>
+<data name="SearchPlaceholder" xml:space="preserve"><value>ابحث عن منتج أو قسم…</value></data>
+<data name="CategorySearch" xml:space="preserve"><value>ابحث عن قسم…</value></data>
+<data name="Menu" xml:space="preserve"><value>القائمة</value></data>
+<data name="Skip" xml:space="preserve"><value>انتقل إلى المحتوى</value></data>
+<data name="Language" xml:space="preserve"><value>اللغة</value></data>
+<data name="Welcome" xml:space="preserve"><value>اختيارات ليومك، بطريقتك</value></data>
+<data name="HeroTitle" xml:space="preserve"><value>اكتشف ما يناسب يومك.</value></data>
+<data name="HeroBody" xml:space="preserve"><value>تصفح الكتالوج، واكتشف الأقسام، وتعرّف على تفاصيل المنتجات التي تهمك.</value></data>
+<data name="Explore" xml:space="preserve"><value>اكتشف الكتالوج</value></data>
+<data name="BrowseCategories" xml:space="preserve"><value>تصفح الأقسام</value></data>
+<data name="HeroEyebrow" xml:space="preserve"><value>اكتشافات ليومك</value></data>
+<data name="CatalogPick" xml:space="preserve"><value>من كتالوجنا</value></data>
+<data name="SeeDetails" xml:space="preserve"><value>عرض المنتج</value></data>
+<data name="NoImage" xml:space="preserve"><value>الصورة غير متوفرة</value></data>
+<data name="CategoryHeading" xml:space="preserve"><value>ابدأ من القسم الذي يناسبك</value></data>
+<data name="CategoryIntro" xml:space="preserve"><value>أقسام متنوعة، في مكان واحد.</value></data>
+<data name="ViewAll" xml:space="preserve"><value>عرض الكل</value></data>
+<data name="Recent" xml:space="preserve"><value>أحدث إضافات الكتالوج</value></data>
+<data name="RecentIntro" xml:space="preserve"><value>تعرّف على أحدث المنتجات المضافة إلى الكتالوج.</value></data>
+<data name="Products" xml:space="preserve"><value>منتجات</value></data>
+<data name="Product" xml:space="preserve"><value>المنتج</value></data>
+<data name="CatalogTitle" xml:space="preserve"><value>اكتشف مجموعتنا</value></data>
+<data name="CatalogIntro" xml:space="preserve"><value>ابحث عما يهمك، وتعرّف على كل التفاصيل.</value></data>
+<data name="AllCategories" xml:space="preserve"><value>جميع الأقسام</value></data>
+<data name="Sort" xml:space="preserve"><value>الترتيب</value></data>
+<data name="Newest" xml:space="preserve"><value>الأحدث إضافة</value></data>
+<data name="NameSort" xml:space="preserve"><value>اسم المنتج</value></data>
+<data name="Apply" xml:space="preserve"><value>تطبيق</value></data>
+<data name="Reset" xml:space="preserve"><value>مسح التصفية</value></data>
+<data name="Results" xml:space="preserve"><value>نتائج</value></data>
+<data name="EmptyTitle" xml:space="preserve"><value>لا توجد منتجات للعرض حالياً</value></data>
+<data name="EmptyBody" xml:space="preserve"><value>جرّب بحثاً آخر أو تصفح الأقسام المتاحة.</value></data>
+<data name="EmptyHome" xml:space="preserve"><value>نعمل على تجهيز الكتالوج. عد لاحقاً لاستكشاف المنتجات المتاحة.</value></data>
+<data name="EmptyCategory" xml:space="preserve"><value>لا توجد أقسام مطابقة</value></data>
+<data name="Pages" xml:space="preserve"><value>صفحات الكتالوج</value></data>
+<data name="Previous" xml:space="preserve"><value>السابق</value></data>
+<data name="Next" xml:space="preserve"><value>التالي</value></data>
+<data name="Page" xml:space="preserve"><value>صفحة</value></data>
+<data name="Of" xml:space="preserve"><value>من</value></data>
+<data name="Available" xml:space="preserve"><value>متاح في الكتالوج</value></data>
+<data name="Description" xml:space="preserve"><value>عن هذا المنتج</value></data>
+<data name="NoDescription" xml:space="preserve"><value>لا يتوفر وصف إضافي لهذا المنتج.</value></data>
+<data name="Category" xml:space="preserve"><value>القسم</value></data>
+<data name="Unit" xml:space="preserve"><value>الوحدة</value></data>
+<data name="Currency" xml:space="preserve"><value>العملة</value></data>
+<data name="Price" xml:space="preserve"><value>السعر</value></data>
+<data name="YER" xml:space="preserve"><value>ر.ي.</value></data>
+<data name="BrowseOnly" xml:space="preserve"><value>تصفح الآن. الطلب عبر المتجر غير متاح بعد.</value></data>
+<data name="BrowseNote" xml:space="preserve"><value>أسعار الكتالوج بالريال اليمني. إتمام الطلب وتكاليف التوصيل وخيارات الدفع غير متاحة في هذه المرحلة.</value></data>
+<data name="Related" xml:space="preserve"><value>المزيد من هذا القسم</value></data>
+<data name="BackCatalog" xml:space="preserve"><value>العودة إلى الكتالوج</value></data>
+<data name="UnavailableTitle" xml:space="preserve"><value>هذا المنتج غير متاح</value></data>
+<data name="UnavailableBody" xml:space="preserve"><value>قد لا يكون المنتج ضمن الكتالوج العام الآن. تصفح المنتجات المتاحة حالياً.</value></data>
+<data name="InvalidTitle" xml:space="preserve"><value>يرجى التحقق من البحث</value></data>
+<data name="InvalidBody" xml:space="preserve"><value>استخدم حتى ١٠٠ حرف، واختر قسماً وصفحة وترتيباً صالحاً.</value></data>
+<data name="ErrorTitle" xml:space="preserve"><value>الكتالوج غير متاح مؤقتاً</value></data>
+<data name="ErrorBody" xml:space="preserve"><value>تعذر تحميل الكتالوج. يرجى المحاولة بعد قليل.</value></data>
+<data name="Retry" xml:space="preserve"><value>حاول مجدداً</value></data>
+<data name="FooterText" xml:space="preserve"><value>اكتشف المنتجات. تعرّف على خياراتك.</value></data>
+<data name="FooterBrowse" xml:space="preserve"><value>اكتشف</value></data>
+<data name="FooterInfo" xml:space="preserve"><value>عن المتجر</value></data>
+<data name="Yemen" xml:space="preserve"><value>اليمن · الريال اليمني</value></data>
+<data name="OriginalContent" xml:space="preserve"><value>تُعرض أسماء المنتجات وأوصافها بلغتها الأصلية.</value></data>
+<data name="CategoryTitle" xml:space="preserve"><value>اكتشف الأقسام</value></data>
+<data name="CategoryBody" xml:space="preserve"><value>بداية رحلتك لاكتشاف ما تبحث عنه.</value></data>
+<data name="DetailLabel" xml:space="preserve"><value>تفاصيل المنتج</value></data>
+<data name="Featured" xml:space="preserve"><value>مختارات من الكتالوج</value></data>
+<data name="FeaturedNote" xml:space="preserve"><value>اكتشف مجموعة من المنتجات المتاحة في الكتالوج.</value></data>
+<data name="SearchSubmit" xml:space="preserve"><value>ابحث في الكتالوج</value></data>
+<data name="CountLabel" xml:space="preserve"><value>المنتجات المتاحة</value></data>
+</root>

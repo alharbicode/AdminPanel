@@ -1,5 +1,15 @@
 # AdminPanel
 
+## Customer storefront (Phase 1)
+
+The solution also contains `AdminPanel.Storefront`, an Arabic-first/English MVC catalog at
+`https://localhost:7289`, using dedicated public API reads and the existing database.
+Products require explicit API publication configuration; the default public catalog is empty.
+See [docs/STOREFRONT.md](docs/STOREFRONT.md) for Windows/Visual Studio setup, publication,
+branding, YER display, language switching, verification and the future COD roadmap.
+The premium administration dashboard is preserved. Accounts, carts and checkout are future phases.
+
+
 ASP.NET Core **.NET 8** Web API and MVC administration client, using **EF Core 9** and **SQL Server**. The MVC app calls the API through an HTTP client; it has no database connection.
 
 ## Projects and implemented features
