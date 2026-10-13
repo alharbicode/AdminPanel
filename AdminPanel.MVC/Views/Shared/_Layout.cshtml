@@ -1,52 +1,87 @@
+@{
+    var signedIn = User.Identity?.IsAuthenticated == true;
+    var dashboard = ViewContext.RouteData.Values["controller"]?.ToString() == "Dashboard";
+    var username = User.Identity?.Name ?? "";
+    var initial = string.IsNullOrEmpty(username) ? "A" : username[..1].ToUpperInvariant();
+}
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="color-scheme" content="dark" />
+    <meta name="theme-color" content="#0c101a" />
     <title>@ViewData["Title"] - AdminPanel</title>
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
-    <noscript><style>#admin-nav.collapse { display: block; }</style></noscript>
+    <link rel="stylesheet" href="~/css/workspace.css" asp-append-version="true" />
+    <noscript><style>#admin-nav.collapse { display: block; } .navigation-toggle { display: none; }</style></noscript>
 </head>
-<body>
-    <a class="visually-hidden-focusable" href="#main-content">Skip to content</a>
-    <header>
-        <nav class="navbar navbar-expand-xl navbar-light bg-white border-bottom mb-3" aria-label="Main navigation">
-            <div class="container">
-                <a class="navbar-brand" asp-controller="Dashboard" asp-action="Index">AdminPanel</a>
-                @if (User.Identity?.IsAuthenticated == true)
+<body class="premium-app @(signedIn ? "signed-in" : "signed-out") @(dashboard ? "dashboard-view" : "management-view")">
+    <a class="skip-link visually-hidden-focusable" href="#main-content">Skip to content</a>
+    <div class="app-frame">
+        <header class="sidebar">
+            <div class="sidebar-brand-row">
+                <a class="workspace-brand" asp-controller="Dashboard" asp-action="Index">
+                    <span class="brand-symbol" aria-hidden="true"><span></span><span></span><span></span><span></span></span>
+                    <span>AdminPanel<span class="brand-caption">ADMINISTRATION</span></span>
+                </a>
+                @if (signedIn)
                 {
-                    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#admin-nav" aria-controls="admin-nav" aria-expanded="false" aria-label="Toggle navigation"><span class="navbar-toggler-icon"></span></button>
-                    <div id="admin-nav" class="collapse navbar-collapse">
-                        <div class="navbar-nav me-auto">
-                            @foreach (var entry in new[] {
-                                new { Controller = "Dashboard", Label = "Dashboard" },
-                                new { Controller = "Categories", Label = "Categories" },
-                                new { Controller = "Products", Label = "Products" },
-                                new { Controller = "Orders", Label = "Orders" },
-                                new { Controller = "ShippingOptions", Label = "Shipping" },
-                                new { Controller = "Discounts", Label = "Discounts" },
-                                new { Controller = "ContentPages", Label = "Content pages" } })
-                            {
-                                var active = ViewContext.RouteData.Values["controller"]?.ToString() == entry.Controller;
-                                <a class="nav-link @(active ? "active" : "")" asp-controller="@entry.Controller" asp-action="Index" aria-current="@(active ? "page" : null)">@entry.Label</a>
-                            }
-                        </div>
-                        <form asp-controller="Account" asp-action="Logout" method="post">
-                            <button class="btn btn-outline-secondary text-nowrap" type="submit">Sign out @User.Identity.Name</button>
-                        </form>
-                    </div>
+                    <button class="navigation-toggle" type="button" data-bs-toggle="collapse" data-bs-target="#admin-nav" aria-controls="admin-nav" aria-expanded="false" aria-label="Toggle navigation"><partial name="_WorkspaceIcon" model='@("Menu")' /></button>
                 }
             </div>
-        </nav>
-    </header>
-    <div id="request-progress" class="container" role="status" aria-live="polite" hidden>
-        <p class="alert alert-info"><span class="spinner-border spinner-border-sm me-2" aria-hidden="true"></span><span id="request-progress-text">Loading…</span></p>
+            @if (signedIn)
+            {
+                <div id="admin-nav" class="collapse sidebar-content">
+                    <nav aria-label="Main navigation" class="workspace-navigation">
+                        <p class="nav-section-label">Workspace</p>
+                        @foreach (var entry in new[] {
+                            new { Controller = "Dashboard", Label = "Dashboard" },
+                            new { Controller = "Categories", Label = "Categories" },
+                            new { Controller = "Products", Label = "Products" },
+                            new { Controller = "Orders", Label = "Orders" },
+                            new { Controller = "ShippingOptions", Label = "Shipping" },
+                            new { Controller = "Discounts", Label = "Discounts" },
+                            new { Controller = "ContentPages", Label = "Content pages" } })
+                        {
+                            var active = ViewContext.RouteData.Values["controller"]?.ToString() == entry.Controller;
+                            <a class="workspace-nav-link @(active ? "active" : "")" asp-controller="@entry.Controller" asp-action="Index" aria-current="@(active ? "page" : null)">
+                                <partial name="_WorkspaceIcon" model="@entry.Controller" /><span>@entry.Label</span>
+                                @if (active) { <span class="active-indicator" aria-hidden="true"></span> }
+                            </a>
+                        }
+                    </nav>
+                    <div class="sidebar-bottom">
+                        <div class="workspace-note"><span class="note-orbit" aria-hidden="true"></span><p>A little clarity.<br /><strong>A lot of possibility.</strong></p><span>Your administration workspace.</span></div>
+                        <div class="workspace-profile">
+                            <span class="profile-avatar" aria-hidden="true">@initial</span>
+                            <div class="profile-copy"><strong>@username</strong><span>Administrator</span></div>
+                        </div>
+                        <form asp-controller="Account" asp-action="Logout" method="post">
+                            <button class="signout-button" type="submit"><partial name="_WorkspaceIcon" model='@("Logout")' /><span>Sign out @username</span></button>
+                        </form>
+                    </div>
+                </div>
+            }
+        </header>
+        <div class="workspace-body">
+            <div class="workspace-topbar">
+                <div class="workspace-breadcrumb"><partial name="_WorkspaceIcon" model='@("Dashboard")' /><span>Workspace</span><span class="breadcrumb-divider" aria-hidden="true">/</span><span class="breadcrumb-current">@ViewData["Title"]</span></div>
+                <span class="workspace-access"><span aria-hidden="true"></span>Admin workspace</span>
+            </div>
+            <div class="workspace-content">
+                <div id="request-progress" role="status" aria-live="polite" hidden>
+                    <p class="alert alert-info"><span class="spinner-border spinner-border-sm me-2" aria-hidden="true"></span><span id="request-progress-text">Loading…</span></p>
+                </div>
+                <main id="main-content" role="main" class="@(dashboard ? "dashboard-main" : "management-main")" tabindex="-1">
+                    @if (TempData["Success"] is string message) { <div class="alert alert-success" role="status">@message</div> }
+                    @RenderBody()
+                </main>
+                <footer class="workspace-footer"><span>AdminPanel</span><span>Built for a clearer overview.</span></footer>
+            </div>
+        </div>
     </div>
-    <div class="container"><main id="main-content" role="main" class="pb-3" tabindex="-1">
-        @if (TempData["Success"] is string message) { <div class="alert alert-success" role="status">@message</div> }
-        @RenderBody()
-    </main></div>
     <script src="~/lib/jquery/dist/jquery.min.js"></script>
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
     <script src="~/js/site.js" asp-append-version="true"></script>
