@@ -1,0 +1,3 @@
+@model int?
+<a class="cart-header-link" asp-controller="Cart" asp-action="Index">@T["Cart"] <span class="cart-count">@(Model.HasValue ? T.Number(Model.Value) : "—")</span></a>
+

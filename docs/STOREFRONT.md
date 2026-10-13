@@ -1,5 +1,8 @@
 # Storefront Phase 1
 
+This is the historical Phase 1 report. For the current customer accounts and carts, including the
+required migration and recovery email setup, see [STOREFRONT-PHASE-2.md](STOREFRONT-PHASE-2.md).
+
 Branch: `codex/storefront-phase-one`, based on `codex/premium-dashboard-ui`.
 Scope: public browsing only. The existing administration project is unchanged.
 There are no Phase 1 database/model/migration changes, customer sessions, accounts,

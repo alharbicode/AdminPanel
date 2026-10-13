@@ -76,4 +76,63 @@
 <data name="FeaturedNote" xml:space="preserve"><value>Discover a selection from the available catalog.</value></data>
 <data name="SearchSubmit" xml:space="preserve"><value>Search catalog</value></data>
 <data name="CountLabel" xml:space="preserve"><value>Available products</value></data>
+<data name="Cart" xml:space="preserve"><value>Shopping cart</value></data>
+<data name="Login" xml:space="preserve"><value>Sign in</value></data>
+<data name="Logout" xml:space="preserve"><value>Sign out</value></data>
+<data name="Register" xml:space="preserve"><value>Create your account</value></data>
+<data name="CreateAccount" xml:space="preserve"><value>Create account</value></data>
+<data name="MyAccount" xml:space="preserve"><value>My account</value></data>
+<data name="DisplayName" xml:space="preserve"><value>Name</value></data>
+<data name="Email" xml:space="preserve"><value>Email address</value></data>
+<data name="Password" xml:space="preserve"><value>Password</value></data>
+<data name="NewPassword" xml:space="preserve"><value>New password</value></data>
+<data name="CurrentPassword" xml:space="preserve"><value>Current password</value></data>
+<data name="ConfirmPassword" xml:space="preserve"><value>Confirm password</value></data>
+<data name="RememberMe" xml:space="preserve"><value>Keep me signed in for this session (up to one hour)</value></data>
+<data name="AlreadyRegistered" xml:space="preserve"><value>Already registered? Sign in</value></data>
+<data name="ForgotPassword" xml:space="preserve"><value>Forgot password</value></data>
+<data name="ResetPassword" xml:space="preserve"><value>Reset password</value></data>
+<data name="ChangePassword" xml:space="preserve"><value>Change password</value></data>
+<data name="SaveProfile" xml:space="preserve"><value>Save profile</value></data>
+<data name="EmailReadOnly" xml:space="preserve"><value>Email changes are not available in this phase.</value></data>
+<data name="PasswordSessions" xml:space="preserve"><value>Changing your password signs out all customer sessions. Your saved cart is retained.</value></data>
+<data name="RequiredField" xml:space="preserve"><value>This field is required.</value></data>
+<data name="EmailInvalid" xml:space="preserve"><value>Enter a valid email address.</value></data>
+<data name="InvalidInput" xml:space="preserve"><value>Check the entered values and try again.</value></data>
+<data name="PasswordLength" xml:space="preserve"><value>Use 12 to 128 characters for your password.</value></data>
+<data name="PasswordMismatch" xml:space="preserve"><value>The passwords do not match.</value></data>
+<data name="EmailInUse" xml:space="preserve"><value>An account already uses this email. Sign in or reset your password.</value></data>
+<data name="InvalidCredentials" xml:space="preserve"><value>The credentials are incorrect or this account is temporarily unavailable.</value></data>
+<data name="SignInAgain" xml:space="preserve"><value>Your session ended. Please sign in again.</value></data>
+<data name="RateLimited" xml:space="preserve"><value>Too many attempts. Please wait a minute and try again.</value></data>
+<data name="ServiceUnavailable" xml:space="preserve"><value>The service is temporarily unavailable. Please try again.</value></data>
+<data name="ProfileUpdated" xml:space="preserve"><value>Your profile was saved.</value></data>
+<data name="PasswordUpdated" xml:space="preserve"><value>Password updated. Sign in with your new password.</value></data>
+<data name="RecoveryRequested" xml:space="preserve"><value>If an eligible account exists, a reset email will be sent. Check your inbox and spam folder.</value></data>
+<data name="RecoveryHelp" xml:space="preserve"><value>Enter your account email to request a password reset.</value></data>
+<data name="SendReset" xml:space="preserve"><value>Send reset email</value></data>
+<data name="HaveResetCode" xml:space="preserve"><value>I have a reset code</value></data>
+<data name="ResetCode" xml:space="preserve"><value>Reset code</value></data>
+<data name="ResetHelp" xml:space="preserve"><value>Open the link in your email or enter its code below. The code expires after 30 minutes and can be used once.</value></data>
+<data name="ResetInvalid" xml:space="preserve"><value>The reset code is invalid, expired or already used. Request a new email.</value></data>
+<data name="AddToCart" xml:space="preserve"><value>Add to cart</value></data>
+<data name="Quantity" xml:space="preserve"><value>Quantity</value></data>
+<data name="UpdateCart" xml:space="preserve"><value>Update</value></data>
+<data name="Remove" xml:space="preserve"><value>Remove</value></data>
+<data name="ContinueBrowsing" xml:space="preserve"><value>Continue browsing</value></data>
+<data name="CartEmpty" xml:space="preserve"><value>Your cart is empty</value></data>
+<data name="EstimatedTotal" xml:space="preserve"><value>Estimated total</value></data>
+<data name="CartEstimate" xml:space="preserve"><value>YER estimate only. Stock is not reserved. Checkout, shipping, taxes and discounts are not calculated in this phase.</value></data>
+<data name="SignInToSave" xml:space="preserve"><value>Sign in to keep your cart across sessions</value></data>
+<data name="CartAdded" xml:space="preserve"><value>Product added to your cart.</value></data>
+<data name="CartUpdated" xml:space="preserve"><value>Your cart was updated.</value></data>
+<data name="CartMerged" xml:space="preserve"><value>Your guest cart was merged into your saved cart.</value></data>
+<data name="CartAdjusted" xml:space="preserve"><value>Your cart was rechecked. Unavailable products were excluded and quantities reduced to stock or cart limits. Review the current items and prices.</value></data>
+<data name="CartConflict" xml:space="preserve"><value>Your cart changed in another request. Review it and retry your change.</value></data>
+<data name="CartFull" xml:space="preserve"><value>A cart can contain at most 100 different products. Remove an item before adding another.</value></data>
+<data name="QuantityInvalid" xml:space="preserve"><value>Enter a whole quantity from 1 to 99. Available stock may impose a lower limit.</value></data>
+<data name="ProductUnavailable" xml:space="preserve"><value>That product is no longer available in the catalog.</value></data>
+<data name="GuestExpired" xml:space="preserve"><value>The guest cart expired or was already consumed. Your saved customer cart is unchanged.</value></data>
+<data name="MergePending" xml:space="preserve"><value>You are signed in, but your guest cart could not be merged yet. Keep this browser session and retry the merge.</value></data>
+<data name="RetryMerge" xml:space="preserve"><value>Retry cart merge</value></data>
 </root>

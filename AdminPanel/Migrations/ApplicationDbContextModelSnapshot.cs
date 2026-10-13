@@ -66,9 +66,53 @@ namespace AdminPanel.API.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("Slug").IsUnique();
+                    b.HasIndex("Slug")
+                        .IsUnique();
 
                     b.ToTable("ContentPages");
+                });
+
+            modelBuilder.Entity("AdminPanel.API.Models.CustomerAccount", b =>
+                {
+                    b.Property<int>("UserId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("DisplayName")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
+                    b.Property<int>("FailedLogins")
+                        .HasColumnType("int");
+
+                    b.Property<long?>("LockedUntilUtcTicks")
+                        .HasColumnType("bigint");
+
+                    b.Property<string>("NormalizedEmail")
+                        .IsRequired()
+                        .HasMaxLength(254)
+                        .HasColumnType("nvarchar(254)");
+
+                    b.Property<long?>("ResetExpiresUtcTicks")
+                        .HasColumnType("bigint");
+
+                    b.Property<string>("ResetTokenHash")
+                        .HasMaxLength(64)
+                        .HasColumnType("nvarchar(64)");
+
+                    b.Property<Guid>("SecurityStamp")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid>("Version")
+                        .IsConcurrencyToken()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.HasKey("UserId");
+
+                    b.HasIndex("NormalizedEmail")
+                        .IsUnique();
+
+                    b.ToTable("CustomerAccounts");
                 });
 
             modelBuilder.Entity("AdminPanel.API.Models.Discount", b =>
@@ -238,6 +282,60 @@ namespace AdminPanel.API.Migrations
                     b.ToTable("ShippingOptions");
                 });
 
+            modelBuilder.Entity("AdminPanel.API.Models.ShoppingCart", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<int?>("CustomerId")
+                        .HasColumnType("int");
+
+                    b.Property<long?>("ExpiresUtcTicks")
+                        .HasColumnType("bigint");
+
+                    b.Property<string>("GuestTokenHash")
+                        .HasMaxLength(64)
+                        .HasColumnType("nvarchar(64)");
+
+                    b.Property<int?>("MergedToCustomerId")
+                        .HasColumnType("int");
+
+                    b.Property<Guid>("Version")
+                        .IsConcurrencyToken()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("CustomerId")
+                        .IsUnique()
+                        .HasFilter("[CustomerId] IS NOT NULL");
+
+                    b.HasIndex("GuestTokenHash")
+                        .IsUnique()
+                        .HasFilter("[GuestTokenHash] IS NOT NULL");
+
+                    b.ToTable("ShoppingCarts");
+                });
+
+            modelBuilder.Entity("AdminPanel.API.Models.ShoppingCartItem", b =>
+                {
+                    b.Property<Guid>("CartId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<int>("ProductId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("Quantity")
+                        .HasColumnType("int");
+
+                    b.HasKey("CartId", "ProductId");
+
+                    b.HasIndex("ProductId");
+
+                    b.ToTable("ShoppingCartItems");
+                });
+
             modelBuilder.Entity("AdminPanel.API.Models.User", b =>
                 {
                     b.Property<int>("Id")
@@ -268,9 +366,21 @@ namespace AdminPanel.API.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("Username").IsUnique();
+                    b.HasIndex("Username")
+                        .IsUnique();
 
                     b.ToTable("Users");
+                });
+
+            modelBuilder.Entity("AdminPanel.API.Models.CustomerAccount", b =>
+                {
+                    b.HasOne("AdminPanel.API.Models.User", "User")
+                        .WithOne()
+                        .HasForeignKey("AdminPanel.API.Models.CustomerAccount", "UserId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("User");
                 });
 
             modelBuilder.Entity("AdminPanel.API.Models.Discount", b =>
@@ -331,6 +441,35 @@ namespace AdminPanel.API.Migrations
                     b.Navigation("Category");
                 });
 
+            modelBuilder.Entity("AdminPanel.API.Models.ShoppingCart", b =>
+                {
+                    b.HasOne("AdminPanel.API.Models.CustomerAccount", "Customer")
+                        .WithMany()
+                        .HasForeignKey("CustomerId")
+                        .OnDelete(DeleteBehavior.Restrict);
+
+                    b.Navigation("Customer");
+                });
+
+            modelBuilder.Entity("AdminPanel.API.Models.ShoppingCartItem", b =>
+                {
+                    b.HasOne("AdminPanel.API.Models.ShoppingCart", "Cart")
+                        .WithMany("Items")
+                        .HasForeignKey("CartId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("AdminPanel.API.Models.Product", "Product")
+                        .WithMany()
+                        .HasForeignKey("ProductId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Cart");
+
+                    b.Navigation("Product");
+                });
+
             modelBuilder.Entity("AdminPanel.API.Models.Category", b =>
                 {
                     b.Navigation("Products");
@@ -339,6 +478,11 @@ namespace AdminPanel.API.Migrations
             modelBuilder.Entity("AdminPanel.API.Models.Order", b =>
                 {
                     b.Navigation("OrderItems");
+                });
+
+            modelBuilder.Entity("AdminPanel.API.Models.ShoppingCart", b =>
+                {
+                    b.Navigation("Items");
                 });
 #pragma warning restore 612, 618
         }

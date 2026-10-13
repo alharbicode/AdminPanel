@@ -76,4 +76,63 @@
 <data name="FeaturedNote" xml:space="preserve"><value>اكتشف مجموعة من المنتجات المتاحة في الكتالوج.</value></data>
 <data name="SearchSubmit" xml:space="preserve"><value>ابحث في الكتالوج</value></data>
 <data name="CountLabel" xml:space="preserve"><value>المنتجات المتاحة</value></data>
+<data name="Cart" xml:space="preserve"><value>سلة التسوق</value></data>
+<data name="Login" xml:space="preserve"><value>تسجيل الدخول</value></data>
+<data name="Logout" xml:space="preserve"><value>تسجيل الخروج</value></data>
+<data name="Register" xml:space="preserve"><value>إنشاء حسابك</value></data>
+<data name="CreateAccount" xml:space="preserve"><value>إنشاء حساب</value></data>
+<data name="MyAccount" xml:space="preserve"><value>حسابي</value></data>
+<data name="DisplayName" xml:space="preserve"><value>الاسم</value></data>
+<data name="Email" xml:space="preserve"><value>البريد الإلكتروني</value></data>
+<data name="Password" xml:space="preserve"><value>كلمة المرور</value></data>
+<data name="NewPassword" xml:space="preserve"><value>كلمة المرور الجديدة</value></data>
+<data name="CurrentPassword" xml:space="preserve"><value>كلمة المرور الحالية</value></data>
+<data name="ConfirmPassword" xml:space="preserve"><value>تأكيد كلمة المرور</value></data>
+<data name="RememberMe" xml:space="preserve"><value>تذكر دخولي لهذه الجلسة (حتى ساعة واحدة)</value></data>
+<data name="AlreadyRegistered" xml:space="preserve"><value>لديك حساب؟ سجل الدخول</value></data>
+<data name="ForgotPassword" xml:space="preserve"><value>نسيت كلمة المرور</value></data>
+<data name="ResetPassword" xml:space="preserve"><value>إعادة تعيين كلمة المرور</value></data>
+<data name="ChangePassword" xml:space="preserve"><value>تغيير كلمة المرور</value></data>
+<data name="SaveProfile" xml:space="preserve"><value>حفظ البيانات</value></data>
+<data name="EmailReadOnly" xml:space="preserve"><value>تغيير البريد الإلكتروني غير متاح في هذه المرحلة.</value></data>
+<data name="PasswordSessions" xml:space="preserve"><value>تغيير كلمة المرور ينهي جميع جلسات العميل، مع الاحتفاظ بسلتك المحفوظة.</value></data>
+<data name="RequiredField" xml:space="preserve"><value>هذا الحقل مطلوب.</value></data>
+<data name="EmailInvalid" xml:space="preserve"><value>أدخل بريداً إلكترونياً صالحاً.</value></data>
+<data name="InvalidInput" xml:space="preserve"><value>تحقق من القيم المدخلة وحاول مجدداً.</value></data>
+<data name="PasswordLength" xml:space="preserve"><value>استخدم من 12 إلى 128 حرفاً لكلمة المرور.</value></data>
+<data name="PasswordMismatch" xml:space="preserve"><value>كلمتا المرور غير متطابقتين.</value></data>
+<data name="EmailInUse" xml:space="preserve"><value>يوجد حساب بهذا البريد. سجل الدخول أو أعد تعيين كلمة المرور.</value></data>
+<data name="InvalidCredentials" xml:space="preserve"><value>بيانات الدخول غير صحيحة أو الحساب غير متاح مؤقتاً.</value></data>
+<data name="SignInAgain" xml:space="preserve"><value>انتهت جلستك. يرجى تسجيل الدخول مجدداً.</value></data>
+<data name="RateLimited" xml:space="preserve"><value>محاولات كثيرة. انتظر دقيقة ثم حاول مجدداً.</value></data>
+<data name="ServiceUnavailable" xml:space="preserve"><value>الخدمة غير متاحة مؤقتاً. يرجى المحاولة مجدداً.</value></data>
+<data name="ProfileUpdated" xml:space="preserve"><value>تم حفظ بياناتك.</value></data>
+<data name="PasswordUpdated" xml:space="preserve"><value>تم تحديث كلمة المرور. سجل الدخول بكلمة المرور الجديدة.</value></data>
+<data name="RecoveryRequested" xml:space="preserve"><value>إذا وُجد حساب مؤهل، فستصلك رسالة إعادة التعيين. تحقق من البريد الوارد والرسائل غير المرغوبة.</value></data>
+<data name="RecoveryHelp" xml:space="preserve"><value>أدخل بريد حسابك لطلب إعادة تعيين كلمة المرور.</value></data>
+<data name="SendReset" xml:space="preserve"><value>إرسال رسالة إعادة التعيين</value></data>
+<data name="HaveResetCode" xml:space="preserve"><value>لدي رمز إعادة تعيين</value></data>
+<data name="ResetCode" xml:space="preserve"><value>رمز إعادة التعيين</value></data>
+<data name="ResetHelp" xml:space="preserve"><value>افتح رابط الرسالة أو أدخل رمزها أدناه. ينتهي الرمز بعد 30 دقيقة ويُستخدم مرة واحدة.</value></data>
+<data name="ResetInvalid" xml:space="preserve"><value>رمز إعادة التعيين غير صالح أو منتهي أو مستخدم. اطلب رسالة جديدة.</value></data>
+<data name="AddToCart" xml:space="preserve"><value>أضف إلى السلة</value></data>
+<data name="Quantity" xml:space="preserve"><value>الكمية</value></data>
+<data name="UpdateCart" xml:space="preserve"><value>تحديث</value></data>
+<data name="Remove" xml:space="preserve"><value>إزالة</value></data>
+<data name="ContinueBrowsing" xml:space="preserve"><value>متابعة التصفح</value></data>
+<data name="CartEmpty" xml:space="preserve"><value>سلتك فارغة</value></data>
+<data name="EstimatedTotal" xml:space="preserve"><value>الإجمالي التقديري</value></data>
+<data name="CartEstimate" xml:space="preserve"><value>تقدير بالريال اليمني فقط، دون حجز مخزون. لا تتوفر عمليات الدفع أو حساب الشحن والضرائب والخصومات في هذه المرحلة.</value></data>
+<data name="SignInToSave" xml:space="preserve"><value>سجل الدخول للاحتفاظ بسلتك بين الجلسات</value></data>
+<data name="CartAdded" xml:space="preserve"><value>تمت إضافة المنتج إلى سلتك.</value></data>
+<data name="CartUpdated" xml:space="preserve"><value>تم تحديث سلتك.</value></data>
+<data name="CartMerged" xml:space="preserve"><value>تم دمج سلة الزائر مع سلتك المحفوظة.</value></data>
+<data name="CartAdjusted" xml:space="preserve"><value>أُعيد التحقق من السلة. استُبعدت المنتجات غير المتاحة وخُفضت الكميات وفق المخزون أو حدود السلة. راجع المنتجات والأسعار الحالية.</value></data>
+<data name="CartConflict" xml:space="preserve"><value>تغيرت سلتك في طلب آخر. راجعها ثم أعد محاولة التعديل.</value></data>
+<data name="CartFull" xml:space="preserve"><value>تستوعب السلة 100 منتج مختلف كحد أقصى. أزل منتجاً قبل إضافة آخر.</value></data>
+<data name="QuantityInvalid" xml:space="preserve"><value>أدخل كمية صحيحة من 1 إلى 99. قد يفرض المخزون المتاح حداً أقل.</value></data>
+<data name="ProductUnavailable" xml:space="preserve"><value>لم يعد هذا المنتج متاحاً في الكتالوج.</value></data>
+<data name="GuestExpired" xml:space="preserve"><value>انتهت صلاحية سلة الزائر أو استُخدمت سابقاً. لم تتغير سلة حسابك المحفوظة.</value></data>
+<data name="MergePending" xml:space="preserve"><value>أنت مسجل الدخول، لكن تعذر دمج سلة الزائر بعد. احتفظ بجلسة المتصفح وأعد محاولة الدمج.</value></data>
+<data name="RetryMerge" xml:space="preserve"><value>إعادة محاولة دمج السلة</value></data>
 </root>

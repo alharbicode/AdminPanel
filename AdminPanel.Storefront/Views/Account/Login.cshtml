@@ -1,0 +1,10 @@
+@model LoginModel
+@{ ViewData["Title"] = T["Login"]; }
+<div class="container page-content"><section class="account-panel"><h1>@T["Login"]</h1>
+<form method="post"><div asp-validation-summary="All" class="validation-summary" role="alert"></div><input asp-for="ReturnUrl" type="hidden" />
+<div class="form-field"><label asp-for="Email">@T["Email"]</label><input asp-for="Email" type="email" autocomplete="email" maxlength="254" dir="ltr" required /><span asp-validation-for="Email"></span></div>
+<div class="form-field"><label asp-for="Password">@T["Password"]</label><input asp-for="Password" type="password" autocomplete="current-password" maxlength="128" required /><span asp-validation-for="Password"></span></div>
+<label class="checkbox-field"><input asp-for="RememberMe" />@T["RememberMe"]</label>
+<button class="button">@T["Login"]</button></form><div class="account-links"><a asp-action="Register">@T["CreateAccount"]</a><a asp-action="ForgotPassword">@T["ForgotPassword"]</a></div>
+</section></div>
+

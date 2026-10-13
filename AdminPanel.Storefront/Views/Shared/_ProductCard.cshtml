@@ -7,4 +7,9 @@
     </a>
     <div class="product-copy"><span class="product-category" dir="auto">@Model.CategoryName</span><h3><a asp-controller="Catalog" asp-action="Details" asp-route-id="@Model.Id" dir="auto">@Model.Name</a></h3>
         <p class="product-price"><bdi>@T.Price(Model.Price)</bdi><span>@(Model.Currency == "YER" ? T["YER"] : Model.Currency)</span></p></div>
+    <form asp-controller="Cart" asp-action="Add" method="post" class="card-cart-form">
+        <input type="hidden" name="ProductId" value="@Model.Id" />
+        <input type="hidden" name="ReturnUrl" value="@(Context.Request.PathBase + Context.Request.Path + Context.Request.QueryString)" />
+        <button class="button button-compact" aria-label="@T["AddToCart"] — @Model.Name">@T["AddToCart"]</button>
+    </form>
 </article>

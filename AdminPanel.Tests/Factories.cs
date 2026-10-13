@@ -22,6 +22,9 @@ namespace AdminPanel.Tests;
 public class ApiFactory : WebApplicationFactory<Program>
 {
     public int[] PublicProductIds { get; init; } = [];
+    public string? MigrationTarget { get; init; }
+    public TestClock Clock { get; } = new();
+    public CaptureResetEmail Emails { get; } = new();
     // Keep each test database alive, but give concurrent HTTP requests their own connection.
     private readonly SqliteConnection _connection = new($"Data Source=AdminPanel_Test_{Guid.NewGuid():N};Mode=Memory;Cache=Shared");
     private readonly string? _sqlServerConnection = CreateSqlServerConnection();
@@ -58,6 +61,8 @@ public class ApiFactory : WebApplicationFactory<Program>
         builder.UseWebRoot(UploadRoot);
         builder.ConfigureServices(services =>
         {
+            services.AddSingleton<TimeProvider>(Clock);
+            services.AddSingleton<AdminPanel.API.Services.IPasswordResetEmail>(Emails);
             services.RemoveAll<DbContextOptions<ApplicationDbContext>>();
             services.RemoveAll<IDbContextOptionsConfiguration<ApplicationDbContext>>();
             if (_sqlServerConnection is null)
@@ -75,7 +80,7 @@ public class ApiFactory : WebApplicationFactory<Program>
         using var scope = Services.CreateScope();
         var db = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
         if (_sqlServerConnection is null) db.Database.EnsureCreated();
-        else db.Database.Migrate();
+        else db.Database.GetService<Microsoft.EntityFrameworkCore.Migrations.IMigrator>().Migrate(MigrationTarget);
         if (db.Users.Any()) return;
         var hasher = new PasswordHasher<User>();
         foreach (var role in new[] { "Admin", "Staff", "Customer" })

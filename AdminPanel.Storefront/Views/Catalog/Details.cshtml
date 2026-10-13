@@ -5,6 +5,11 @@
     <div class="product-detail">
         <div class="detail-image"><img src="@(p.HasImage ? Url.Action("Image", "Catalog", new { id = p.Id }) : Url.Content("~/images/product-placeholder.svg"))" alt="@p.Name" width="700" height="700" fetchpriority="high" data-product-image />@if (!p.HasImage) { <span>@T["NoImage"]</span> }</div>
         <div class="detail-copy"><a class="eyebrow" asp-action="Index" asp-route-CategoryId="@p.CategoryId" dir="auto">@p.CategoryName</a><h1 dir="auto">@p.Name</h1><span class="availability"><span aria-hidden="true"></span>@T["Available"]</span><p class="detail-price"><bdi>@T.Price(p.Price)</bdi><span>@(p.Currency == "YER" ? T["YER"] : p.Currency)</span></p>
+            <form asp-controller="Cart" asp-action="Add" method="post" class="quantity-form detail-cart-form">
+                <input type="hidden" name="ProductId" value="@p.Id" />
+                <label for="product-quantity">@T["Quantity"]</label><input id="product-quantity" name="Quantity" type="number" value="1" min="1" max="99" inputmode="numeric" required />
+                <button class="button">@T["AddToCart"]</button>
+            </form>
             <p class="browse-notice">@T["BrowseOnly"]</p><h2>@T["Description"]</h2><p class="product-description" dir="auto">@(string.IsNullOrWhiteSpace(p.Description) ? T["NoDescription"] : p.Description)</p>
             <dl class="product-facts"><div><dt>@T["Category"]</dt><dd dir="auto">@p.CategoryName</dd></div><div><dt>@T["Unit"]</dt><dd dir="auto">@p.Unit</dd></div><div><dt>@T["Currency"]</dt><dd><bdi>@p.Currency</bdi></dd></div></dl><p class="price-note">@T["BrowseNote"]</p>
         </div>
