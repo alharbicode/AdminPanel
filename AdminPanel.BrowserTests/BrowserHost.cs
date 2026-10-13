@@ -9,9 +9,9 @@ namespace AdminPanel.BrowserTests;
 
 // Loopback HTTPS transport into the real TestServer pipelines. No mocked controllers or API responses.
 // The existing fixture enforces disposable SQLite / loopback SQL Server databases and random credentials.
-internal sealed class BrowserHost : IAsyncDisposable
+internal sealed class BrowserHost(ApiFactory? api = null) : IAsyncDisposable
 {
-    public ApiFactory Api { get; } = new();
+    public ApiFactory Api { get; } = api ?? new();
     private MvcFactory? _mvc;
     private HttpClient? _pipeline;
     private WebApplication? _bridge;
@@ -20,7 +20,7 @@ internal sealed class BrowserHost : IAsyncDisposable
 
     public async Task Start()
     {
-        Api.Seed();
+        if (api is null) Api.Seed();
         _mvc = new MvcFactory(Api);
         // Initialize the factory before obtaining its handler. Do not share a client cookie container.
         _ = _mvc.Services;
@@ -61,7 +61,7 @@ internal sealed class BrowserHost : IAsyncDisposable
         if (_bridge is not null) { await _bridge.StopAsync(); await _bridge.DisposeAsync(); }
         _pipeline?.Dispose();
         _mvc?.Dispose();
-        Api.Dispose();
+        if (api is null) Api.Dispose();
         _certificate?.Dispose();
     }
 }

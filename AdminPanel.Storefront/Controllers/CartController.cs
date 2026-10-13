@@ -13,6 +13,20 @@ public sealed class CartController(CartGateway carts) : Controller
     [HttpPost] public Task<IActionResult> Add(CartEditModel model) => Change(model, "add");
     [HttpPost] public Task<IActionResult> Update(CartEditModel model) => Change(model, "set");
     [HttpPost] public Task<IActionResult> Remove(CartEditModel model) => Change(model, "remove");
+    [HttpPost]
+    public async Task<IActionResult> Refresh(CartRefreshModel model)
+    {
+        if (!ModelState.IsValid || model.Version is null || model.Version == Guid.Empty)
+        { TempData["Notice"] = "InvalidInput"; return RedirectToAction(nameof(Index)); }
+        try
+        {
+            await carts.Refresh(model.Version.Value);
+            TempData["Notice"] = "CartRefreshed";
+        }
+        catch (CustomerApiException e) when (e.Status is not (HttpStatusCode.Unauthorized or HttpStatusCode.Forbidden))
+        { TempData["Notice"] = e.Code; }
+        return RedirectToAction(nameof(Index));
+    }
     private async Task<IActionResult> Change(CartEditModel model, string operation)
     {
         if (!ModelState.IsValid) { TempData["Notice"] = "QuantityInvalid"; return RedirectToAction(nameof(Index)); }

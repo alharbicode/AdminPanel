@@ -5,7 +5,9 @@
     @if (Model.MergePending) {
         <div class="store-notice" role="status"><p>@T["MergePending"]</p><form asp-action="Merge" method="post"><button class="button">@T["RetryMerge"]</button></form></div>
     }
-    @if (Model.Cart.Adjusted) { <p class="store-notice" role="status">@T["CartAdjusted"]</p> }
+    @if (Model.Cart.Adjusted) {
+        <div class="store-notice" role="status"><p>@T["CartRefreshHelp"]</p><form asp-action="Refresh" method="post"><input type="hidden" name="Version" value="@Model.Cart.Version" /><button class="button button-compact">@T["RefreshAvailability"]</button></form></div>
+    }
     @if (Model.Cart.Items.Count == 0) {
         <div class="empty-state"><h2>@T["CartEmpty"]</h2><a class="button" asp-controller="Catalog" asp-action="Index">@T["ContinueBrowsing"]</a></div>
     } else {
@@ -25,6 +27,7 @@
         }
         </div><aside class="cart-summary"><h2>@T["EstimatedTotal"]</h2><p class="detail-price"><bdi>@T.Price(Model.Cart.Total)</bdi> @T["YER"]</p><p>@T["CartEstimate"]</p><a class="button" asp-controller="Catalog" asp-action="Index">@T["ContinueBrowsing"]</a>
         @if (User.Identity?.IsAuthenticated != true) { <p><a asp-controller="Account" asp-action="Login">@T["SignInToSave"]</a></p> }
+        @if (!Model.MergePending) { <p><a class="button" asp-controller="Checkout" asp-action="Index">@T["ProceedCheckout"]</a></p> }
         </aside></div>
     }
 </div>

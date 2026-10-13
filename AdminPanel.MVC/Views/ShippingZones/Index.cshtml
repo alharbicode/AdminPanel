@@ -1,0 +1,31 @@
+@model PagedList<ShippingZoneViewModel>
+@{ ViewData["Title"] = "Shipping zones"; }
+<div class="d-flex flex-wrap justify-content-between align-items-center gap-2 mb-3"><h1>Shipping zones</h1><a asp-action="Create" class="btn btn-primary">Create shipping zone</a></div>
+<p>Yemen delivery destinations and rates. Only enabled zones can be used at checkout. Existing orders retain their shipping snapshots.</p>
+<div asp-validation-summary="All" class="text-danger" role="alert"></div>
+<form method="get" asp-action="Index" class="row g-3 mb-4">
+    <div class="col-md-4"><label for="Search" class="form-label">Search</label><input id="Search" name="Search" value="@Model.Query.Search" maxlength="200" class="form-control" placeholder="Governorate or city" /></div>
+    <div class="col-md-3"><label for="Available" class="form-label">Status</label><select id="Available" name="Available" class="form-select"><option value="">All zones</option><option value="true" selected="@(Model.Query.Available == true)">Enabled</option><option value="false" selected="@(Model.Query.Available == false)">Disabled</option></select></div>
+    <div class="col-md-2"><label for="PageSize" class="form-label">Per page</label><select id="PageSize" name="PageSize" class="form-select">
+        @foreach (var size in new[] { 10, 25, 50, 100 }.Append(Model.Query.PageSize).Where(x => x >= 1 && x <= 100).Distinct().OrderBy(x => x))
+        { <option value="@size" selected="@(Model.Query.PageSize == size)">@size</option> }
+    </select></div>
+    <div class="col-12 d-flex gap-2"><button class="btn btn-outline-primary" type="submit">Apply filters</button><a asp-action="Index" class="btn btn-outline-secondary">Reset</a></div>
+</form>
+@if (!Model.Items.Any()) { <div class="alert alert-info">No shipping zones found. Adjust the filters or create a shipping zone.</div> }
+else
+{
+    <div class="table-responsive" role="region" aria-label="Scrollable records" tabindex="0"><table class="table table-striped align-middle">
+        <caption class="visually-hidden">Yemen shipping zones</caption>
+        <thead><tr><th scope="col">Governorate</th><th scope="col">City</th><th scope="col">Fee (YER)</th><th scope="col">Status</th><th scope="col">Actions</th></tr></thead>
+        <tbody>@foreach (var item in Model.Items)
+        {
+            <tr><td>@item.Governorate</td><td>@(string.IsNullOrEmpty(item.City) ? "Governorate-wide" : item.City)</td><td>@item.Fee.ToString("N2")</td><td>@(item.Enabled ? "Enabled" : "Disabled")</td><td>
+                <a asp-action="Details" asp-route-id="@item.Id" aria-label="Details for @item.Governorate @item.City">Details</a>
+                <a asp-action="Edit" asp-route-id="@item.Id" class="ms-2" aria-label="Edit @item.Governorate @item.City">Edit</a>
+                @if (item.Enabled) { <a asp-action="Disable" asp-route-id="@item.Id" class="ms-2 text-danger" aria-label="Disable @item.Governorate @item.City">Disable</a> }
+            </td></tr>
+        }</tbody>
+    </table></div>
+}
+<partial name="_Pagination" model="Model" />

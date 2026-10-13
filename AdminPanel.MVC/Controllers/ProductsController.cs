@@ -45,6 +45,12 @@ public class ProductsController(ApiClient api) : ManagementController(api)
             using var response = await Api.SaveProductAsync(model, update);
             if (response.IsSuccessStatusCode) return RedirectToAction(nameof(Index));
             if (response.StatusCode == System.Net.HttpStatusCode.NotFound) return NotFound();
+            if (response.StatusCode == System.Net.HttpStatusCode.Conflict)
+            {
+                ModelState.AddModelError("", "Stock changed while you were editing. Reload the product to review current stock before saving again.");
+                await LoadCategories();
+                return View(update ? "Edit" : "Create", model);
+            }
             ModelState.AddModelError("", "Could not save product. Check the category, values and image (JPEG, PNG or WebP).");
         }
         await LoadCategories();

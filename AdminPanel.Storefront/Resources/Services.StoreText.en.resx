@@ -53,8 +53,8 @@
 <data name="Currency" xml:space="preserve"><value>Currency</value></data>
 <data name="Price" xml:space="preserve"><value>Price</value></data>
 <data name="YER" xml:space="preserve"><value>YER</value></data>
-<data name="BrowseOnly" xml:space="preserve"><value>Browse today. Ordering is not available yet.</value></data>
-<data name="BrowseNote" xml:space="preserve"><value>Catalog prices are shown in Yemeni Rial. Checkout, delivery charges, and payment options are not available in this phase.</value></data>
+<data name="BrowseOnly" xml:space="preserve"><value>Shop with Cash on Delivery within enabled destinations in Yemen.</value></data>
+<data name="BrowseNote" xml:space="preserve"><value>Prices are in Yemeni Rial. Eligible discounts and delivery fees are calculated when you review your order.</value></data>
 <data name="Related" xml:space="preserve"><value>More in this category</value></data>
 <data name="BackCatalog" xml:space="preserve"><value>Back to the catalog</value></data>
 <data name="UnavailableTitle" xml:space="preserve"><value>This product is unavailable</value></data>
@@ -122,7 +122,7 @@
 <data name="ContinueBrowsing" xml:space="preserve"><value>Continue browsing</value></data>
 <data name="CartEmpty" xml:space="preserve"><value>Your cart is empty</value></data>
 <data name="EstimatedTotal" xml:space="preserve"><value>Estimated total</value></data>
-<data name="CartEstimate" xml:space="preserve"><value>YER estimate only. Stock is not reserved. Checkout, shipping, taxes and discounts are not calculated in this phase.</value></data>
+<data name="CartEstimate" xml:space="preserve"><value>Items estimate in YER before discounts and delivery. Stock is not reserved; review the final Cash on Delivery amount at checkout.</value></data>
 <data name="SignInToSave" xml:space="preserve"><value>Sign in to keep your cart across sessions</value></data>
 <data name="CartAdded" xml:space="preserve"><value>Product added to your cart.</value></data>
 <data name="CartUpdated" xml:space="preserve"><value>Your cart was updated.</value></data>
@@ -135,4 +135,99 @@
 <data name="GuestExpired" xml:space="preserve"><value>The guest cart expired or was already consumed. Your saved customer cart is unchanged.</value></data>
 <data name="MergePending" xml:space="preserve"><value>You are signed in, but your guest cart could not be merged yet. Keep this browser session and retry the merge.</value></data>
 <data name="RetryMerge" xml:space="preserve"><value>Retry cart merge</value></data>
+<data name="Checkout" xml:space="preserve"><value>Checkout</value></data>
+<data name="CheckoutIntro" xml:space="preserve"><value>Delivery within enabled destinations in Yemen. Pay in cash when your order arrives.</value></data>
+<data name="DeliveryDetails" xml:space="preserve"><value>Contact and delivery details</value></data>
+<data name="DeliveryDestination" xml:space="preserve"><value>Governorate and delivery destination</value></data>
+<data name="SelectDestination" xml:space="preserve"><value>Select a delivery destination</value></data>
+<data name="GovernorateWide" xml:space="preserve"><value>Governorate-wide delivery</value></data>
+<data name="DestinationHelp" xml:space="preserve"><value>Only enabled delivery destinations appear. For a city rate, enter that city below. For a governorate-wide rate, enter your city.</value></data>
+<data name="City" xml:space="preserve"><value>City</value></data>
+<data name="ContactName" xml:space="preserve"><value>Recipient name</value></data>
+<data name="Phone" xml:space="preserve"><value>Phone number</value></data>
+<data name="PhoneHelp" xml:space="preserve"><value>Enter a phone number where the delivery team can reach you.</value></data>
+<data name="PhoneInvalid" xml:space="preserve"><value>Enter 7 to 15 digits. Spaces, parentheses, hyphens and a leading + are allowed.</value></data>
+<data name="EmailOptional" xml:space="preserve"><value>Email address (optional)</value></data>
+<data name="AddressLine" xml:space="preserve"><value>Detailed delivery address</value></data>
+<data name="AddressHelp" xml:space="preserve"><value>Include the neighborhood, street, building and a nearby landmark.</value></data>
+<data name="AddressInvalid" xml:space="preserve"><value>Enter a delivery address of 5 to 500 characters.</value></data>
+<data name="DeliveryInstructions" xml:space="preserve"><value>Delivery instructions (optional)</value></data>
+<data name="COD" xml:space="preserve"><value>Cash on Delivery</value></data>
+<data name="CODHelp" xml:space="preserve"><value>Pay the displayed final amount in YER on delivery.</value></data>
+<data name="ReviewOrder" xml:space="preserve"><value>Review order</value></data>
+<data name="LoadingCheckout" xml:space="preserve"><value>Preparing your review…</value></data>
+<data name="YourCart" xml:space="preserve"><value>Your cart</value></data>
+<data name="CheckoutEstimate" xml:space="preserve"><value>Item estimate before eligible discounts and delivery. Review the final amount on the next page.</value></data>
+<data name="BackToCart" xml:space="preserve"><value>Back to cart</value></data>
+<data name="GuestCheckout" xml:space="preserve"><value>You can complete this order as a guest. No account is required.</value></data>
+<data name="NoDestinations" xml:space="preserve"><value>Delivery is not available yet</value></data>
+<data name="NoDestinationsHelp" xml:space="preserve"><value>No delivery destinations are currently enabled. Your cart is saved; please check again later.</value></data>
+<data name="ReviewBeforeConfirm" xml:space="preserve"><value>Check your items, delivery details and final Cash on Delivery amount before placing the order.</value></data>
+<data name="OrderItems" xml:space="preserve"><value>Order items</value></data>
+<data name="EditDelivery" xml:space="preserve"><value>Edit delivery details</value></data>
+<data name="OrderSummary" xml:space="preserve"><value>Order summary</value></data>
+<data name="StockOnConfirm" xml:space="preserve"><value>Stock is deducted only when your order is successfully placed.</value></data>
+<data name="PlaceOrder" xml:space="preserve"><value>Place Cash on Delivery order</value></data>
+<data name="PlacingOrder" xml:space="preserve"><value>Placing your order…</value></data>
+<data name="ConfirmationTerms" xml:space="preserve"><value>Availability and prices are rechecked on confirmation. If they change, you will be asked to review again.</value></data>
+<data name="PerItem" xml:space="preserve"><value>per item</value></data>
+<data name="DiscountApplied" xml:space="preserve"><value>Applied discount</value></data>
+<data name="OriginalPrice" xml:space="preserve"><value>Original unit price</value></data>
+<data name="Subtotal" xml:space="preserve"><value>Items subtotal</value></data>
+<data name="DiscountTotal" xml:space="preserve"><value>Discounts</value></data>
+<data name="ShippingFee" xml:space="preserve"><value>Delivery fee</value></data>
+<data name="CODTotal" xml:space="preserve"><value>Total due on delivery</value></data>
+<data name="MyOrders" xml:space="preserve"><value>My orders</value></data>
+<data name="OrderHistoryIntro" xml:space="preserve"><value>Your orders, delivery details and current status.</value></data>
+<data name="NoOrders" xml:space="preserve"><value>No orders on this page</value></data>
+<data name="ViewOrder" xml:space="preserve"><value>View order</value></data>
+<data name="OrderPages" xml:space="preserve"><value>Order history pages</value></data>
+<data name="TrackGuestOrder" xml:space="preserve"><value>Track a guest order</value></data>
+<data name="TrackOrder" xml:space="preserve"><value>Track order</value></data>
+<data name="TrackingHelp" xml:space="preserve"><value>Enter the private tracking code saved when you placed your guest order.</value></data>
+<data name="TrackingCode" xml:space="preserve"><value>Private tracking code</value></data>
+<data name="TrackingPrivacy" xml:space="preserve"><value>Keep this code private. Anyone with it can view your delivery details and manage the order.</value></data>
+<data name="RecentGuestOrder" xml:space="preserve"><value>Open the guest order saved in this browser</value></data>
+<data name="OrderDetails" xml:space="preserve"><value>Order details</value></data>
+<data name="OrderPlaced" xml:space="preserve"><value>Your order was placed</value></data>
+<data name="OrderReference" xml:space="preserve"><value>Order reference</value></data>
+<data name="OrderPlacedHelp" xml:space="preserve"><value>Your order is saved. Follow its status here and have the displayed amount ready for delivery.</value></data>
+<data name="SaveTrackingCode" xml:space="preserve"><value>Save your private tracking code</value></data>
+<data name="SaveTrackingHelp" xml:space="preserve"><value>This code is displayed on this confirmation only. Copy or write it down to open your order on another device. Your order reference alone cannot unlock the details.</value></data>
+<data name="CopyTrackingCode" xml:space="preserve"><value>Copy code</value></data>
+<data name="TrackingCopied" xml:space="preserve"><value>Tracking code copied.</value></data>
+<data name="CancellationRequestRecorded" xml:space="preserve"><value>Cancellation request recorded</value></data>
+<data name="CancellationPendingHelp" xml:space="preserve"><value>The store must review this request. Your order is not cancelled until its status says Cancelled.</value></data>
+<data name="CancelOrder" xml:space="preserve"><value>Cancel order</value></data>
+<data name="RequestCancellation" xml:space="preserve"><value>Request cancellation</value></data>
+<data name="CancelOrderHelp" xml:space="preserve"><value>You can cancel before preparation begins. This keeps the order in your history and restores its stock once.</value></data>
+<data name="RequestCancellationHelp" xml:space="preserve"><value>Preparation or shipping has started. Send a cancellation request for store administration to review.</value></data>
+<data name="CancellationReason" xml:space="preserve"><value>Reason for cancellation</value></data>
+<data name="OrderSnapshotHelp" xml:space="preserve"><value>These are the prices and delivery details saved when this order was placed.</value></data>
+<data name="TrackAnotherOrder" xml:space="preserve"><value>Track another guest order</value></data>
+<data name="ForgetTracking" xml:space="preserve"><value>Remove order access from this browser</value></data>
+<data name="ProceedCheckout" xml:space="preserve"><value>Proceed to checkout</value></data>
+<data name="CheckoutChanged" xml:space="preserve"><value>Your cart, availability, prices or delivery option changed. Check the details and review your order again.</value></data>
+<data name="ShippingUnavailable" xml:space="preserve"><value>This destination is unavailable or the city does not match the selected rate. Select an enabled destination and check the city.</value></data>
+<data name="CheckoutInvalid" xml:space="preserve"><value>This checkout review is invalid. Open your cart and review the order again.</value></data>
+<data name="IdempotencyConflict" xml:space="preserve"><value>This order submission was already used with different details. Check your order history or guest tracking before starting a new checkout.</value></data>
+<data name="OrderNotFound" xml:space="preserve"><value>This order could not be found or you do not have access to it.</value></data>
+<data name="OrderConflict" xml:space="preserve"><value>The order changed in another request. Check its current status and try again.</value></data>
+<data name="OrderTransitionInvalid" xml:space="preserve"><value>This action is not available for the current order status.</value></data>
+<data name="CancellationUnavailable" xml:space="preserve"><value>This order cannot be cancelled directly at its current stage.</value></data>
+<data name="CancellationReasonRequired" xml:space="preserve"><value>Enter a cancellation reason of 1 to 500 characters.</value></data>
+<data name="OrderCancelled" xml:space="preserve"><value>Your order was cancelled. Its history has been retained.</value></data>
+<data name="CancellationRequested" xml:space="preserve"><value>Your cancellation request was sent to store administration for review.</value></data>
+<data name="CheckoutRetry" xml:space="preserve"><value>We could not confirm the result. Retry this same confirmation safely; it will not create a duplicate order.</value></data>
+<data name="OrderStatusPending" xml:space="preserve"><value>Pending confirmation</value></data>
+<data name="OrderStatusPendingConfirmation" xml:space="preserve"><value>Pending confirmation</value></data>
+<data name="OrderStatusConfirmed" xml:space="preserve"><value>Confirmed</value></data>
+<data name="OrderStatusPreparing" xml:space="preserve"><value>Preparing</value></data>
+<data name="OrderStatusShipped" xml:space="preserve"><value>Shipped</value></data>
+<data name="OrderStatusDelivered" xml:space="preserve"><value>Delivered</value></data>
+<data name="OrderStatusCancelled" xml:space="preserve"><value>Cancelled</value></data>
+<data name="RefreshAvailability" xml:space="preserve"><value>Apply availability changes</value></data>
+<data name="CartRefreshHelp" xml:space="preserve"><value>Stock or availability changed. Apply these changes to remove unavailable products and save the shown quantities before checking out.</value></data>
+<data name="CartRefreshed" xml:space="preserve"><value>Your cart now matches current availability. Review its items before checkout.</value></data>
+<data name="CheckoutStockChanged" xml:space="preserve"><value>Availability changed. Apply the current quantities and remove unavailable items using the button below, then continue to checkout.</value></data>
 </root>

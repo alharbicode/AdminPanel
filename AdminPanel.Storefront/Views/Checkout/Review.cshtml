@@ -1,0 +1,24 @@
+@model ReviewPage
+@{ ViewData["Title"] = T["ReviewOrder"]; ViewData["CheckoutReviewToken"] = Model.ReviewToken; var quote = Model.State.Quote; var form = Model.State.Form; }
+<div class="container page-content">
+    <div class="page-heading"><h1>@T["ReviewOrder"]</h1><p>@T["ReviewBeforeConfirm"]</p></div>
+    <div asp-validation-summary="All" class="validation-summary" role="alert"></div>
+    <div class="checkout-layout">
+        <div><section class="checkout-panel"><h2>@T["OrderItems"]</h2><partial name="_CheckoutItems" model="quote.Items" /></section>
+            <section class="checkout-panel"><h2>@T["DeliveryDetails"]</h2>
+                <address><strong dir="auto">@form.ContactName</strong><br /><bdi>@form.Phone</bdi><br />
+                    @if (!string.IsNullOrEmpty(form.Email)) { <bdi>@form.Email</bdi><br /> }
+                    <span dir="auto">@quote.Governorate · @quote.City</span><br /><span class="preserve-lines" dir="auto">@form.AddressLine</span>
+                </address>
+                @if (!string.IsNullOrWhiteSpace(form.DeliveryInstructions)) { <h3>@T["DeliveryInstructions"]</h3><p class="preserve-lines" dir="auto">@form.DeliveryInstructions</p> }
+                <form asp-action="Edit" method="post"><input type="hidden" name="reviewToken" value="@Model.ReviewToken" /><button class="text-button">@T["EditDelivery"]</button></form>
+            </section>
+        </div>
+        <aside class="cart-summary"><h2>@T["OrderSummary"]</h2>
+            <partial name="_OrderTotals" model="@(new OrderTotals(quote.Subtotal, quote.DiscountTotal, quote.ShippingFee, quote.Total))" />
+            <p class="payment-note"><strong>@T["COD"]</strong><br />@T["CODHelp"]</p><p>@T["StockOnConfirm"]</p>
+            <form asp-action="Confirm" method="post" data-checkout-confirm><input type="hidden" name="reviewToken" value="@Model.ReviewToken" /><button class="button" data-busy-text="@T["PlacingOrder"]">@T["PlaceOrder"]</button></form>
+            <p class="field-help">@T["ConfirmationTerms"]</p>
+        </aside>
+    </div>
+</div>

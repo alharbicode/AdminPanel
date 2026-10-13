@@ -45,7 +45,7 @@ public sealed class AdministrationController(ApplicationDbContext db) : Controll
             rows = rows.Where(x => x.Name.Contains(term) || x.Product!.Name.Contains(term));
         }
         if (query.ProductId.HasValue) rows = rows.Where(x => x.ProductId == query.ProductId.Value);
-        // These are date-window filters only; they do not determine checkout eligibility.
+        // Date-window filters only: checkout also validates product and percentage configuration.
         var now = DateTime.UtcNow;
         rows = query.Period switch
         {
@@ -95,6 +95,7 @@ public sealed class AdministrationController(ApplicationDbContext db) : Controll
     }
 
     [HttpGet("/api/dashboard")]
+    [ResponseCache(NoStore = true, Location = ResponseCacheLocation.None)]
     public async Task<IActionResult> Dashboard(CancellationToken ct)
     {
         var products = db.Products.AsNoTracking();
@@ -108,10 +109,11 @@ public sealed class AdministrationController(ApplicationDbContext db) : Controll
             OrderCount = await orders.CountAsync(ct),
             OrdersByStatus = await orders.GroupBy(x => x.Status).Select(g => new { Status = g.Key, Count = g.Count() }).OrderBy(x => x.Status).ToListAsync(ct),
             ShippingOptionCount = await db.ShippingOptions.CountAsync(ct),
+            ShippingZoneCount = await db.ShippingZones.CountAsync(ct),
             DiscountCount = await db.Discounts.CountAsync(ct),
             ContentPageCount = await db.ContentPages.CountAsync(ct),
             RecentOrders = await orders.OrderByDescending(x => x.OrderDate).ThenByDescending(x => x.Id).Take(5)
-                .Select(x => new { x.Id, CustomerName = x.Customer!.Username, x.OrderDate, x.Status, x.TotalPrice }).ToListAsync(ct)
+                .Select(x => new { x.Id, CustomerName = x.ContactName ?? (x.Customer == null ? "Guest" : x.Customer.Username), x.OrderDate, x.Status, x.TotalPrice, x.Currency }).ToListAsync(ct)
         });
     }
 }

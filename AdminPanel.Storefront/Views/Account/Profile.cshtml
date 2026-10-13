@@ -5,5 +5,6 @@
 <div class="form-field"><label asp-for="DisplayName">@T["DisplayName"]</label><input asp-for="DisplayName" type="text" autocomplete="name" maxlength="100" required /><span asp-validation-for="DisplayName"></span></div>
 <div class="form-field"><label>@T["Email"]</label><p dir="auto">@Model.Email</p><p class="field-help">@T["EmailReadOnly"]</p></div>
 <button class="button">@T["SaveProfile"]</button></form><p class="account-links"><a asp-controller="Cart" asp-action="Index">@T["Cart"]</a><a asp-action="ChangePassword">@T["ChangePassword"]</a></p><form asp-action="Logout" method="post"><button class="text-button">@T["Logout"]</button></form>
+<p class="account-links"><a asp-controller="Orders" asp-action="Index">@T["MyOrders"]</a></p>
 </section></div>
 

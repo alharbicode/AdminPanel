@@ -99,6 +99,15 @@ public sealed class CartService(ApplicationDbContext db, CatalogVisibility visib
         await db.SaveChangesAsync(ct); // Parent version + all item changes commit or roll back together.
         return await Read(cart, ct, adjusted);
     }
+    public async Task<CartView> Refresh(ShoppingCart cart, CartRefreshDto dto, CancellationToken ct)
+    {
+        if (dto.Version != cart.Version) throw new CartProblem(409, "CartConflict");
+        var products = await Products(cart.Items.Select(i => i.ProductId), ct);
+        var adjusted = Normalize(cart, products);
+        cart.Version = Guid.NewGuid();
+        await db.SaveChangesAsync(ct);
+        return await Read(cart, ct, adjusted);
+    }
     public async Task<CartView> Merge(int customerId, string token, CancellationToken ct)
     {
         var guest = await Guest(token, allowMerged: true, ct);

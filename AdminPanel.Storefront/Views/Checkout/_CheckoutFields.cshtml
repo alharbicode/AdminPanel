@@ -1,0 +1,7 @@
+@model CheckoutModel
+<input asp-for="CartVersion" type="hidden" /><input asp-for="IdempotencyKey" type="hidden" />
+<div class="form-field"><label asp-for="ContactName">@T["ContactName"]</label><input asp-for="ContactName" autocomplete="name" maxlength="100" required /><span asp-validation-for="ContactName"></span></div>
+<div class="form-row">
+    <div class="form-field"><label asp-for="Phone">@T["Phone"]</label><input asp-for="Phone" type="tel" autocomplete="tel" dir="ltr" maxlength="30" required aria-describedby="phone-help" /><span asp-validation-for="Phone"></span><p id="phone-help" class="field-help">@T["PhoneHelp"]</p></div>
+    <div class="form-field"><label asp-for="Email">@T["EmailOptional"]</label><input asp-for="Email" type="email" autocomplete="email" dir="ltr" maxlength="254" /><span asp-validation-for="Email"></span></div>
+</div>

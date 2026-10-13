@@ -41,6 +41,10 @@ public sealed class MergeCartDto
 {
     [Required, RegularExpression("^[A-Za-z0-9_-]{43}$")] public string GuestToken { get; set; } = "";
 }
+public sealed class CartRefreshDto
+{
+    [Required] public Guid? Version { get; set; }
+}
 public sealed record CustomerView(int Id, string DisplayName, string Email);
 public sealed record CustomerLoginResult(string Token, int ExpiresInSeconds, CustomerView Customer);
 public sealed record CartLine(int ProductId, string Name, string CategoryName, decimal Price, string Currency,

@@ -28,7 +28,10 @@ public sealed class MvcTests : IDisposable
     }
     private static async Task<HttpResponseMessage> Post(HttpClient client, string url, string page, Dictionary<string, string> fields)
     {
-        fields["__RequestVerificationToken"] = Token(await client.GetStringAsync(page));
+        var html = await client.GetStringAsync(page);
+        fields["__RequestVerificationToken"] = Token(html);
+        var version = Regex.Match(html, "name=\"[Vv]ersion\"[^>]*value=\"([^\"]+)\"");
+        if (version.Success) fields["version"] = version.Groups[1].Value;
         return await client.PostAsync(url, new FormUrlEncodedContent(fields));
     }
 
@@ -93,6 +96,7 @@ public sealed class MvcTests : IDisposable
         Assert.Equal("image/png", imageResponse.Content.Headers.ContentType!.MediaType);
         using var update = ApiTests.ProductForm();
         update.Add(new StringContent(id.ToString()), "Id");
+        update.Add(new StringContent("7"), "ExpectedStockQuantity");
         update.Add(new StringContent(Token(await client.GetStringAsync($"/Products/Edit/{id}"))), "__RequestVerificationToken");
         Assert.Equal(HttpStatusCode.Redirect, (await client.PostAsync("/Products/Edit", update)).StatusCode);
         var after = await api.GetFromJsonAsync<JsonElement>($"/api/products/{id}");
@@ -106,7 +110,7 @@ public sealed class MvcTests : IDisposable
     {
         using var client = await Login();
         using var api = await _api.AdminClient();
-        using var created = await api.PostAsJsonAsync("/api/orders", new { customerId = 3, items = new[] { new { productId = 1, quantity = 2 } } });
+        using var created = await api.PostAsJsonAsync("/api/orders", new { requestKey = Guid.NewGuid(), customerId = 3, items = new[] { new { productId = 1, quantity = 2 } } });
         created.EnsureSuccessStatusCode();
         var id = (await created.Content.ReadFromJsonAsync<JsonElement>()).GetProperty("orderId").GetInt32();
         Assert.Contains("customer", await client.GetStringAsync("/Orders"));
@@ -114,7 +118,7 @@ public sealed class MvcTests : IDisposable
         Assert.Equal(HttpStatusCode.Redirect, (await Post(client, "/Orders/UpdateStatus", $"/Orders/Details/{id}",
             new() { ["id"] = id.ToString(), ["newStatus"] = "Confirmed" })).StatusCode);
         Assert.Equal("Confirmed", (await api.GetFromJsonAsync<JsonElement>($"/api/orders/{id}")).GetProperty("status").GetString());
-        Assert.Equal(HttpStatusCode.Redirect, (await Post(client, "/Orders/Cancel", $"/Orders/Details/{id}", new() { ["id"] = id.ToString() })).StatusCode);
-        Assert.Equal(HttpStatusCode.NotFound, (await client.GetAsync($"/Orders/Details/{id}")).StatusCode);
+        Assert.Equal(HttpStatusCode.Redirect, (await Post(client, "/Orders/Cancel", $"/Orders/Details/{id}", new() { ["id"] = id.ToString(), ["reason"] = "Regression cancellation" })).StatusCode);
+        Assert.Contains("Cancelled", await client.GetStringAsync($"/Orders/Details/{id}"));
     }
 }

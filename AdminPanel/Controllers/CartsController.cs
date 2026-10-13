@@ -21,6 +21,8 @@ public sealed class GuestCartController(CartService carts) : ControllerBase
     public async Task<IActionResult> Set(int id, CartMutationDto dto, CancellationToken ct) => Ok(await carts.Mutate(await carts.Guest(Token, false, ct), id, dto, "set", ct));
     [HttpDelete("items/{id:int}")]
     public async Task<IActionResult> Remove(int id, CartMutationDto dto, CancellationToken ct) => Ok(await carts.Mutate(await carts.Guest(Token, false, ct), id, dto, "remove", ct));
+    [HttpPost("refresh")]
+    public async Task<IActionResult> Refresh(CartRefreshDto dto, CancellationToken ct) => Ok(await carts.Refresh(await carts.Guest(Token, false, ct), dto, ct));
 }
 [ApiController, Route("api/customer/cart")]
 [Authorize(AuthenticationSchemes = CustomerSecurity.Scheme, Roles = "Customer")]
@@ -36,6 +38,8 @@ public sealed class CustomerCartController(CartService carts) : ControllerBase
     public async Task<IActionResult> Set(int id, CartMutationDto dto, CancellationToken ct) => Ok(await carts.Mutate(await carts.Customer(Id, ct), id, dto, "set", ct));
     [HttpDelete("items/{id:int}")]
     public async Task<IActionResult> Remove(int id, CartMutationDto dto, CancellationToken ct) => Ok(await carts.Mutate(await carts.Customer(Id, ct), id, dto, "remove", ct));
+    [HttpPost("refresh")]
+    public async Task<IActionResult> Refresh(CartRefreshDto dto, CancellationToken ct) => Ok(await carts.Refresh(await carts.Customer(Id, ct), dto, ct));
     [HttpPost("merge")]
     public async Task<IActionResult> Merge(MergeCartDto dto, CancellationToken ct) => Ok(await carts.Merge(Id, dto.GuestToken, ct));
 }

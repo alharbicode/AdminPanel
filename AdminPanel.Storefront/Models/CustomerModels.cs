@@ -55,4 +55,8 @@ public sealed record CartSnapshot(Guid Version, List<CartItem> Items, int ItemCo
 }
 public sealed record GuestCart(string Token, DateTimeOffset ExpiresUtc, CartSnapshot Cart);
 public sealed record CartPage(CartSnapshot Cart, bool MergePending);
+public sealed class CartRefreshModel
+{
+    [Required(ErrorMessage = "RequiredField")] public Guid? Version { get; set; }
+}
 

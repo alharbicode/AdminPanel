@@ -19,8 +19,9 @@
                 <input id="global-search" type="search" name="Search" value="@Context.Request.Query["Search"]" maxlength="100" placeholder="@T["SearchPlaceholder"]" />
                 <button type="submit" aria-label="@T["SearchSubmit"]"><partial name="_Icon" model='@("search")' /></button>
             </form>
-            <form asp-controller="Language" asp-action="Change" method="post" class="language-switch" aria-label="@T["Language"]">
-                <input type="hidden" name="returnUrl" value="@(Context.Request.PathBase + Context.Request.Path + Context.Request.QueryString)" />
+            <form asp-controller="@(ViewData["CheckoutReviewToken"] is string ? "Checkout" : "Language")" asp-action="@(ViewData["CheckoutReviewToken"] is string ? "ChangeLanguage" : "Change")" method="post" class="language-switch" aria-label="@T["Language"]">
+                @if (ViewData["CheckoutReviewToken"] is string reviewToken) { <input type="hidden" name="reviewToken" value="@reviewToken" /> }
+                else { <input type="hidden" name="returnUrl" value="@(ViewData["LanguageReturnUrl"] ?? (Context.Request.PathBase + Context.Request.Path + Context.Request.QueryString))" /> }
                 <button type="submit" name="culture" value="ar" lang="ar" aria-pressed="@(T.Arabic ? "true" : "false")" aria-label="العربية">AR</button>
                 <span aria-hidden="true">/</span>
                 <button type="submit" name="culture" value="en" lang="en" aria-pressed="@(!T.Arabic ? "true" : "false")" aria-label="English">EN</button>
@@ -32,9 +33,11 @@
             <a asp-controller="Catalog" asp-action="Index" aria-current="@(ViewContext.RouteData.Values["action"]?.ToString() == "Index" && ViewContext.RouteData.Values["controller"]?.ToString() == "Catalog" ? "page" : null)">@T["Catalog"]</a>
             <div class="customer-nav">
                 @if (User.Identity?.IsAuthenticated == true) {
+                    <a asp-controller="Orders" asp-action="Index">@T["MyOrders"]</a>
                     <a asp-controller="Account" asp-action="Profile">@T["MyAccount"]</a>
                     <form asp-controller="Account" asp-action="Logout" method="post"><button class="text-button">@T["Logout"]</button></form>
                 } else { <a asp-controller="Account" asp-action="Login">@T["Login"]</a> }
+                <a asp-controller="Orders" asp-action="Track">@T["TrackOrder"]</a>
                 @await Component.InvokeAsync("CartCount")
             </div>
         </nav>

@@ -58,6 +58,8 @@ public class ApiClient
         Add("Name", model.Name); Add("Description", model.Description ?? "");
         Add("Price", model.Price.ToString(CultureInfo.InvariantCulture));
         Add("StockQuantity", model.StockQuantity.ToString(CultureInfo.InvariantCulture));
+        if (update && model.ExpectedStockQuantity.HasValue)
+            Add("ExpectedStockQuantity", model.ExpectedStockQuantity.Value.ToString(CultureInfo.InvariantCulture));
         Add("Unit", model.Unit); Add("IsAvailable", model.IsAvailable.ToString());
         Add("CategoryId", model.CategoryId.ToString(CultureInfo.InvariantCulture));
         if (model.ImageFile is not null)

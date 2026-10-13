@@ -16,7 +16,7 @@ public sealed class AdminListQuery : IValidatableObject
     public bool? Available { get; set; }
     public bool? HasProducts { get; set; }
     [RegularExpression("^(in-stock|out-of-stock)$")] public string? Stock { get; set; }
-    [RegularExpression("^(Pending|Confirmed|Shipped|Delivered)$")] public string? Status { get; set; }
+    [RegularExpression("^(Pending|Confirmed|Preparing|Shipped|Delivered|Cancelled)$")] public string? Status { get; set; }
     [DataType(DataType.Date)] public DateTime? From { get; set; }
     [DataType(DataType.Date)] public DateTime? To { get; set; }
     public IEnumerable<ValidationResult> Validate(ValidationContext context)

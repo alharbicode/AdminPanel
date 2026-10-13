@@ -14,7 +14,7 @@ public class ProductsController(ApplicationDbContext context, ProductImageStore 
     private IQueryable<ProductDto> Products() => context.Products.AsNoTracking().Select(p => new ProductDto
     {
         Id = p.Id, Name = p.Name, Description = p.Description, Price = p.Price, ImageUrl = p.ImageUrl,
-        StockQuantity = p.StockQuantity, Unit = p.Unit, IsAvailable = p.IsAvailable, CategoryId = p.CategoryId
+        StockQuantity = p.StockQuantity, ExpectedStockQuantity = p.StockQuantity, Unit = p.Unit, IsAvailable = p.IsAvailable, CategoryId = p.CategoryId
     });
     [HttpGet]
     public async Task<ActionResult<IEnumerable<ProductDto>>> GetProducts() => Ok(await Products().ToListAsync());
@@ -35,6 +35,11 @@ public class ProductsController(ApplicationDbContext context, ProductImageStore 
     {
         var product = id.HasValue ? await context.Products.FindAsync(id.Value) : new Product();
         if (product is null) return NotFound();
+        // A value copied from an earlier edit page must never overwrite stock consumed by checkout.
+        // Legacy clients may omit the expectation only when they are not changing current stock.
+        if (id.HasValue && ((dto.ExpectedStockQuantity.HasValue && dto.ExpectedStockQuantity != product.StockQuantity) ||
+            (!dto.ExpectedStockQuantity.HasValue && dto.StockQuantity != product.StockQuantity)))
+            return Conflict(new { message = "Stock changed or its original value is missing. Reload the product before editing stock." });
         if (!await context.Categories.AnyAsync(c => c.Id == dto.CategoryId))
             return BadRequest(new { message = "Invalid category." });
         string? newImage = null;

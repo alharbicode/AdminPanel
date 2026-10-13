@@ -56,5 +56,13 @@ public sealed class CartGateway(CustomerClient api, IHttpContextAccessor accesso
         _read = Task.FromResult(result);
         return result;
     }
+    public async Task<CartSnapshot> Refresh(Guid version)
+    {
+        var authenticated = Context.User.Identity?.IsAuthenticated == true;
+        var result = await api.Send<CartSnapshot>(HttpMethod.Post, (authenticated ? "customer/cart" : "guest/cart") + "/refresh",
+            new { Version = version }, guest: authenticated ? null : GuestToken, anonymous: !authenticated);
+        _read = Task.FromResult(result);
+        return result;
+    }
 }
 

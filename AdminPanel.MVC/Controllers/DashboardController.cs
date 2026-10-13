@@ -3,6 +3,7 @@ using AdminPanel.MVC.Services;
 using Microsoft.AspNetCore.Mvc;
 
 namespace AdminPanel.MVC.Controllers;
+[ResponseCache(NoStore = true, Location = ResponseCacheLocation.None)]
 public class DashboardController(ApiClient api) : Controller
 {
     public async Task<IActionResult> Index() => View(await api.GetAsync<DashboardViewModel>("dashboard") ?? new());

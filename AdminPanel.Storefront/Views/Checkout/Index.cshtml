@@ -1,0 +1,41 @@
+@model CheckoutPage
+@{ ViewData["Title"] = T["Checkout"]; }
+<div class="container page-content">
+    <div class="page-heading"><h1>@T["Checkout"]</h1><p>@T["CheckoutIntro"]</p></div>
+    <div asp-validation-summary="All" class="validation-summary" role="alert"></div>
+    @if (Model.Cart.Items.Count == 0) {
+        <div class="empty-state"><h2>@T["CartEmpty"]</h2><a class="button" asp-controller="Cart" asp-action="Index">@T["Cart"]</a></div>
+    } else if (Model.Destinations.Count == 0) {
+        <div class="empty-state"><h2>@T["NoDestinations"]</h2><p>@T["NoDestinationsHelp"]</p><a class="button" asp-controller="Cart" asp-action="Index">@T["BackToCart"]</a></div>
+    } else {
+        <div class="checkout-layout">
+            <section class="checkout-panel"><h2>@T["DeliveryDetails"]</h2>
+                <form asp-action="Review" method="post" data-checkout-form>
+                    <partial name="_CheckoutFields" model="Model.Form" view-data="ViewData" />
+                    <div class="form-field">
+                        <label for="ShippingZoneId">@T["DeliveryDestination"]</label>
+                        <select id="ShippingZoneId" name="ShippingZoneId" required aria-describedby="destination-help" data-destination>
+                            <option value="">@T["SelectDestination"]</option>
+                            @foreach (var group in Model.Destinations.GroupBy(x => x.Governorate)) {
+                                <optgroup label="@group.Key">
+                                @foreach (var zone in group) {
+                                    <option value="@zone.Id" selected="@(zone.Id == Model.Form.ShippingZoneId)" data-city="@zone.City">@zone.Governorate — @(string.IsNullOrEmpty(zone.City) ? T["GovernorateWide"] : zone.City) · @T.Price(zone.Fee) @T["YER"]</option>
+                                }
+                                </optgroup>
+                            }
+                        </select>
+                        <p id="destination-help" class="field-help">@T["DestinationHelp"]</p>
+                    </div>
+                    <partial name="_AddressFields" model="Model.Form" view-data="ViewData" />
+                    <p class="payment-note"><strong>@T["COD"]</strong> · @T["CODHelp"]</p>
+                    <button class="button" data-busy-text="@T["LoadingCheckout"]">@T["ReviewOrder"]</button>
+                </form>
+            </section>
+            <aside class="cart-summary"><h2>@T["YourCart"]</h2><p>@T.Number(Model.Cart.ItemCount) @T["Products"]</p>
+                <p class="detail-price"><bdi>@T.Price(Model.Cart.Total)</bdi> @T["YER"]</p><p>@T["CheckoutEstimate"]</p>
+                <a asp-controller="Cart" asp-action="Index">@T["BackToCart"]</a>
+                @if (User.Identity?.IsAuthenticated != true) { <p>@T["GuestCheckout"]</p> }
+            </aside>
+        </div>
+    }
+</div>

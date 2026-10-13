@@ -1,0 +1,47 @@
+@model OrderPage
+@{ var order = Model.Order; ViewData["Title"] = Model.Confirmed ? T["OrderPlaced"] : T["OrderDetails"]; }
+<div class="container page-content">
+    <div class="page-heading"><h1>@(Model.Confirmed ? T["OrderPlaced"] : T["OrderDetails"])</h1>
+        <p>@T["OrderReference"]: <strong><bdi>@order.Reference</bdi></strong> · <time datetime="@order.OrderDate.ToString("O")">@order.OrderDate.ToString("g")</time> UTC</p>
+        <p class="order-status">@T["OrderStatus" + order.Status]</p>
+    </div>
+    @if (Model.Confirmed) { <p class="store-notice" role="status">@T["OrderPlacedHelp"]</p> }
+    @if (!string.IsNullOrEmpty(Model.TrackingCode)) {
+        <section class="tracking-save" aria-labelledby="save-tracking-heading"><h2 id="save-tracking-heading">@T["SaveTrackingCode"]</h2><p>@T["SaveTrackingHelp"]</p>
+            <div class="form-field"><label for="saved-tracking-code">@T["TrackingCode"]</label><input id="saved-tracking-code" type="text" dir="ltr" value="@Model.TrackingCode" readonly autocomplete="off" spellcheck="false" /></div>
+            <button class="button button-compact" type="button" data-copy-tracking data-copied="@T["TrackingCopied"]" hidden>@T["CopyTrackingCode"]</button><span class="field-help" role="status" data-copy-status></span>
+            <p class="field-help">@T["TrackingPrivacy"]</p>
+        </section>
+    }
+    <div class="checkout-layout">
+        <div><section class="checkout-panel"><h2>@T["OrderItems"]</h2><partial name="_CheckoutItems" model="order.Items" /></section>
+            <section class="checkout-panel"><h2>@T["DeliveryDetails"]</h2>
+                <address><strong dir="auto">@order.ContactName</strong><br /><bdi>@order.Phone</bdi><br />
+                    @if (!string.IsNullOrEmpty(order.Email)) { <bdi>@order.Email</bdi><br /> }
+                    <span dir="auto">@order.Governorate · @order.City</span><br /><span class="preserve-lines" dir="auto">@order.AddressLine</span>
+                </address>
+                @if (!string.IsNullOrWhiteSpace(order.DeliveryInstructions)) { <h3>@T["DeliveryInstructions"]</h3><p class="preserve-lines" dir="auto">@order.DeliveryInstructions</p> }
+            </section>
+            @if (order.CancelledAt is not null) {
+                <section class="checkout-panel"><h2>@T["OrderStatusCancelled"]</h2><p><time datetime="@order.CancelledAt.Value.ToString("O")">@order.CancelledAt.Value.ToString("g")</time> UTC</p><p class="preserve-lines" dir="auto">@order.CancellationReason</p></section>
+            }
+            @if (order.CancellationRequestedAt is not null) {
+                <section class="checkout-panel"><h2>@T["CancellationRequestRecorded"]</h2><p><time datetime="@order.CancellationRequestedAt.Value.ToString("O")">@order.CancellationRequestedAt.Value.ToString("g")</time> UTC</p><p class="preserve-lines" dir="auto">@order.CancellationRequestReason</p><p class="field-help">@T["CancellationPendingHelp"]</p></section>
+            }
+            @if (order.CanCancel || order.CanRequestCancellation) {
+                <section class="checkout-panel"><h2>@(order.CanCancel ? T["CancelOrder"] : T["RequestCancellation"])</h2><p>@(order.CanCancel ? T["CancelOrderHelp"] : T["RequestCancellationHelp"])</p>
+                    <form asp-action="@(order.CanCancel ? "Cancel" : "RequestCancellation")" method="post">
+                        <input type="hidden" name="Id" value="@order.Id" /><input type="hidden" name="Version" value="@order.Version" /><input type="hidden" name="Guest" value="@Model.Guest.ToString().ToLowerInvariant()" />
+                        <div class="form-field"><label for="Reason">@T["CancellationReason"]</label><textarea id="Reason" name="Reason" maxlength="500" rows="3" required></textarea></div>
+                        <button class="button">@(order.CanCancel ? T["CancelOrder"] : T["RequestCancellation"])</button>
+                    </form>
+                </section>
+            }
+        </div>
+        <aside class="cart-summary"><h2>@T["OrderSummary"]</h2><partial name="_OrderTotals" model="@(new OrderTotals(order.Subtotal, order.DiscountTotal, order.ShippingFee, order.Total))" />
+            <p class="payment-note"><strong>@T["COD"]</strong><br />@T["CODHelp"]</p><p>@T["OrderSnapshotHelp"]</p>
+            @if (Model.Guest) { <a asp-action="Track">@T["TrackAnotherOrder"]</a><form asp-action="Forget" method="post"><button class="text-button">@T["ForgetTracking"]</button></form> }
+            else { <a asp-action="Index">@T["MyOrders"]</a> }
+        </aside>
+    </div>
+</div>

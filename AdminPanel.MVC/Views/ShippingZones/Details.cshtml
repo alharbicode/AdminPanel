@@ -1,0 +1,7 @@
+@model ShippingZoneViewModel
+@{ ViewData["Title"] = "Shipping zone details"; }
+<h1>@ViewData["Title"]</h1>
+<partial name="_Details" model="Model" />
+<a asp-action="Edit" asp-route-id="@Model.Id" class="btn btn-primary">Edit</a>
+@if (Model.Enabled) { <a asp-action="Disable" asp-route-id="@Model.Id" class="btn btn-outline-danger">Disable</a> }
+<a asp-action="Index" class="btn btn-outline-secondary">Back to shipping zones</a>
