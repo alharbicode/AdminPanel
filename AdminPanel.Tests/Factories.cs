@@ -21,7 +21,9 @@ namespace AdminPanel.Tests;
 
 public class ApiFactory : WebApplicationFactory<Program>
 {
-    private readonly SqliteConnection _connection = new("Data Source=:memory:");
+    public int[] PublicProductIds { get; init; } = [];
+    // Keep each test database alive, but give concurrent HTTP requests their own connection.
+    private readonly SqliteConnection _connection = new($"Data Source=AdminPanel_Test_{Guid.NewGuid():N};Mode=Memory;Cache=Shared");
     private readonly string? _sqlServerConnection = CreateSqlServerConnection();
     private static string? CreateSqlServerConnection()
     {
@@ -44,7 +46,8 @@ public class ApiFactory : WebApplicationFactory<Program>
             ["JwtSettings:SecretKey"] = Secret, ["JwtSettings:Issuer"] = "AdminPanel.API",
             ["JwtSettings:Audience"] = "AdminPanel.MVC", ["JwtSettings:LifetimeMinutes"] = "60",
             ["ConnectionStrings:DefaultConnection"] = "Server=unused;Database=unused"
-        }));
+        }.Concat(PublicProductIds.Select((id, index) => new KeyValuePair<string, string?>(
+            $"PublicCatalog:ProductIds:{index}", id.ToString(System.Globalization.CultureInfo.InvariantCulture))))));
         return base.CreateHost(builder);
     }
     protected override void ConfigureWebHost(IWebHostBuilder builder)
@@ -60,7 +63,7 @@ public class ApiFactory : WebApplicationFactory<Program>
             if (_sqlServerConnection is null)
             {
                 _connection.Open();
-                services.AddDbContext<ApplicationDbContext>(options => options.UseSqlite(_connection));
+                services.AddDbContext<ApplicationDbContext>(options => options.UseSqlite(_connection.ConnectionString));
             }
             else services.AddDbContext<ApplicationDbContext>(options => options.UseSqlServer(_sqlServerConnection));
         });

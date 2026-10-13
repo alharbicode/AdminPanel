@@ -44,6 +44,8 @@ jobs:
         run: dotnet run --project AdminPanel.BrowserTests --no-build --configuration Release -- --install-browsers
       - name: Browser administrator workflows
         run: dotnet run --project AdminPanel.BrowserTests --no-build --configuration Release
+      - name: Browser Arabic and English storefront workflows
+        run: dotnet run --project AdminPanel.BrowserTests --no-build --configuration Release -- --storefront
       - run: dotnet tool restore
       - name: Check migration model and generate SQL
         env:
@@ -76,7 +78,7 @@ jobs:
           dotnet-version: '8.0.x'
       - run: dotnet restore AdminPanel.sln
       - run: dotnet build AdminPanel.sln --no-restore --configuration Release
-      - name: Verify Windows LocalDB and two HTTPS applications
+      - name: Verify Windows LocalDB and three HTTPS applications
         shell: pwsh
         run: ./scripts/Test-WindowsSetup.ps1
       - uses: actions/upload-artifact@v4

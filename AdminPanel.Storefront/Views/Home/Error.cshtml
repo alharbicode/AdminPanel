@@ -1,0 +1,2 @@
+@{ ViewData["Title"] = T["ErrorTitle"]; }
+<div class="container page-content"><div class="empty-state error-state"><partial name="_Icon" model='@("box")' /><h1>@T["ErrorTitle"]</h1><p>@T["ErrorBody"]</p><a class="button" asp-controller="Home" asp-action="Index">@T["Retry"]</a></div></div>

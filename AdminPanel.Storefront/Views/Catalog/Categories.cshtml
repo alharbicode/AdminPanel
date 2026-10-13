@@ -1,0 +1,10 @@
+@model CategoriesModel
+@{ ViewData["Title"] = T["Categories"]; }
+<div class="container page-content">
+    <nav class="breadcrumbs" aria-label="@T["Menu"]"><a asp-controller="Home" asp-action="Index">@T["Home"]</a><span aria-hidden="true">/</span><span>@T["Categories"]</span></nav>
+    <div class="page-heading"><p class="eyebrow">@T["Categories"]</p><h1>@T["CategoryTitle"]</h1><p>@T["CategoryBody"]</p></div>
+    <form method="get" class="category-search" role="search"><label class="sr-only" for="category-search">@T["Search"]</label><input id="category-search" type="search" name="Search" maxlength="100" value="@Model.Query.Search" placeholder="@T["CategorySearch"]" /><button class="button" type="submit">@T["Search"]</button></form>
+    @if (Model.Categories.Items.Count > 0) { <div class="category-grid">@foreach (var item in Model.Categories.Items) { <partial name="_CategoryCard" model="item" /> }</div> }
+    else { <div class="empty-state"><h2>@T["EmptyCategory"]</h2><a class="button" asp-action="Categories">@T["Reset"]</a></div> }
+    <partial name="_Pagination" model='new PaginationModel(Model.Categories.Page, Model.Categories.TotalPages, Model.Query, Url.Action("Categories", "Catalog")!)' />
+</div>

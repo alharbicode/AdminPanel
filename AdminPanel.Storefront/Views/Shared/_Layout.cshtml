@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="@T.Language" dir="@T.Direction">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="theme-color" content="#153f36" />
+    <title>@ViewData["Title"] · @Store.Value.Name</title>
+    <link rel="stylesheet" href="~/css/store.css" asp-append-version="true" />
+</head>
+<body>
+    <a class="skip-link" href="#main">@T["Skip"]</a>
+    <div class="announcement"><div class="container"><span>@T["Welcome"]</span><span>@T["Yemen"]</span></div></div>
+    <header class="store-header">
+        <div class="container header-main">
+            <a class="brand" asp-controller="Home" asp-action="Index"><span class="brand-mark"><partial name="_Icon" model='@("bag")' /></span><span dir="auto">@Store.Value.Name</span></a>
+            <form class="header-search" asp-controller="Catalog" asp-action="Index" method="get" role="search">
+                <label class="sr-only" for="global-search">@T["Search"]</label>
+                <input id="global-search" type="search" name="Search" value="@Context.Request.Query["Search"]" maxlength="100" placeholder="@T["SearchPlaceholder"]" />
+                <button type="submit" aria-label="@T["SearchSubmit"]"><partial name="_Icon" model='@("search")' /></button>
+            </form>
+            <form asp-controller="Language" asp-action="Change" method="post" class="language-switch" aria-label="@T["Language"]">
+                <input type="hidden" name="returnUrl" value="@(Context.Request.PathBase + Context.Request.Path + Context.Request.QueryString)" />
+                <button type="submit" name="culture" value="ar" lang="ar" aria-pressed="@(T.Arabic ? "true" : "false")" aria-label="العربية">AR</button>
+                <span aria-hidden="true">/</span>
+                <button type="submit" name="culture" value="en" lang="en" aria-pressed="@(!T.Arabic ? "true" : "false")" aria-label="English">EN</button>
+            </form>
+        </div>
+        <nav class="store-nav container" aria-label="@T["Menu"]">
+            <a class="category-nav" asp-controller="Catalog" asp-action="Categories"><partial name="_Icon" model='@("grid")' />@T["AllCategories"]</a>
+            <a asp-controller="Home" asp-action="Index" aria-current="@(ViewContext.RouteData.Values["controller"]?.ToString() == "Home" ? "page" : null)">@T["Home"]</a>
+            <a asp-controller="Catalog" asp-action="Index" aria-current="@(ViewContext.RouteData.Values["action"]?.ToString() == "Index" && ViewContext.RouteData.Values["controller"]?.ToString() == "Catalog" ? "page" : null)">@T["Catalog"]</a>
+            <span class="nav-note">@T["BrowseOnly"]</span>
+        </nav>
+    </header>
+    <main id="main" tabindex="-1">@RenderBody()</main>
+    <footer class="store-footer">
+        <div class="container footer-main"><div><a class="brand footer-brand" asp-controller="Home" asp-action="Index"><span class="brand-mark"><partial name="_Icon" model='@("bag")' /></span><span dir="auto">@Store.Value.Name</span></a><p>@T["FooterText"]</p></div>
+            <div><strong>@T["FooterBrowse"]</strong><a asp-controller="Catalog" asp-action="Index">@T["Catalog"]</a><a asp-controller="Catalog" asp-action="Categories">@T["Categories"]</a></div>
+            <div class="footer-info"><strong>@T["FooterInfo"]</strong><p>@T["BrowseOnly"]</p><p>@T["OriginalContent"]</p></div>
+        </div>
+        <div class="container footer-bottom"><span dir="auto">© @DateTime.UtcNow.Year @Store.Value.Name</span><span>@T["Yemen"]</span></div>
+    </footer>
+    <script src="~/js/store.js" asp-append-version="true" defer></script>
+</body>
+</html>

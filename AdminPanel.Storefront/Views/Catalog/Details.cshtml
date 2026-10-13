@@ -1,0 +1,13 @@
+@model DetailsModel
+@{ ViewData["Title"] = Model.Product.Name; var p = Model.Product; }
+<div class="container page-content">
+    <nav class="breadcrumbs" aria-label="@T["Menu"]"><a asp-controller="Home" asp-action="Index">@T["Home"]</a><span aria-hidden="true">/</span><a asp-action="Index">@T["Catalog"]</a><span aria-hidden="true">/</span><span dir="auto">@p.Name</span></nav>
+    <div class="product-detail">
+        <div class="detail-image"><img src="@(p.HasImage ? Url.Action("Image", "Catalog", new { id = p.Id }) : Url.Content("~/images/product-placeholder.svg"))" alt="@p.Name" width="700" height="700" fetchpriority="high" data-product-image />@if (!p.HasImage) { <span>@T["NoImage"]</span> }</div>
+        <div class="detail-copy"><a class="eyebrow" asp-action="Index" asp-route-CategoryId="@p.CategoryId" dir="auto">@p.CategoryName</a><h1 dir="auto">@p.Name</h1><span class="availability"><span aria-hidden="true"></span>@T["Available"]</span><p class="detail-price"><bdi>@T.Price(p.Price)</bdi><span>@(p.Currency == "YER" ? T["YER"] : p.Currency)</span></p>
+            <p class="browse-notice">@T["BrowseOnly"]</p><h2>@T["Description"]</h2><p class="product-description" dir="auto">@(string.IsNullOrWhiteSpace(p.Description) ? T["NoDescription"] : p.Description)</p>
+            <dl class="product-facts"><div><dt>@T["Category"]</dt><dd dir="auto">@p.CategoryName</dd></div><div><dt>@T["Unit"]</dt><dd dir="auto">@p.Unit</dd></div><div><dt>@T["Currency"]</dt><dd><bdi>@p.Currency</bdi></dd></div></dl><p class="price-note">@T["BrowseNote"]</p>
+        </div>
+    </div>
+    @if (Model.Related.Count > 0) { <section class="home-section"><div class="section-heading"><h2>@T["Related"]</h2><a class="text-link" asp-action="Index" asp-route-CategoryId="@p.CategoryId">@T["ViewAll"]<partial name="_Icon" model='@("arrow")' /></a></div><div class="product-grid">@foreach(var item in Model.Related) { <partial name="_ProductCard" model="item" /> }</div></section> }
+</div>

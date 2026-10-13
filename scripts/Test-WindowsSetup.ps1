@@ -76,10 +76,14 @@ try {
     $env:ASPNETCORE_Kestrel__Certificates__Default__Path = $certificatePath
     $env:ASPNETCORE_Kestrel__Certificates__Default__Password = $certificatePassword
     $env:ApiSettings__BaseUrl = 'https://localhost:17556/api/'
+    $env:PublicCatalog__ProductIds__0 = '1'
     $processes += Start-App 'AdminPanel' 'AdminPanel.API' 'https://localhost:17556'
     $processes += Start-App 'AdminPanel.MVC' 'AdminPanel.MVC' 'https://localhost:17889'
+    $env:ApiSettings__BaseUrl = 'https://localhost:17556/api/catalog/'
+    $processes += Start-App 'AdminPanel.Storefront' 'AdminPanel.Storefront' 'https://localhost:17989'
     Wait-Endpoint 'https://localhost:17556/api/categories' 401
     Wait-Endpoint 'https://localhost:17889/Account/Login' 200
+    Wait-Endpoint 'https://localhost:17989/' 200
 
     $login = Invoke-WebRequest 'https://localhost:17889/Account/Login' -SessionVariable session
     $signedIn = Invoke-WebRequest 'https://localhost:17889/Account/Login' -Method Post -WebSession $session -Body @{
@@ -96,7 +100,15 @@ try {
     if ($created.Content -notmatch 'Windows smoke shipping') { throw 'Windows MVC-to-API write did not appear in the list.' }
     $csrf = Invoke-WebRequest 'https://localhost:17889/ShippingOptions/Create' -Method Post -WebSession $session -Body @{Name='Rejected';Area='Test';Price='1'} -SkipHttpErrorCheck
     if ($csrf.StatusCode -ne 400) { throw 'Windows CSRF protection failed.' }
-    Write-Output 'WINDOWS SMOKE PASS: isolated LocalDB migrations, bootstrap, two HTTPS processes, trusted TLS, administrator login, MVC/API shipping creation and CSRF rejection.'
+    $apiLogin = Invoke-RestMethod 'https://localhost:17556/api/auth/login' -Method Post -ContentType 'application/json' -Body (@{username=$env:BootstrapAdmin__Username;password=$env:BootstrapAdmin__Password} | ConvertTo-Json)
+    $adminHeaders = @{Authorization='Bearer ' + $apiLogin.token}
+    Invoke-RestMethod 'https://localhost:17556/api/categories' -Method Post -Headers $adminHeaders -ContentType 'application/json' -Body '{"name":"Windows catalog"}' | Out-Null
+    Invoke-RestMethod 'https://localhost:17556/api/products' -Method Post -Headers $adminHeaders -Form @{Name='Windows catalog product';CategoryId='1';Price='1250.50';StockQuantity='2';IsAvailable='true';Unit='Piece'} | Out-Null
+    $storePage = Invoke-WebRequest 'https://localhost:17989/' -SessionVariable storeSession
+    if ($storePage.Content -notmatch 'lang="ar" dir="rtl"' -or $storePage.Content -notmatch 'Windows catalog product') { throw 'Arabic storefront catalog failed.' }
+    $english = Invoke-WebRequest 'https://localhost:17989/Language/Change' -Method Post -WebSession $storeSession -Body @{culture='en';returnUrl='/Catalog/Details/1';__RequestVerificationToken=(Get-Token $storePage.Content)}
+    if ($english.Content -notmatch 'lang="en" dir="ltr"' -or $english.Content -notmatch 'Windows catalog product') { throw 'English storefront details failed.' }
+    Write-Output 'WINDOWS SMOKE PASS: isolated LocalDB migrations, bootstrap, three HTTPS processes, trusted TLS, admin CRUD/CSRF and bilingual public storefront with actual catalog data.'
 } finally {
     foreach ($process in $processes) {
         if (!$process.HasExited) { $process.Kill($true); $process.WaitForExit() }
@@ -123,7 +135,7 @@ try {
             Remove-Item -LiteralPath $resolvedCertificate
         }
     }
-    foreach ($setting in @('JwtSettings__SecretKey','ConnectionStrings__DefaultConnection','BootstrapAdmin__Username','BootstrapAdmin__Email','BootstrapAdmin__Password','ASPNETCORE_Kestrel__Certificates__Default__Password','ASPNETCORE_Kestrel__Certificates__Default__Path','ASPNETCORE_URLS','ASPNETCORE_ENVIRONMENT','ApiSettings__BaseUrl')) {
+    foreach ($setting in @('JwtSettings__SecretKey','ConnectionStrings__DefaultConnection','BootstrapAdmin__Username','BootstrapAdmin__Email','BootstrapAdmin__Password','ASPNETCORE_Kestrel__Certificates__Default__Password','ASPNETCORE_Kestrel__Certificates__Default__Path','ASPNETCORE_URLS','ASPNETCORE_ENVIRONMENT','ApiSettings__BaseUrl','PublicCatalog__ProductIds__0')) {
         [Environment]::SetEnvironmentVariable($setting, $null, 'Process')
     }
 }

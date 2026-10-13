@@ -1,16 +1,27 @@
 # AdminPanel
 
-ASP.NET Core **.NET 8** Web API and MVC administration client, using **EF Core 9** and **SQL Server**. The MVC app calls the API through an HTTP client; it has no database connection.
+## Customer storefront (Phase 1)
+
+The solution also contains `AdminPanel.Storefront`, an Arabic-first/English MVC catalog at
+`https://localhost:7289`, using dedicated public API reads and the existing database.
+Products require explicit API publication configuration; the default public catalog is empty.
+See [docs/STOREFRONT.md](docs/STOREFRONT.md) for Windows/Visual Studio setup, publication,
+branding, YER display, language switching, verification and the future COD roadmap.
+The premium administration dashboard is preserved. Accounts, carts and checkout are future phases.
+
+
+ASP.NET Core **.NET 8** Web API, MVC administration client and MVC public storefront, using **EF Core 9** and **SQL Server**. Both MVC applications call the API through HTTP clients; neither connects to the database.
 
 ## Projects and implemented features
 
 - `AdminPanel/`: API, JWT authentication, EF models/migrations, category and product CRUD, product image uploads, order creation/list/details/status/cancellation, shipping options, discounts and content page CRUD.
 - `AdminPanel.MVC/`: administrator login/logout, responsive navigation, category/product CRUD, order list/details/status/cancellation, full shipping/discount/content management and a data-backed dashboard.
-- `AdminPanel.Tests/`: xUnit integration tests. Both ASP.NET request pipelines run in-process with disposable relational databases. SQLite is the default; CI also runs the full suite against SQL Server 2022 with all migrations. Tests never use the application connection string.
+- `AdminPanel.Storefront/`: Arabic/English public home, searchable/paged product catalog, category browsing, product details/images and YER prices. Public products require explicit publication configuration.
+- `AdminPanel.Tests/`: xUnit integration tests. The API and both MVC request pipelines run in-process with disposable relational databases. SQLite is the default; CI also runs the full suite against SQL Server 2022 with all migrations. Tests never use the application connection string.
 - `AdminPanel.BrowserTests/`: official Playwright Chromium/Firefox workflow runner; disposable fixtures, responsive-layout and basic accessibility checks, screenshots and result artifacts.
 - `docs/AUDIT.md`: findings, prioritized acceptance criteria, assumptions and verification record.
 
-Administration is **Admin only**. Staff and Customer credentials do not authorize administration. There is no public registration, customer checkout UI, or customer-facing API policy.
+Administration is **Admin only**. Staff and Customer credentials do not authorize administration. The separate anonymous catalog is read-only; public registration, customer sessions, cart and checkout are not implemented.
 
 For a complete Windows walkthrough, troubleshooting and local browser-test commands, see [docs/WINDOWS-SETUP.md](docs/WINDOWS-SETUP.md).
 
@@ -87,9 +98,9 @@ try {
 
 The command writes an ASP.NET Identity password hash and exits without starting a server. It refuses to overwrite an existing username. For an existing account, supply the same settings and use `--reset-password` instead; this changes only its password, preserving role and blocked state. Existing plaintext passwords are **not accepted** by login and require this reset. Provisioning/reset is an operator action, not an HTTP endpoint.
 
-## Run both applications
+## Run the three applications
 
-Open two terminals in the repository root:
+Open three terminals in the repository root:
 
 ```powershell
 # Terminal 1
@@ -97,11 +108,19 @@ dotnet run --project AdminPanel --launch-profile https
 
 # Terminal 2
 dotnet run --project AdminPanel.MVC --launch-profile https
+
+# Terminal 3
+dotnet run --project AdminPanel.Storefront --launch-profile https
 ```
 
 - API: [https://localhost:7056](https://localhost:7056)
 - Development Swagger: [https://localhost:7056/swagger](https://localhost:7056/swagger)
 - MVC login: [https://localhost:7189/Account/Login](https://localhost:7189/Account/Login)
+- Public storefront: [https://localhost:7289](https://localhost:7289)
+
+The storefront is empty until approved product IDs are configured on the API. Follow the
+[publication instructions](docs/STOREFRONT.md#windows--visual-studio-setup); confirm the stored prices
+are YER before publishing. The storefront's API base URL is `https://localhost:7056/api/catalog/`.
 
 MVC `ApiSettings:BaseUrl` defaults to `https://localhost:7056/api/` and must end with `/`. Set `ApiSettings__BaseUrl` if the API URL changes. Keep HTTPS: MVC authentication cookies are Secure and HttpOnly. Do not disable TLS certificate validation. The MVC's server-side API calls do not require a browser CORS policy.
 
@@ -109,7 +128,7 @@ Login returns a short-lived JWT to the MVC server. MVC stores it inside its encr
 
 ## API contracts and data behavior
 
-- All administration routes require a Bearer token for an Admin user. Only `POST /api/auth/login` is anonymous; it is rate-limited.
+- All administration routes require a Bearer token for an Admin user. `POST /api/auth/login` is anonymous and rate-limited. The separate `/api/catalog` GET endpoints are anonymous with a restricted public projection and publication policy; see [their contract](docs/STOREFRONT.md#additive-api-contract).
 - Products: `POST /api/products` and `PUT /api/products/{id}` accept **multipart/form-data**, with Name, Description, Price, StockQuantity, Unit, IsAvailable, CategoryId, and optional ImageFile. Client-supplied ImageUrl is ignored. JPEG/PNG/WebP uploads require matching signatures and are limited to 5 MiB (6 MiB total request).
 - Orders: `POST /api/orders` accepts CustomerId, optional ShippingOptionId, and 1–100 Items with positive ProductId/Quantity. Duplicate product lines must be combined. Products must exist, be available and have enough stock.
 - `GET /api/orders/{id}` includes customer name/email and line items with the captured purchase price. Totals currently sum product prices only; shipping and discounts are **not applied**.
@@ -139,13 +158,13 @@ Discount create/edit/filter screens search products by name or description throu
 
 ## Verification and remaining scope
 
-CI runs restore, Release build, all integration tests on SQLite and SQL Server 2022, EF model/migration checks, SQL script generation and a dependency vulnerability audit. Phase 3 passed **57 integration tests per provider**, **329 explicit browser checks plus Playwright assertions per browser/provider** in Chromium and Firefox, and the standalone Windows LocalDB/HTTPS smoke check. See [docs/AUDIT.md](docs/AUDIT.md) for run links, screen coverage and results.
+CI runs restore, Release build, all integration tests on SQLite and SQL Server 2022, EF model/migration checks, SQL script generation and a dependency vulnerability audit. Storefront Phase 1 passed **70 integration tests per provider**, **329 administration and 251 storefront explicit browser checks plus Playwright assertions per browser/provider** in Chromium and Firefox, and the standalone Windows LocalDB/HTTPS smoke check for all three applications. See [docs/AUDIT.md](docs/AUDIT.md#storefront-phase-1) for run links, screen coverage and results.
 
 Browser checks include 26 administration routes at desktop and phone widths, CRUD/uploads/order cancellation, filters and product search, validation, loading/duplicate prevention, CSRF, keyboard navigation and JavaScript-disabled forms. Screenshots/result artifacts are retained by CI. These are selected accessibility and layout checks, not a full WCAG audit; WebKit and physical devices remain unverified.
 
 The integration suite covers authentication, token validation, Admin-only authorization, CSRF protection, MVC-to-API category/product/order/shipping/discount/content flows, dashboard counts, search/filter/pagination, encoded content, uploads, input validation, reference constraints, and stock/cancellation concurrency.
 
-Outstanding product decisions: Staff permissions, customer onboarding/checkout, discount/shipping/tax calculation, currency, fulfillment transition rules, and retained cancellation history. All six administration lists use server-side pagination. Discount product selection uses bounded search; category selectors still load all categories. Old/replaced image files are deliberately retained to avoid deleting shared legacy assets; an explicit orphan cleanup policy remains future work. Images have size/type/signature checks, not malware scanning or image decoding. Multi-instance hosting requires shared MVC Data Protection keys and distributed rate limiting.
+Approved future storefront scope: single vendor, Yemen/YER initially, guest and registered shopping, governorate/city shipping rates and COD. Accounts/cart/checkout remain unimplemented. Staff permissions, tax and discount application, detailed COD/fulfillment/cancellation rules still require decisions; see the [phased plan](docs/STOREFRONT.md#approved-future-phases--plan-only). All six administration lists use server-side pagination. Discount product selection uses bounded search; admin category selectors still load all categories. Old/replaced image files are deliberately retained to avoid deleting shared legacy assets; an explicit orphan cleanup policy remains future work. Images have size/type/signature checks, not malware scanning or image decoding. Multi-instance hosting requires shared MVC Data Protection keys and distributed rate limiting.
 
 For optional local SQL Server integration runs, `ADMINPANEL_TEST_SQLSERVER` must point to a disposable server at `localhost,1433` or `127.0.0.1,1433`, with permission to create/drop databases. The fixture ignores the supplied database name, generates a unique `AdminPanel_Test_` database per test, applies migrations and deletes that database afterwards. CI generates ephemeral credentials and stops its container after verification. Keep this variable unset for normal SQLite tests.
 

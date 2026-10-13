@@ -82,6 +82,11 @@ Open [MVC login](https://localhost:7189/Account/Login). The API listens on [http
 
 MVC `ApiSettings:BaseUrl` is `https://localhost:7056/api/`. If ports change, set `ApiSettings__BaseUrl` in the MVC terminal, including the trailing slash. Keep both HTTPS profiles: authentication cookies are Secure and HttpOnly. Close the terminals or press Ctrl+C to stop the applications.
 
+For the public storefront, follow [STOREFRONT.md](STOREFRONT.md) to publish approved products, then run
+`dotnet run --project AdminPanel.Storefront --launch-profile https` in a third terminal and open
+[https://localhost:7289](https://localhost:7289). Its API URL ends in `/api/catalog/`, unlike the admin
+client's `/api/`. Visual Studio can start all three projects using their HTTPS launch profiles.
+
 Common problems:
 
 | Symptom | Check |
@@ -105,12 +110,15 @@ dotnet run --project AdminPanel.BrowserTests --configuration Release -- --instal
 
 # Runs Chromium and Firefox against disposable fixtures; optional -- --headed.
 dotnet run --project AdminPanel.BrowserTests --configuration Release
+
+# Arabic/English public catalog workflows, also Chromium and Firefox.
+dotnet run --project AdminPanel.BrowserTests --configuration Release -- --storefront
 ```
 
 The browser harness starts a loopback HTTPS transport into the real MVC/API ASP.NET pipelines, uses random test credentials and a fresh database for each browser, and destroys its fixtures afterwards. Its self-signed certificate exception exists only in the test browser. The application HTTP client retains normal TLS verification. Browser screenshots and a result JSON are saved under `AdminPanel.BrowserTests/TestResults/`; they are ignored by Git. Authentication traces, cookies and passwords are not written as artifacts.
 
 Optional SQL Server test runs require `ADMINPANEL_TEST_SQLSERVER` to refer to a **disposable loopback SQL Server on port 1433**, with database create/drop permission. The fixture deliberately rejects arbitrary servers, ignores any supplied database name, generates unique `AdminPanel_Test_` databases, migrates and deletes them. Leave this variable unset to use SQLite. Normal development LocalDB configuration and the test fixture connection are separate.
 
-CI runs the full integration and browser suites with SQLite and disposable SQL Server. A separate **Windows** CI job runs `scripts/Test-WindowsSetup.ps1`: it creates its own uniquely named LocalDB instance, applies migrations, bootstraps a random test administrator, starts both actual HTTPS application processes, verifies login, an MVC/API write and CSRF rejection, and cleans up its database/processes/test certificates. That script is restricted to disposable Windows CI runners; do not use it to manage your development or production instance.
+CI runs the full integration and browser suites with SQLite and disposable SQL Server. A separate **Windows** CI job runs `scripts/Test-WindowsSetup.ps1`: it creates its own uniquely named LocalDB instance, applies migrations, bootstraps a random test administrator, starts all three actual HTTPS application processes, verifies login, an MVC/API write, CSRF rejection and bilingual public catalog rendering, and cleans up its database/processes/test certificates. That script is restricted to disposable Windows CI runners; do not use it to manage your development or production instance.
 
 See [AUDIT.md](AUDIT.md) for the actual completed-run evidence and limitations. Browser automation checks selected accessibility basics and layout bounds; it is not a full WCAG audit or a guarantee of identical rendering across all devices.

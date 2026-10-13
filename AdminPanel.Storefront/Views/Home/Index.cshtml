@@ -1,0 +1,28 @@
+@model HomeModel
+@{ ViewData["Title"] = T["Home"]; var pick = Model.Products.FirstOrDefault(); }
+<div class="container home-content">
+    <section class="hero">
+        <div class="hero-copy"><span class="eyebrow">@T["HeroEyebrow"]</span><h1>@T["HeroTitle"]</h1><p>@T["HeroBody"]</p><a class="button button-light" asp-controller="Catalog" asp-action="Index">@T["Explore"]<partial name="_Icon" model='@("arrow")' /></a><span class="hero-caption">@T["Yemen"]</span></div>
+        <div class="hero-showcase">
+            @if (pick is not null)
+            {
+                <a class="hero-product" asp-controller="Catalog" asp-action="Details" asp-route-id="@pick.Id"><span class="showcase-tag">@T["CatalogPick"]</span>
+                    <img src="@(pick.HasImage ? Url.Action("Image", "Catalog", new { id = pick.Id }) : Url.Content("~/images/product-placeholder.svg"))" alt="@pick.Name" width="460" height="340" fetchpriority="high" data-product-image />
+                    <span class="hero-product-caption"><span><span class="hero-product-category" dir="auto">@pick.CategoryName</span><strong dir="auto">@pick.Name</strong></span><span class="round-arrow"><partial name="_Icon" model='@("arrow")' /></span></span>
+                </a>
+            }
+            else { <div class="hero-empty"><partial name="_Icon" model='@("bag")' /><p>@T["EmptyHome"]</p></div> }
+        </div>
+    </section>
+    <section class="home-section" aria-labelledby="categories-title">
+        <div class="section-heading"><div><p class="eyebrow">@T["Categories"]</p><h2 id="categories-title">@T["CategoryHeading"]</h2><p>@T["CategoryIntro"]</p></div><a class="text-link" asp-controller="Catalog" asp-action="Categories">@T["ViewAll"]<partial name="_Icon" model='@("arrow")' /></a></div>
+        @if (Model.Categories.Count > 0) { <div class="category-grid">@foreach (var item in Model.Categories) { <partial name="_CategoryCard" model="item" /> }</div> }
+        else { <p class="empty-inline">@T["EmptyCategory"]</p> }
+    </section>
+    <section class="home-section" aria-labelledby="recent-title">
+        <div class="section-heading"><div><p class="eyebrow">@T["Featured"]</p><h2 id="recent-title">@T["Recent"]</h2><p>@T["RecentIntro"]</p></div><a class="text-link" asp-controller="Catalog" asp-action="Index">@T["ViewAll"]<partial name="_Icon" model='@("arrow")' /></a></div>
+        @if (Model.Products.Count > 0) { <div class="product-grid">@foreach (var product in Model.Products) { <partial name="_ProductCard" model="product" /> }</div> }
+        else { <div class="empty-state"><partial name="_Icon" model='@("box")' /><h3>@T["EmptyTitle"]</h3><p>@T["EmptyHome"]</p></div> }
+    </section>
+    <aside class="catalog-banner"><span class="banner-icon"><partial name="_Icon" model='@("globe")' /></span><div><h2>@T["BrowseCategories"]</h2><p>@T["FeaturedNote"]</p></div><a class="button" asp-controller="Catalog" asp-action="Categories">@T["Explore"]<partial name="_Icon" model='@("arrow")' /></a></aside>
+</div>

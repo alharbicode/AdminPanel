@@ -14,5 +14,6 @@
     <PackageReference Include="xunit.runner.visualstudio" Version="2.8.2" PrivateAssets="all" />
     <ProjectReference Include="../AdminPanel/AdminPanel.API.csproj" />
     <ProjectReference Include="../AdminPanel.MVC/AdminPanel.MVC.csproj" Aliases="mvc" />
+    <ProjectReference Include="../AdminPanel.Storefront/AdminPanel.Storefront.csproj" Aliases="storefront" />
   </ItemGroup>
 </Project>

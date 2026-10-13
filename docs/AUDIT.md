@@ -3,6 +3,10 @@
 Baseline: `afdeda5208a2dc75bf410771e47b3ff7a55c5aef` on `master`.
 Development branch: `codex/audit-repair-adminpanel`.
 
+The administration repair results below are historical. The latest addition is **Storefront Phase 1**
+on `codex/storefront-phase-one`, based on `codex/premium-dashboard-ui`; its scope, verification and
+remaining work are recorded at the end of this document and in [STOREFRONT.md](STOREFRONT.md).
+
 ## Priorities and acceptance criteria
 
 1. **P0 - Restore a coherent build and data model.** The order model is in the global namespace, contains a duplicate OrderItem, and disagrees with every order migration and controller. MVC order models and Razor views also disagree. Restore the migration-backed entities, remove obsolete EF 1.x tooling, align EF packages, and repair view names/models. Acceptance: restore/build both applications; migration model consistency check passes.
@@ -120,4 +124,59 @@ Windows CI initially stalled on an interactive CurrentUser root-certificate prom
 - Category dropdowns still load all categories; product pickers are bounded. Legacy unpaged API collection endpoints remain for compatibility. Search follows each database's collation; no fuzzy search or large-scale performance claim is made.
 - Browser checks cover Chromium/Firefox and selected desktop/phone widths. WebKit/Safari, physical mobile devices, screen-reader testing, full contrast/WCAG review and production infrastructure are not verified.
 - Image decoding/malware scanning, orphan cleanup, shared Data Protection keys and distributed rate limiting remain operational follow-ups. Plan the separately scoped framework support upgrade.
-- The local agent host lacks a usable .NET SDK; builds and full application tests execute in GitHub Actions. No production data, master merge or deployment is involved.
+- During the administration repair the agent host lacked a usable .NET SDK. A usable SDK is now available for the local storefront verification recorded below. No production data, master merge or deployment is involved.
+
+## Storefront Phase 1
+
+Branch `codex/storefront-phase-one` starts from premium-dashboard commit `6cf0cb8`.
+[Draft PR #3](https://github.com/alharbicode/AdminPanel/pull/3) targets `codex/premium-dashboard-ui`.
+The earlier administration Phase 1–3 sections describe a different workstream; only the public
+browsing phase of the approved e-commerce roadmap is implemented here.
+
+| Feature | Implementation and acceptance |
+| --- | --- |
+| Separate storefront | New ASP.NET Core MVC project uses public API reads only, with no SQL reference, administrator credential or bearer token. |
+| Public catalog | Dedicated anonymous GET routes return bounded projections; publication requires an explicit configured ID plus availability, positive stock, valid category and nonnegative price. Empty configuration exposes nothing. |
+| Browsing | Responsive home, search/paged products, category filtering/name sorting, searchable/paged category directory, product details and related products use actual API records. |
+| Images | Visibility rechecked at the API, local JPEG/PNG/WebP paths only, bounded proxy transfer, no external fetch, neutral missing-image fallback. Concurrent requests must return the real fixture image. |
+| Arabic/English | Arabic-first interface with visible AR/EN switch, RTL/LTR, original catalog text, YER prices and centralized store branding. Switch is antiforgery-protected and preserves only local return locations. |
+| Existing admin | Premium MVC project, administrator authentication/authorization, backend services, models, database context and migrations have no changes from the premium base. Existing admin integration/browser workflows still pass. |
+| Local setup | Windows/Visual Studio guide covers all three apps, publication allowlist, currency confirmation and branding; existing JWT/bootstrap/database instructions remain applicable. |
+
+Verified on **2026-10-13**, implementation commit `f0ed003`, in
+[run 38433192498](https://github.com/alharbicode/AdminPanel/actions/runs/38433192498): restore and Release
+build passed with zero compiler warnings/errors; **70/70 integration tests on each provider**;
+**329 administration and 251 storefront explicit browser checks plus Playwright assertions** in each
+Chromium/Firefox and SQLite/SQL Server combination; Windows isolated LocalDB, existing migrations,
+bootstrap, three HTTPS processes and real catalog/language-switch smoke passed. EF reports no pending
+model changes; idempotent SQL generated; NuGet reported no vulnerable packages in the five projects.
+
+Local Windows SDK 8.0.425 restore/build and all 70 tests also passed. Playwright using installed Edge
+passed all 251 storefront checks after a test-fixture concurrency repair: independent request connections
+now share only a uniquely named in-memory database. Earlier parallel image requests could produce
+SQLite connection errors and fall back to placeholders; the added concurrent-image checks require JPEG
+responses. The final local browser log was checked and had no application errors.
+
+Storefront browser coverage includes Arabic/English at 1440, 1024, 768, 390 and 320 pixels, normal and
+invalid/missing pages, real catalog images, search/filter/paging, preserved language/query state,
+encoded stored markup, CSRF, keyboard skip navigation, reduced motion and no-JavaScript browsing.
+Selected desktop/mobile screenshots were reviewed; all captures/result JSON are CI artifacts.
+No production data was accessed or changed. Nothing was merged or deployed.
+
+- [x] Public MVC storefront and narrow catalog API, preserving the premium admin.
+- [x] Arabic/English, RTL/LTR, YER, original product content and centralized configurable name.
+- [x] Fail-closed publication policy, safe images, bounded queries, encoded content and antiforgery.
+- [x] SQL Server/SQLite integration and Chromium/Firefox regression/browser verification.
+- [x] Windows setup, screenshots, recorded evidence and explicit later-phase plan.
+- [ ] Phase 2 approval: separate customer accounts/recovery/sessions, guest/registered carts and addresses.
+- [ ] Phase 3 approval and rules: Yemen governorate/city rates, guest/registered COD, server totals,
+  snapshots, idempotency, concurrency, retained cancellations and private tracking.
+- [ ] Phase 4: provider evaluation, verified payment events/refunds, international/currency expansion
+  and separately approved production readiness.
+- [ ] Publication/branding administration settings, translated catalog content, large-catalog performance,
+  full accessibility/device review, private/durable image storage and supported-runtime upgrade.
+
+The user has now approved single-vendor retail, Yemen/YER, guest and registered shopping, destination
+rates and future COD. Detailed tax/discount/COD/fulfillment rules and Staff permissions remain decisions.
+The [storefront guide](STOREFRONT.md) records limitations, acceptance gates and complexity for future
+phases. They are **plan only**; explicit owner approval is required before Phase 2 implementation.
