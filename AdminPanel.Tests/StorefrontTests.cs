@@ -106,6 +106,19 @@ public sealed class StorefrontTests : IDisposable
     }
 
     [Fact]
+    public async Task Concurrent_storefront_image_requests_return_actual_catalog_images()
+    {
+        using var store = _store.Client();
+        await Task.WhenAll(Enumerable.Range(0, 12).Select(async _ =>
+        {
+            using var response = await store.GetAsync("/Catalog/Image/27");
+            Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+            Assert.Equal("image/jpeg", response.Content.Headers.ContentType!.MediaType);
+            Assert.True((await response.Content.ReadAsByteArrayAsync()).Length > 0);
+        }));
+    }
+
+    [Fact]
     public async Task Administration_stays_protected_and_public_surface_has_no_writes()
     {
         using var anonymous = _api.Client();

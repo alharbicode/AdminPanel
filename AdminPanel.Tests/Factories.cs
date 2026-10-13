@@ -22,7 +22,8 @@ namespace AdminPanel.Tests;
 public class ApiFactory : WebApplicationFactory<Program>
 {
     public int[] PublicProductIds { get; init; } = [];
-    private readonly SqliteConnection _connection = new("Data Source=:memory:");
+    // Keep each test database alive, but give concurrent HTTP requests their own connection.
+    private readonly SqliteConnection _connection = new($"Data Source=AdminPanel_Test_{Guid.NewGuid():N};Mode=Memory;Cache=Shared");
     private readonly string? _sqlServerConnection = CreateSqlServerConnection();
     private static string? CreateSqlServerConnection()
     {
@@ -62,7 +63,7 @@ public class ApiFactory : WebApplicationFactory<Program>
             if (_sqlServerConnection is null)
             {
                 _connection.Open();
-                services.AddDbContext<ApplicationDbContext>(options => options.UseSqlite(_connection));
+                services.AddDbContext<ApplicationDbContext>(options => options.UseSqlite(_connection.ConnectionString));
             }
             else services.AddDbContext<ApplicationDbContext>(options => options.UseSqlServer(_sqlServerConnection));
         });
