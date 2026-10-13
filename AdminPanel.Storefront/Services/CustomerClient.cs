@@ -23,7 +23,7 @@ public sealed class CustomerClient
         _accessor = accessor;
     }
     public async Task<T> Send<T>(HttpMethod method, string path, object? data = null, string? guest = null,
-        string? token = null, bool anonymous = false)
+        string? token = null, bool anonymous = false, string? guestOrder = null)
     {
         var context = _accessor.HttpContext!;
         using var request = new HttpRequestMessage(method, path);
@@ -31,6 +31,7 @@ public sealed class CustomerClient
         if (!anonymous) token ??= await context.GetTokenAsync("access_token");
         if (token is not null) request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", token);
         if (guest is not null) request.Headers.Add("X-Guest-Cart", guest);
+        if (guestOrder is not null) request.Headers.Add("X-Guest-Order", guestOrder);
         using var response = await _http.SendAsync(request, context.RequestAborted);
         if (!response.IsSuccessStatusCode)
         {

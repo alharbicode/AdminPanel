@@ -80,7 +80,7 @@ internal static class StorefrontRunner
                 await Expect(page.Locator(".detail-image img")).ToHaveAttributeAsync("src", "/Catalog/Image/27");
                 Check(await page.EvaluateAsync<bool>("async () => (await Promise.all(Array.from({length:12}, () => fetch('/Catalog/Image/27', {cache:'no-store'})))).every(r => r.status === 200 && !r.redirected && r.headers.get('content-type') === 'image/jpeg')"), "Concurrent catalog photos were replaced by placeholders.");
                 Check(await page.EvaluateAsync<int>("async () => (await fetch('/Language/Change', {method:'POST',headers:{'Content-Type':'application/x-www-form-urlencoded'},body:'culture=en'})).status") == 400, "Missing CSRF accepted");
-                foreach (var route in new[] { "/Checkout", "/Payments" })
+                foreach (var route in new[] { "/Payments" })
                     Check(await page.EvaluateAsync<int>("async path => (await fetch(path)).status", route) == 404, "Future phase exposed: " + route);
                 await page.GotoAsync("/");
                 await context.ClearCookiesAsync();

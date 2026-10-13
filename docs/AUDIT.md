@@ -3,10 +3,13 @@
 Baseline: `afdeda5208a2dc75bf410771e47b3ff7a55c5aef` on `master`.
 Development branch: `codex/audit-repair-adminpanel`.
 
-The administration repair and Storefront Phase 1 results below are historical. The latest addition is
-**Storefront Phase 2** on `codex/storefront-phase-two`, based on `codex/storefront-phase-one`.
-Its customer accounts/cart scope, migration considerations and remaining work are recorded in
-[STOREFRONT-PHASE-2.md](STOREFRONT-PHASE-2.md). Phase 2 verification is recorded below.
+The administration repair and Storefront Phase 1/2 sections below are historical records of their
+respective scopes and results. The latest addition is **Storefront Phase 3** on
+`codex/storefront-phase-three`, based on `codex/storefront-phase-two`. The owner approved Yemen/YER
+guest/customer checkout, configured shipping, automatic eligible discounts, COD and retained order
+cancellation. These approved rules supersede the earlier out-of-scope/decision notes; they do not
+authorize deployment or an existing-database migration. See [the current Phase 3 record](#storefront-phase-3)
+and [implementation/setup guide](STOREFRONT-PHASE-3.md).
 
 ## Priorities and acceptance criteria
 
@@ -16,7 +19,7 @@ Its customer accounts/cart scope, migration considerations and remaining work ar
 4. **P1 - Protect data integrity and errors.** Validate DTOs and references; reject invalid quantities, unavailable products and insufficient stock; enforce optimistic stock concurrency; avoid cascading removal of catalog/history; validate uploads; return safe errors. Acceptance: invalid or conflicting requests do not change inventory/data; cancellation restores inventory once; relational integration tests verify constraints and HTTP failures.
 5. **P2 - Make development reproducible.** Document SQL Server setup, explicit migrations, admin provisioning, secret management, HTTPS endpoints and tests. Add CI and automated integration coverage. Acceptance: documented commands match actual projects/configuration; restore, build, tests and migration script checks have recorded results.
 
-## Product decisions and boundaries
+## Product decisions and boundaries at the original administration repair
 
 - The user confirmed **Admin only** administration for this repair; Staff permissions remain unspecified. Storefront Phase 2 now adds explicitly approved customer accounts and carts; customer checkout remains out of scope.
 - Existing order creation totals product line prices only. Applying discounts/shipping, currency/tax rules, and fulfillment transition rules require product decisions.
@@ -230,3 +233,93 @@ and address/change policies, MFA, session refresh, expired/consumed-cart retenti
 limiting and shared Data Protection keys. API auth limits currently aggregate requests from the
 storefront host. Full accessibility, Safari/physical-device and load testing are not claimed.
 Framework support upgrade remains separate. Checkout and later business rules are deferred.
+
+## Storefront Phase 3
+
+Branch `codex/storefront-phase-three` starts from approved Phase 2 and targets
+`codex/storefront-phase-two`. The new work implements only the owner's approved single-vendor Yemen
+checkout/COD scope. Existing dashboard/storefront design, administrator permissions and earlier
+account/cart behavior are preserved. No owner database, including `AdminPanel_Dev`, was upgraded.
+
+### Audit findings and repairs
+
+| Finding | Repair and acceptance criterion |
+| --- | --- |
+| Repeating manual order creation could create duplicates | Admin create now requires a nonempty `RequestKey`; owner/key uniqueness and canonical payload comparison return the original success or reject key reuse. Storefront confirmation has equivalent durable idempotency. |
+| DELETE cancellation erased historical orders | Both legacy and current cancellation routes retain order/lines, actor/time/reason and a restoration marker. Repeat/concurrent calls must restore stock once only. |
+| Status updates allowed arbitrary fulfillment changes | Shared state machine enforces Pending, Confirmed, Preparing, Shipped, Delivered forward transitions; Cancelled is terminal. No cancellation after shipping/delivery. |
+| Stale admin stock forms could overwrite checkout changes | Product PUT requires the displayed expected stock value, then EF checks the originally loaded stock at save. Conflicting updates return 409. |
+| Products, discount definitions and shipping could change after a quote | Confirmation recalculates authoritative data and compares the reviewed fingerprint. A serializable transaction and concurrency predicates protect order/stock/cart consistency. |
+| Order displays relied on mutable product/user records | New checkout orders retain contact/address/country, item name, original/discount/final price, shipping, currency and COD snapshots. Later edits do not rewrite them. Legacy values are preserved without fabricated backfills. |
+| Legacy shipping options did not define public delivery coverage | Separate Admin-managed ShippingZones expose only valid enabled governorate/city selections. No legacy option is automatically enabled for checkout. |
+| No customer checkout or protected order access existed | Guest/customer review and confirmation, customer-owned history/details, private guest tracking, early cancellation and later request forms are implemented in Arabic/English. |
+| Read-only cart normalization could leave invalid stored lines before checkout | Explicit versioned refresh persists availability/quantity adjustments without touching stock and supplies a clear repair path. |
+
+### Approved behavior and boundaries
+
+- Product prices and delivery fees are YER; initial payment is COD. No online payment, tax charge,
+  currency conversion, international delivery or multi-vendor workflow is added.
+- A selected enabled shipping zone supplies the fee. Named-city rows require that city; empty city
+  means governorate-wide. There is no implicit city-rate precedence or exclusion. An enabled broad
+  zone covers its cities even if a separate city row is disabled; administrators must configure only
+  coverage the store actually supports.
+- Eligible product discounts use UTC inclusive start/exclusive end, valid percentages through 100%,
+  greatest percentage then lowest ID. Only one applies. Unit discount rounds to two decimals away
+  from zero before quantity multiplication. Shipping is added after the item discount; no tax is inferred.
+- Stock is deducted when a Pending order is successfully confirmed by the customer, never while
+  browsing, maintaining a cart or requesting a quote. Order/lines/stock/cart finalize together.
+- Customers/guests directly cancel Pending/Confirmed orders. Administrators may also cancel Preparing
+  orders. Shipped/Delivered cancellation is blocked. Preparing/Shipped customers can record an
+  administration request; it changes neither status nor stock. Returns/recalls/refunds remain separate.
+- Manual administration creation retains its existing product-price-only calculation, now with
+  explicit request-key protection. Current stock/order edits use expected values/versions; external
+  clients must supply the new safety preconditions.
+- Guest tracking uses a non-guessable secret supplied in an explicit API header, hash-only database
+  storage and a protected browser cookie. Public references/IDs/email/phone cannot retrieve an order.
+  Save the displayed private tracking code; order email/SMS notifications are not implemented.
+
+### Migration and setup evidence
+
+`20261013213455_AddCheckoutSnapshotsAndShippingZones` adds the new zone table, nullable order/item
+snapshots, idempotency/cancellation metadata and indexes. Customer ownership becomes nullable for
+genuine guests. Existing user, catalog, image, discount, shipping and order records are not deleted
+or repriced. The migration's Down path refuses automatic downgrade to prevent losing guest/order
+history. Use a reviewed forward fix or verified backup restoration instead.
+
+The reviewable [Phase 3 SQL](migrations/phase3-upgrade.sql) and
+[Windows/Visual Studio instructions](STOREFRONT-PHASE-3.md#windows-and-visual-studio-setup) are for owner
+review. Generation is not application. Any verification migration must target an isolated test
+database; a production/local owner database remains untouched until separately approved.
+
+### Phase 3 verification checkpoint
+
+At the preliminary checkpoint, **128 integration tests passed locally**. This includes existing
+regressions and checkout/order-integrity cases. Additional validation/boundary/browser coverage and
+final results are being collected; no final Phase 3 SQL Server, Chromium/Firefox or CI success is
+claimed yet. Replace this checkpoint with executed run/commit evidence before completion.
+
+The expanded checks cover authoritative guest/customer pricing, active/expired/invalid/overlapping
+discounts, exact UTC boundaries, disabled destinations, cart changes, idempotency, concurrent stock
+and duplicate submissions, private ownership/tracking, cancellation/request state rules, exactly-once
+restoration, legacy records, stale admin writes, shipping CRUD, antiforgery and audience isolation.
+Browser targets include Arabic/English checkout/tracking/history, responsive widths, real submission,
+CSRF, cancellation, navigation and no-JavaScript behavior. Targets are not proof of passed execution.
+
+### Current remaining-work checklist
+
+- [x] Guest/customer checkout, authoritative quote review and durable submission handling.
+- [x] Yemen zone/rate administration, approved discount calculation and immutable snapshots.
+- [x] Safe fulfillment/cancellation, order ownership, private guest tracking and availability repair.
+- [x] Additive/reviewed migration generated; owner's database not migrated; automatic Down refused.
+- [x] Setup, API contracts, calculation rules, retry behavior and rollback risks documented.
+- [ ] Record final restore/build and complete SQLite/SQL Server integration results.
+- [ ] Record executed Chromium/Firefox and Windows standalone verification with screenshots/artifacts.
+- [ ] Publish/update the Phase 3 draft PR and record final matching-head CI evidence.
+- [ ] Owner review before any merge, existing-database migration or deployment.
+- [ ] Configure real coverage/rates, tax/invoice policy, COD collection/reconciliation and refusal handling.
+- [ ] Decide shipped cancellations/returns/refunds, notification delivery and tracking/PII retention/revocation.
+- [ ] Production email verification, backups/monitoring, durable/shared Data Protection, client rate limiting,
+  framework support upgrade, full accessibility, Safari/physical-device and load testing.
+
+Staff permissions, online gateways, international delivery, currency conversion, multi-vendor features
+and a major visual redesign remain excluded. Phase 3 ends with owner review, not automatic launch.

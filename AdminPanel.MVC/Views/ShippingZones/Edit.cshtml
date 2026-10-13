@@ -1,0 +1,10 @@
+@model ShippingZoneViewModel
+@{ ViewData["Title"] = "Edit shipping zone"; }
+<h1>@ViewData["Title"]</h1>
+<p>Changes affect future checkout quotes. Existing orders retain their charged fee and destination.</p>
+<form asp-action="Edit" method="post" class="management-form">
+    <partial name="_Form" model="Model" />
+    <button class="btn btn-primary" type="submit">Save changes</button>
+    <a asp-action="Index" class="btn btn-outline-secondary">Cancel</a>
+</form>
+@section Scripts { <partial name="_ValidationScriptsPartial" /> }

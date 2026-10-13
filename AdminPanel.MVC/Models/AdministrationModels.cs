@@ -17,7 +17,7 @@ public sealed class AdminListQuery : IValidatableObject
     public bool? Available { get; set; }
     public bool? HasProducts { get; set; }
     [RegularExpression("^(in-stock|out-of-stock)$")] public string? Stock { get; set; }
-    [RegularExpression("^(Pending|Confirmed|Shipped|Delivered)$")] public string? Status { get; set; }
+    [RegularExpression("^(Pending|Confirmed|Preparing|Shipped|Delivered|Cancelled)$")] public string? Status { get; set; }
     [DataType(DataType.Date)] public DateTime? From { get; set; }
     [DataType(DataType.Date)] public DateTime? To { get; set; }
     public IEnumerable<ValidationResult> Validate(ValidationContext context)
@@ -98,6 +98,7 @@ public sealed class DashboardViewModel
     public int OutOfStockProductCount { get; set; }
     public int OrderCount { get; set; }
     public int ShippingOptionCount { get; set; }
+    public int ShippingZoneCount { get; set; }
     public int DiscountCount { get; set; }
     public int ContentPageCount { get; set; }
     public List<OrderStatusCount> OrdersByStatus { get; set; } = new();
@@ -105,4 +106,4 @@ public sealed class DashboardViewModel
 }
 public sealed record OrderStatusCount(string Status, int Count);
 public sealed record ProductOptionViewModel(int Id, string Name);
-public sealed record RecentOrder(int Id, string CustomerName, DateTime OrderDate, string Status, decimal TotalPrice);
+public sealed record RecentOrder(int Id, string CustomerName, DateTime OrderDate, string Status, decimal TotalPrice, string? Currency = null);

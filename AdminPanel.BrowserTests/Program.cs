@@ -19,6 +19,7 @@ internal static class BrowserRunner
     public static async Task<int> Main(string[] args)
     {
         if (args.Contains("--customers")) return await CustomerRunner.Run(args);
+        if (args.Contains("--checkout")) return await CheckoutRunner.Run(args);
         if (args.Contains("--storefront")) return await StorefrontRunner.Run(args);
         if (args.Contains("--install-browsers"))
             return Microsoft.Playwright.Program.Main(new[] { "install", "--with-deps", "chromium", "firefox" });
@@ -88,7 +89,7 @@ internal static class BrowserRunner
         db.ContentPages.Add(new ContentPage { Title = "Browser seed page", Slug = "browser-seed", Content = "Safe preview" });
         await db.SaveChangesAsync();
         using var api = await host.Api.AdminClient();
-        (await api.PostAsJsonAsync("/api/orders", new { customerId = 3, shippingOptionId = 1, items = new[] { new { productId = 1, quantity = 1 } } })).EnsureSuccessStatusCode();
+        (await api.PostAsJsonAsync("/api/orders", new { requestKey = Guid.NewGuid(), customerId = 3, shippingOptionId = 1, items = new[] { new { productId = 1, quantity = 1 } } })).EnsureSuccessStatusCode();
     }
 
     private static async Task Login(IPage page, BrowserHost host)
@@ -264,6 +265,7 @@ internal static class BrowserRunner
         await page.GetByRole(AriaRole.Button, new() { Name = "Update", Exact = true }).ClickAsync();
         await Expect(page.GetByText("Order status updated.", new() { Exact = true })).ToBeVisibleAsync();
         page.Dialog += (_, dialog) => dialog.AcceptAsync();
+        await page.GetByLabel("Cancellation reason", new() { Exact = true }).FillAsync("Browser cancellation");
         await page.GetByRole(AriaRole.Button, new() { Name = "Cancel Order", Exact = true }).ClickAsync();
         await Expect(page.GetByText("Order cancelled and stock restored.", new() { Exact = true })).ToBeVisibleAsync();
         Check((await api.GetFromJsonAsync<JsonElement>("/api/products/1")).GetProperty("stockQuantity").GetInt32() == 10, "Browser cancellation failed to restore stock.");

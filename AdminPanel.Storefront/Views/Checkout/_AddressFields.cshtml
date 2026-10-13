@@ -1,0 +1,4 @@
+@model CheckoutModel
+<div class="form-field"><label asp-for="City">@T["City"]</label><input asp-for="City" autocomplete="address-level2" maxlength="100" required /><span asp-validation-for="City"></span></div>
+<div class="form-field"><label asp-for="AddressLine">@T["AddressLine"]</label><textarea asp-for="AddressLine" autocomplete="street-address" maxlength="500" minlength="5" rows="3" required aria-describedby="address-help"></textarea><span asp-validation-for="AddressLine"></span><p id="address-help" class="field-help">@T["AddressHelp"]</p></div>
+<div class="form-field"><label asp-for="DeliveryInstructions">@T["DeliveryInstructions"]</label><textarea asp-for="DeliveryInstructions" maxlength="1000" rows="3"></textarea><span asp-validation-for="DeliveryInstructions"></span></div>

@@ -1,0 +1,12 @@
+@model ShippingZoneViewModel
+@{ ViewData["Title"] = "Disable shipping zone"; }
+<h1>@ViewData["Title"]</h1>
+<p class="alert alert-warning">Disable new deliveries to this zone? Existing orders and their shipping snapshots are retained. You can enable the zone again later.</p>
+<div asp-validation-summary="All" class="text-danger" role="alert"></div>
+<partial name="_Details" model="Model" />
+<form asp-action="Disable" method="post">
+    <input type="hidden" asp-for="Id" />
+    <input type="hidden" asp-for="Version" />
+    <button class="btn btn-danger" type="submit">Disable shipping zone</button>
+    <a asp-action="Index" class="btn btn-outline-secondary">Cancel</a>
+</form>

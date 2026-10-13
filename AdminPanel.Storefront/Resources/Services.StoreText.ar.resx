@@ -53,8 +53,8 @@
 <data name="Currency" xml:space="preserve"><value>العملة</value></data>
 <data name="Price" xml:space="preserve"><value>السعر</value></data>
 <data name="YER" xml:space="preserve"><value>ر.ي.</value></data>
-<data name="BrowseOnly" xml:space="preserve"><value>تصفح الآن. الطلب عبر المتجر غير متاح بعد.</value></data>
-<data name="BrowseNote" xml:space="preserve"><value>أسعار الكتالوج بالريال اليمني. إتمام الطلب وتكاليف التوصيل وخيارات الدفع غير متاحة في هذه المرحلة.</value></data>
+<data name="BrowseOnly" xml:space="preserve"><value>تسوّق بالدفع عند الاستلام ضمن وجهات التوصيل المتاحة في اليمن.</value></data>
+<data name="BrowseNote" xml:space="preserve"><value>الأسعار بالريال اليمني. تُحسب الخصومات المستحقة ورسوم التوصيل عند مراجعة طلبك.</value></data>
 <data name="Related" xml:space="preserve"><value>المزيد من هذا القسم</value></data>
 <data name="BackCatalog" xml:space="preserve"><value>العودة إلى الكتالوج</value></data>
 <data name="UnavailableTitle" xml:space="preserve"><value>هذا المنتج غير متاح</value></data>
@@ -122,7 +122,7 @@
 <data name="ContinueBrowsing" xml:space="preserve"><value>متابعة التصفح</value></data>
 <data name="CartEmpty" xml:space="preserve"><value>سلتك فارغة</value></data>
 <data name="EstimatedTotal" xml:space="preserve"><value>الإجمالي التقديري</value></data>
-<data name="CartEstimate" xml:space="preserve"><value>تقدير بالريال اليمني فقط، دون حجز مخزون. لا تتوفر عمليات الدفع أو حساب الشحن والضرائب والخصومات في هذه المرحلة.</value></data>
+<data name="CartEstimate" xml:space="preserve"><value>قيمة المنتجات التقديرية بالريال اليمني قبل الخصومات والتوصيل. المخزون غير محجوز؛ راجع المبلغ النهائي للدفع عند الاستلام عند إتمام الطلب.</value></data>
 <data name="SignInToSave" xml:space="preserve"><value>سجل الدخول للاحتفاظ بسلتك بين الجلسات</value></data>
 <data name="CartAdded" xml:space="preserve"><value>تمت إضافة المنتج إلى سلتك.</value></data>
 <data name="CartUpdated" xml:space="preserve"><value>تم تحديث سلتك.</value></data>
@@ -135,4 +135,99 @@
 <data name="GuestExpired" xml:space="preserve"><value>انتهت صلاحية سلة الزائر أو استُخدمت سابقاً. لم تتغير سلة حسابك المحفوظة.</value></data>
 <data name="MergePending" xml:space="preserve"><value>أنت مسجل الدخول، لكن تعذر دمج سلة الزائر بعد. احتفظ بجلسة المتصفح وأعد محاولة الدمج.</value></data>
 <data name="RetryMerge" xml:space="preserve"><value>إعادة محاولة دمج السلة</value></data>
+<data name="Checkout" xml:space="preserve"><value>إتمام الطلب</value></data>
+<data name="CheckoutIntro" xml:space="preserve"><value>التوصيل إلى المناطق المتاحة داخل اليمن. ادفع نقداً عند استلام طلبك.</value></data>
+<data name="DeliveryDetails" xml:space="preserve"><value>بيانات التواصل والتوصيل</value></data>
+<data name="DeliveryDestination" xml:space="preserve"><value>المحافظة ووجهة التوصيل</value></data>
+<data name="SelectDestination" xml:space="preserve"><value>اختر وجهة التوصيل</value></data>
+<data name="GovernorateWide" xml:space="preserve"><value>التوصيل ضمن المحافظة</value></data>
+<data name="DestinationHelp" xml:space="preserve"><value>تظهر وجهات التوصيل المفعّلة فقط. أدخل المدينة المحددة للتعرفة، أو مدينتك عند اختيار تعرفة تشمل المحافظة.</value></data>
+<data name="City" xml:space="preserve"><value>المدينة</value></data>
+<data name="ContactName" xml:space="preserve"><value>اسم المستلم</value></data>
+<data name="Phone" xml:space="preserve"><value>رقم الهاتف</value></data>
+<data name="PhoneHelp" xml:space="preserve"><value>أدخل رقم هاتف يمكن لفريق التوصيل التواصل معك من خلاله.</value></data>
+<data name="PhoneInvalid" xml:space="preserve"><value>أدخل من 7 إلى 15 رقماً. يُسمح بالمسافات والأقواس والشرطات وعلامة + في البداية.</value></data>
+<data name="EmailOptional" xml:space="preserve"><value>البريد الإلكتروني (اختياري)</value></data>
+<data name="AddressLine" xml:space="preserve"><value>عنوان التوصيل بالتفصيل</value></data>
+<data name="AddressHelp" xml:space="preserve"><value>اذكر الحي والشارع والمبنى وأقرب معلم واضح.</value></data>
+<data name="AddressInvalid" xml:space="preserve"><value>أدخل عنوان التوصيل من 5 إلى 500 حرف.</value></data>
+<data name="DeliveryInstructions" xml:space="preserve"><value>تعليمات التوصيل (اختياري)</value></data>
+<data name="COD" xml:space="preserve"><value>الدفع نقداً عند الاستلام</value></data>
+<data name="CODHelp" xml:space="preserve"><value>ادفع المبلغ النهائي الموضّح بالريال اليمني عند الاستلام.</value></data>
+<data name="ReviewOrder" xml:space="preserve"><value>مراجعة الطلب</value></data>
+<data name="LoadingCheckout" xml:space="preserve"><value>جارٍ إعداد مراجعة الطلب…</value></data>
+<data name="YourCart" xml:space="preserve"><value>سلتك</value></data>
+<data name="CheckoutEstimate" xml:space="preserve"><value>قيمة المنتجات التقديرية قبل الخصومات المستحقة والتوصيل. راجع المبلغ النهائي في الصفحة التالية.</value></data>
+<data name="BackToCart" xml:space="preserve"><value>العودة إلى السلة</value></data>
+<data name="GuestCheckout" xml:space="preserve"><value>يمكنك إتمام هذا الطلب كزائر دون إنشاء حساب.</value></data>
+<data name="NoDestinations" xml:space="preserve"><value>التوصيل غير متاح حالياً</value></data>
+<data name="NoDestinationsHelp" xml:space="preserve"><value>لا توجد وجهات توصيل مفعّلة حالياً. سلتك محفوظة؛ يرجى المحاولة لاحقاً.</value></data>
+<data name="ReviewBeforeConfirm" xml:space="preserve"><value>تحقق من المنتجات وبيانات التوصيل والمبلغ النهائي للدفع عند الاستلام قبل تأكيد الطلب.</value></data>
+<data name="OrderItems" xml:space="preserve"><value>منتجات الطلب</value></data>
+<data name="EditDelivery" xml:space="preserve"><value>تعديل بيانات التوصيل</value></data>
+<data name="OrderSummary" xml:space="preserve"><value>ملخص الطلب</value></data>
+<data name="StockOnConfirm" xml:space="preserve"><value>تُخصم الكمية من المخزون فقط عند إنشاء طلبك بنجاح.</value></data>
+<data name="PlaceOrder" xml:space="preserve"><value>تأكيد الطلب والدفع عند الاستلام</value></data>
+<data name="PlacingOrder" xml:space="preserve"><value>جارٍ تأكيد طلبك…</value></data>
+<data name="ConfirmationTerms" xml:space="preserve"><value>يُعاد التحقق من التوفر والأسعار عند التأكيد. إذا تغيّرت، سنطلب منك المراجعة مجدداً.</value></data>
+<data name="PerItem" xml:space="preserve"><value>للقطعة</value></data>
+<data name="DiscountApplied" xml:space="preserve"><value>الخصم المطبّق</value></data>
+<data name="OriginalPrice" xml:space="preserve"><value>السعر الأصلي للقطعة</value></data>
+<data name="Subtotal" xml:space="preserve"><value>مجموع المنتجات</value></data>
+<data name="DiscountTotal" xml:space="preserve"><value>الخصومات</value></data>
+<data name="ShippingFee" xml:space="preserve"><value>رسوم التوصيل</value></data>
+<data name="CODTotal" xml:space="preserve"><value>المبلغ المطلوب عند الاستلام</value></data>
+<data name="MyOrders" xml:space="preserve"><value>طلباتي</value></data>
+<data name="OrderHistoryIntro" xml:space="preserve"><value>طلباتك وبيانات التوصيل وحالة كل طلب.</value></data>
+<data name="NoOrders" xml:space="preserve"><value>لا توجد طلبات في هذه الصفحة</value></data>
+<data name="ViewOrder" xml:space="preserve"><value>عرض الطلب</value></data>
+<data name="OrderPages" xml:space="preserve"><value>صفحات سجل الطلبات</value></data>
+<data name="TrackGuestOrder" xml:space="preserve"><value>تتبع طلب زائر</value></data>
+<data name="TrackOrder" xml:space="preserve"><value>تتبع الطلب</value></data>
+<data name="TrackingHelp" xml:space="preserve"><value>أدخل رمز التتبع الخاص الذي حفظته عند إنشاء طلبك كزائر.</value></data>
+<data name="TrackingCode" xml:space="preserve"><value>رمز التتبع الخاص</value></data>
+<data name="TrackingPrivacy" xml:space="preserve"><value>احتفظ بهذا الرمز سرياً. يستطيع من يملكه الاطلاع على بيانات التوصيل وإدارة الطلب.</value></data>
+<data name="RecentGuestOrder" xml:space="preserve"><value>فتح طلب الزائر المحفوظ في هذا المتصفح</value></data>
+<data name="OrderDetails" xml:space="preserve"><value>تفاصيل الطلب</value></data>
+<data name="OrderPlaced" xml:space="preserve"><value>تم إنشاء طلبك</value></data>
+<data name="OrderReference" xml:space="preserve"><value>مرجع الطلب</value></data>
+<data name="OrderPlacedHelp" xml:space="preserve"><value>تم حفظ طلبك. تابع حالته هنا وجهّز المبلغ الموضّح للدفع عند الاستلام.</value></data>
+<data name="SaveTrackingCode" xml:space="preserve"><value>احفظ رمز التتبع الخاص بك</value></data>
+<data name="SaveTrackingHelp" xml:space="preserve"><value>يظهر الرمز في صفحة التأكيد هذه فقط. انسخه أو دوّنه لفتح طلبك من جهاز آخر. مرجع الطلب وحده لا يتيح الوصول إلى التفاصيل.</value></data>
+<data name="CopyTrackingCode" xml:space="preserve"><value>نسخ الرمز</value></data>
+<data name="TrackingCopied" xml:space="preserve"><value>تم نسخ رمز التتبع.</value></data>
+<data name="CancellationRequestRecorded" xml:space="preserve"><value>تم تسجيل طلب الإلغاء</value></data>
+<data name="CancellationPendingHelp" xml:space="preserve"><value>يجب أن تراجع إدارة المتجر هذا الطلب. لا يُعد الطلب ملغى حتى تتغير حالته إلى ملغى.</value></data>
+<data name="CancelOrder" xml:space="preserve"><value>إلغاء الطلب</value></data>
+<data name="RequestCancellation" xml:space="preserve"><value>طلب الإلغاء</value></data>
+<data name="CancelOrderHelp" xml:space="preserve"><value>يمكنك الإلغاء قبل بدء التجهيز. يبقى الطلب في سجلك وتُعاد كميته إلى المخزون مرة واحدة.</value></data>
+<data name="RequestCancellationHelp" xml:space="preserve"><value>بدأ التجهيز أو الشحن. أرسل طلب إلغاء لتراجعه إدارة المتجر.</value></data>
+<data name="CancellationReason" xml:space="preserve"><value>سبب الإلغاء</value></data>
+<data name="OrderSnapshotHelp" xml:space="preserve"><value>هذه الأسعار وبيانات التوصيل المحفوظة عند إنشاء الطلب.</value></data>
+<data name="TrackAnotherOrder" xml:space="preserve"><value>تتبع طلب زائر آخر</value></data>
+<data name="ForgetTracking" xml:space="preserve"><value>إزالة الوصول إلى الطلب من هذا المتصفح</value></data>
+<data name="ProceedCheckout" xml:space="preserve"><value>المتابعة لإتمام الطلب</value></data>
+<data name="CheckoutChanged" xml:space="preserve"><value>تغيّرت السلة أو التوفر أو الأسعار أو خيار التوصيل. تحقق من التفاصيل وراجع طلبك مجدداً.</value></data>
+<data name="ShippingUnavailable" xml:space="preserve"><value>هذه الوجهة غير متاحة أو المدينة لا تطابق التعرفة المحددة. اختر وجهة مفعّلة وتحقق من المدينة.</value></data>
+<data name="CheckoutInvalid" xml:space="preserve"><value>مراجعة الطلب غير صالحة. افتح سلتك وراجع الطلب مجدداً.</value></data>
+<data name="IdempotencyConflict" xml:space="preserve"><value>استُخدم هذا التأكيد سابقاً ببيانات مختلفة. تحقق من سجل طلباتك أو تتبع طلب الزائر قبل بدء طلب جديد.</value></data>
+<data name="OrderNotFound" xml:space="preserve"><value>تعذر العثور على الطلب أو ليس لديك إذن للوصول إليه.</value></data>
+<data name="OrderConflict" xml:space="preserve"><value>تغيّر الطلب في طلب آخر. تحقق من حالته الحالية وحاول مجدداً.</value></data>
+<data name="OrderTransitionInvalid" xml:space="preserve"><value>هذا الإجراء غير متاح لحالة الطلب الحالية.</value></data>
+<data name="CancellationUnavailable" xml:space="preserve"><value>لا يمكن إلغاء هذا الطلب مباشرةً في مرحلته الحالية.</value></data>
+<data name="CancellationReasonRequired" xml:space="preserve"><value>أدخل سبب الإلغاء من حرف واحد إلى 500 حرف.</value></data>
+<data name="OrderCancelled" xml:space="preserve"><value>تم إلغاء طلبك والاحتفاظ بسجله.</value></data>
+<data name="CancellationRequested" xml:space="preserve"><value>أُرسل طلب الإلغاء إلى إدارة المتجر للمراجعة.</value></data>
+<data name="CheckoutRetry" xml:space="preserve"><value>تعذر التأكد من النتيجة. أعد محاولة التأكيد نفسه بأمان؛ لن يُنشئ طلباً مكرراً.</value></data>
+<data name="OrderStatusPending" xml:space="preserve"><value>بانتظار التأكيد</value></data>
+<data name="OrderStatusPendingConfirmation" xml:space="preserve"><value>بانتظار التأكيد</value></data>
+<data name="OrderStatusConfirmed" xml:space="preserve"><value>مؤكد</value></data>
+<data name="OrderStatusPreparing" xml:space="preserve"><value>قيد التجهيز</value></data>
+<data name="OrderStatusShipped" xml:space="preserve"><value>تم الشحن</value></data>
+<data name="OrderStatusDelivered" xml:space="preserve"><value>تم التسليم</value></data>
+<data name="OrderStatusCancelled" xml:space="preserve"><value>ملغى</value></data>
+<data name="RefreshAvailability" xml:space="preserve"><value>تطبيق تغييرات التوفر</value></data>
+<data name="CartRefreshHelp" xml:space="preserve"><value>تغيّر المخزون أو التوفر. طبّق التغييرات لإزالة المنتجات غير المتاحة وحفظ الكميات المعروضة قبل إتمام الطلب.</value></data>
+<data name="CartRefreshed" xml:space="preserve"><value>أصبحت سلتك مطابقة للتوفر الحالي. راجع المنتجات قبل إتمام الطلب.</value></data>
+<data name="CheckoutStockChanged" xml:space="preserve"><value>تغيّر التوفر. استخدم الزر أدناه لتطبيق الكميات الحالية وإزالة المنتجات غير المتاحة، ثم تابع لإتمام الطلب.</value></data>
 </root>

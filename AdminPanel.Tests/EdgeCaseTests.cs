@@ -32,7 +32,7 @@ public sealed class EdgeCaseTests
         product!.IsAvailable = false;
         await db.SaveChangesAsync();
         Assert.Equal(HttpStatusCode.BadRequest, (await client.PostAsJsonAsync("/api/orders",
-            new { customerId = 3, items = new[] { new { productId = 1, quantity = 1 } } })).StatusCode);
+            new { requestKey = Guid.NewGuid(), customerId = 3, items = new[] { new { productId = 1, quantity = 1 } } })).StatusCode);
         Assert.Equal(10, (await db.Products.AsNoTracking().SingleAsync()).StockQuantity);
     }
 

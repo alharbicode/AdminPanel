@@ -21,6 +21,7 @@ builder.Services.AddDataProtection().SetApplicationName("AdminPanel.Storefront")
 builder.Services.AddHttpContextAccessor();
 builder.Services.AddHttpClient<CustomerClient>();
 builder.Services.AddScoped<CartGateway>();
+builder.Services.AddScoped<CheckoutGateway>();
 builder.Services.AddAntiforgery(options =>
 {
     options.Cookie.Name = "__Host-Alharbi.Antiforgery";

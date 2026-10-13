@@ -1,0 +1,10 @@
+@model List<CheckoutItem>
+<div class="order-items">
+@foreach (var item in Model) {
+    <article class="order-item" data-product-id="@item.ProductId">
+        <div><h3 dir="auto">@item.ProductName</h3><p>@T["Quantity"]: @T.Number(item.Quantity) · <bdi>@T.Price(item.UnitPrice)</bdi> @T["YER"] @T["PerItem"]</p>
+        @if (item.UnitDiscount > 0) { <p class="order-discount">@T["DiscountApplied"]: <span dir="auto">@item.DiscountName</span> (<bdi>@T.Price(item.UnitDiscount)</bdi> @T["YER"] @T["PerItem"])<br /><span>@T["OriginalPrice"]: <bdi>@T.Price(item.OriginalUnitPrice)</bdi> @T["YER"]</span></p> }</div>
+        <strong class="order-line-total"><bdi>@T.Price(item.LineTotal)</bdi> @T["YER"]</strong>
+    </article>
+}
+</div>

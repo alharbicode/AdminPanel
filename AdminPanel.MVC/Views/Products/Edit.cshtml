@@ -6,6 +6,7 @@
 <form asp-action="Edit" method="post" enctype="multipart/form-data">
     <div asp-validation-summary="All" class="text-danger"></div>
     <input type="hidden" asp-for="Id" />
+    <input type="hidden" asp-for="ExpectedStockQuantity" />
 
     <div class="form-group mb-2">
         <label asp-for="Name"></label>

@@ -1,0 +1,11 @@
+@model TrackOrderModel
+@{ ViewData["Title"] = T["TrackOrder"]; }
+<div class="container page-content"><section class="account-panel">
+    <h1>@T["TrackOrder"]</h1><p>@T["TrackingHelp"]</p>
+    <form method="post" autocomplete="off">
+        <div asp-validation-summary="All" class="validation-summary" role="alert"></div>
+        <div class="form-field"><label asp-for="TrackingCode">@T["TrackingCode"]</label><input asp-for="TrackingCode" type="password" autocomplete="off" dir="ltr" maxlength="43" required aria-describedby="tracking-help" /><span asp-validation-for="TrackingCode"></span><p class="field-help" id="tracking-help">@T["TrackingPrivacy"]</p></div>
+        <button class="button">@T["TrackOrder"]</button>
+    </form>
+    <p class="account-links"><a asp-action="Guest">@T["RecentGuestOrder"]</a><a asp-action="Index">@T["MyOrders"]</a></p>
+</section></div>

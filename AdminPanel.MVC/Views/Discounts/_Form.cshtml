@@ -1,7 +1,7 @@
 @model DiscountViewModel
 <div asp-validation-summary="All" class="text-danger" role="alert"></div>
 <input type="hidden" asp-for="Id" />
-<p class="text-muted">This configures a discount record. Applying discounts to checkout is not implemented.</p>
+<p class="text-muted">Checkout automatically applies the highest eligible percentage for this product during its UTC date window. Discounts do not stack; equal percentages use the lowest discount ID. Existing orders retain the discount originally charged.</p>
 <div class="mb-3"><label asp-for="Name" class="form-label"></label><input asp-for="Name" class="form-control" maxlength="200" /><span asp-validation-for="Name" class="text-danger"></span></div>
 <partial name="_ProductPicker" />
 <div class="mb-3"><label asp-for="Percentage" class="form-label"></label><input asp-for="Percentage" type="number" min="0" max="100" step="0.01" class="form-control" /><span asp-validation-for="Percentage" class="text-danger"></span></div>

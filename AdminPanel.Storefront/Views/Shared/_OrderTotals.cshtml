@@ -1,0 +1,7 @@
+@model OrderTotals
+<dl class="order-totals">
+    <div><dt>@T["Subtotal"]</dt><dd><bdi>@T.Price(Model.Subtotal)</bdi> @T["YER"]</dd></div>
+    <div><dt>@T["DiscountTotal"]</dt><dd>− <bdi>@T.Price(Model.DiscountTotal)</bdi> @T["YER"]</dd></div>
+    <div><dt>@T["ShippingFee"]</dt><dd><bdi>@T.Price(Model.ShippingFee)</bdi> @T["YER"]</dd></div>
+    <div class="order-grand-total"><dt>@T["CODTotal"]</dt><dd><bdi>@T.Price(Model.Total)</bdi> @T["YER"]</dd></div>
+</dl>

@@ -1,8 +1,10 @@
 # Windows development setup and verification
 
 These steps configure a **local development database**; they do not deploy the application.
-For `codex/storefront-phase-two`, also review the [Phase 2 migration and email guide](STOREFRONT-PHASE-2.md)
-before applying any migration. The agent has not changed the owner's local database.
+For `codex/storefront-phase-three`, first review the [Phase 3 checkout/migration guide](STOREFRONT-PHASE-3.md)
+and the earlier [Phase 2 migration/email guide](STOREFRONT-PHASE-2.md). The agent has not migrated the
+owner's local database, including `AdminPanel_Dev`. Existing-database upgrades require owner review,
+an explicitly selected target and a tested backup; no startup migration runs.
 
 ## Install prerequisites
 
@@ -39,13 +41,13 @@ dotnet user-secrets set "ConnectionStrings:DefaultConnection" "Server=(localdb)\
 Remove-Variable jwtSecret
 
 dotnet ef migrations script --idempotent --project AdminPanel --output migrations.sql -- --environment Development
-# Review migrations.sql and confirm this is your development database.
+# Owner action only, after target/backup/script review and approval:
 dotnet ef database update --project AdminPanel -- --environment Development
 ```
 
 The generated SQL file is an inspection artifact. Do not commit connection strings or keys. The API validates JWT configuration at startup; `Issuer`, `Audience` and token lifetime have checked-in non-secret defaults. MVC has **no database connection**.
 
-For an existing development database, `HardenDataIntegrity` rejects duplicate or overlong usernames/slugs. Resolve the reported data conflict deliberately, then retry. No startup migration or automatic record cleanup occurs. Phase 2/3 introduce no schema changes.
+For an existing development database, `HardenDataIntegrity` rejects duplicate or overlong usernames/slugs. Resolve the reported data conflict deliberately, then retry. No startup migration or automatic record cleanup occurs. The earlier **administration** Phase 2/3 did not change schema; **storefront** Phase 2 adds account/cart tables and storefront Phase 3 adds shipping zones, guest ownership and order/item snapshots. Review [Phase 3 upgrade SQL and rollback restrictions](STOREFRONT-PHASE-3.md#migration-review-and-rollback). Its Down migration explicitly refuses automatic downgrade to avoid losing order history.
 
 `TrustServerCertificate=true` above is specific to your local development SQL Server. It does not disable HTTPS validation between MVC and API. A shared SQL Server requires its own access and certificate configuration.
 
@@ -89,6 +91,11 @@ For the public storefront, follow [STOREFRONT.md](STOREFRONT.md) to publish appr
 [https://localhost:7289](https://localhost:7289). Its API URL ends in `/api/catalog/`, unlike the admin
 client's `/api/`. Visual Studio can start all three projects using their HTTPS launch profiles.
 
+For checkout, configure actual enabled Yemen delivery zones in the administration Shipping zones
+screen. Legacy shipping options do not automatically enable public delivery. Confirm product/rate
+currency is YER. Use only disposable test records for checkout checks: successful COD confirmation
+deducts inventory and creates retained order history. See [Phase 3 shipping and cancellation rules](STOREFRONT-PHASE-3.md).
+
 Common problems:
 
 | Symptom | Check |
@@ -115,6 +122,10 @@ dotnet run --project AdminPanel.BrowserTests --configuration Release
 
 # Arabic/English public catalog workflows, also Chromium and Firefox.
 dotnet run --project AdminPanel.BrowserTests --configuration Release -- --storefront
+
+# Customer account/cart workflows, then Phase 3 checkout/order workflows.
+dotnet run --project AdminPanel.BrowserTests --configuration Release -- --customers
+dotnet run --project AdminPanel.BrowserTests --configuration Release -- --checkout
 ```
 
 The browser harness starts a loopback HTTPS transport into the real MVC/API ASP.NET pipelines, uses random test credentials and a fresh database for each browser, and destroys its fixtures afterwards. Its self-signed certificate exception exists only in the test browser. The application HTTP client retains normal TLS verification. Browser screenshots and a result JSON are saved under `AdminPanel.BrowserTests/TestResults/`; they are ignored by Git. Authentication traces, cookies and passwords are not written as artifacts.

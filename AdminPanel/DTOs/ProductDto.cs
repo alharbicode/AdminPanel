@@ -8,6 +8,7 @@ public class ProductDto
     [TwoDecimalPlaces, Range(typeof(decimal), "0", "9999999999999999.99")] public decimal Price { get; set; }
     public string ImageUrl { get; set; } = "";
     [Range(0, int.MaxValue)] public int StockQuantity { get; set; }
+    [Range(0, int.MaxValue)] public int? ExpectedStockQuantity { get; set; }
     [Required, StringLength(50)] public string Unit { get; set; } = "Piece";
     public bool IsAvailable { get; set; }
     [Range(1, int.MaxValue)] public int CategoryId { get; set; }

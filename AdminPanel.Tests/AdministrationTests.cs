@@ -165,7 +165,7 @@ public sealed class AdministrationTests : IDisposable
         Assert.Equal(HttpStatusCode.OK, duplicate.StatusCode);
         Assert.Contains("slug is already in use", await duplicate.Content.ReadAsStringAsync());
         Assert.Single((await api.GetFromJsonAsync<JsonElement[]>("/api/contentpages"))!);
-        (await api.PostAsJsonAsync("/api/orders", new { customerId = 3, shippingOptionId = 1, items = new[] { new { productId = 1, quantity = 1 } } })).EnsureSuccessStatusCode();
+        (await api.PostAsJsonAsync("/api/orders", new { requestKey = Guid.NewGuid(), customerId = 3, shippingOptionId = 1, items = new[] { new { productId = 1, quantity = 1 } } })).EnsureSuccessStatusCode();
         var deletion = await Post(client, "/ShippingOptions/Delete", "/ShippingOptions/Delete/1", new() { ["Id"] = "1" });
         Assert.Equal(HttpStatusCode.OK, deletion.StatusCode);
         Assert.Contains("used by an order", await deletion.Content.ReadAsStringAsync());

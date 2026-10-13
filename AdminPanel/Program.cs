@@ -31,6 +31,8 @@ builder.Services.AddScoped<ProductImageStore>();
 builder.Services.AddSingleton(TimeProvider.System);
 builder.Services.AddScoped<CatalogVisibility>();
 builder.Services.AddScoped<CartService>();
+builder.Services.AddScoped<CheckoutService>();
+builder.Services.AddScoped<OrderLifecycle>();
 builder.Services.AddScoped<IPasswordResetEmail, PasswordResetEmail>();
 builder.Services.AddAuthentication().AddJwtBearer(CustomerSecurity.Scheme, options => CustomerSecurity.Configure(options, builder.Configuration));
 if (audience == CustomerSecurity.Audience)
@@ -63,6 +65,12 @@ builder.Services.AddAuthorization(options =>
 builder.Services.AddRateLimiter(options =>
 {
     options.RejectionStatusCode = StatusCodes.Status429TooManyRequests;
+    options.AddPolicy("checkout", context => RateLimitPartition.GetFixedWindowLimiter(
+        context.Connection.RemoteIpAddress?.ToString() ?? "unknown",
+        _ => new FixedWindowRateLimiterOptions { PermitLimit = 60, Window = TimeSpan.FromMinutes(1), QueueLimit = 0 }));
+    options.AddPolicy("guest-orders", context => RateLimitPartition.GetFixedWindowLimiter(
+        context.Connection.RemoteIpAddress?.ToString() ?? "unknown",
+        _ => new FixedWindowRateLimiterOptions { PermitLimit = 60, Window = TimeSpan.FromMinutes(1), QueueLimit = 0 }));
     options.AddPolicy("customer-auth", context => RateLimitPartition.GetFixedWindowLimiter(
         context.Connection.RemoteIpAddress?.ToString() ?? "unknown",
         _ => new FixedWindowRateLimiterOptions { PermitLimit = 20, Window = TimeSpan.FromMinutes(1), QueueLimit = 0 }));

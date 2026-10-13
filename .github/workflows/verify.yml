@@ -48,6 +48,8 @@ jobs:
         run: dotnet run --project AdminPanel.BrowserTests --no-build --configuration Release -- --storefront
       - name: Browser customer accounts and carts
         run: dotnet run --project AdminPanel.BrowserTests --no-build --configuration Release -- --customers
+      - name: Browser checkout and order management
+        run: dotnet run --project AdminPanel.BrowserTests --no-build --configuration Release -- --checkout
       - run: dotnet tool restore
       - name: Check migration model and generate SQL
         env:

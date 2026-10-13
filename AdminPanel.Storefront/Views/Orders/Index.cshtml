@@ -1,0 +1,27 @@
+@model CustomerOrders
+@{ ViewData["Title"] = T["MyOrders"]; }
+<div class="container page-content">
+    <div class="page-heading"><h1>@T["MyOrders"]</h1><p>@T["OrderHistoryIntro"]</p></div>
+    @if (Model.Items.Count == 0) {
+        <div class="empty-state"><h2>@T["NoOrders"]</h2><a class="button" asp-controller="Catalog" asp-action="Index">@T["ContinueBrowsing"]</a></div>
+    } else {
+        <div class="order-history">
+        @foreach (var order in Model.Items) {
+            <article class="order-history-card">
+                <div><h2><a asp-action="Details" asp-route-id="@order.Id"><bdi>@order.Reference</bdi></a></h2><p><time datetime="@order.OrderDate.ToString("O")">@order.OrderDate.ToString("g")</time> UTC</p></div>
+                <p class="order-status">@T["OrderStatus" + order.Status]</p>
+                <p><strong><bdi>@T.Price(order.Total)</bdi> @T["YER"]</strong><br /><span>@T["COD"]</span></p>
+                <a class="button button-compact" asp-action="Details" asp-route-id="@order.Id">@T["ViewOrder"]</a>
+            </article>
+        }
+        </div>
+    }
+    @if (Model.TotalPages > 1) {
+        <nav class="pagination" aria-label="@T["OrderPages"]">
+            @if (Model.PageNumber > 1) { <a asp-action="Index" asp-route-pageNumber="@(Model.PageNumber - 1)" rel="prev">@T["Previous"]</a> }
+            <span>@T["Page"] @T.Number(Model.PageNumber) @T["Of"] @T.Number(Model.TotalPages)</span>
+            @if (Model.PageNumber < Model.TotalPages) { <a asp-action="Index" asp-route-pageNumber="@(Model.PageNumber + 1)" rel="next">@T["Next"]</a> }
+        </nav>
+    }
+    <p class="account-links"><a asp-action="Track">@T["TrackGuestOrder"]</a><a asp-controller="Account" asp-action="Profile">@T["MyAccount"]</a></p>
+</div>

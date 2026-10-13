@@ -105,7 +105,7 @@ public sealed class ApiTests : IDisposable
     {
         using var client = await _api.AdminClient();
         Assert.Equal(HttpStatusCode.BadRequest, (await client.PostAsJsonAsync("/api/orders",
-            new { customerId = 3, items = new[] { new { productId = 1, quantity } } })).StatusCode);
+            new { requestKey = Guid.NewGuid(), customerId = 3, items = new[] { new { productId = 1, quantity } } })).StatusCode);
         await AssertStock(client, 10);
         Assert.Empty((await client.GetFromJsonAsync<JsonElement[]>("/api/orders"))!);
     }
@@ -114,7 +114,7 @@ public sealed class ApiTests : IDisposable
     public async Task Order_details_status_and_cancellation_preserve_price_and_stock()
     {
         using var client = await _api.AdminClient();
-        using var created = await client.PostAsJsonAsync("/api/orders", new { customerId = 3, shippingOptionId = 1, items = new[] { new { productId = 1, quantity = 2 } } });
+        using var created = await client.PostAsJsonAsync("/api/orders", new { requestKey = Guid.NewGuid(), customerId = 3, shippingOptionId = 1, items = new[] { new { productId = 1, quantity = 2 } } });
         Assert.Equal(HttpStatusCode.Created, created.StatusCode);
         var id = (await created.Content.ReadFromJsonAsync<JsonElement>()).GetProperty("orderId").GetInt32();
         var order = await client.GetFromJsonAsync<JsonElement>($"/api/orders/{id}");
@@ -128,7 +128,10 @@ public sealed class ApiTests : IDisposable
         Assert.Equal(HttpStatusCode.Conflict, (await client.DeleteAsync("/api/products/1")).StatusCode);
         Assert.Equal(HttpStatusCode.Conflict, (await client.DeleteAsync("/api/shippingoptions/1")).StatusCode);
         Assert.Equal(HttpStatusCode.NoContent, (await client.DeleteAsync($"/api/orders/{id}")).StatusCode);
-        Assert.Equal(HttpStatusCode.NotFound, (await client.DeleteAsync($"/api/orders/{id}")).StatusCode);
+        Assert.Equal(HttpStatusCode.NoContent, (await client.DeleteAsync($"/api/orders/{id}")).StatusCode);
+        var cancelled = await client.GetFromJsonAsync<JsonElement>($"/api/orders/{id}");
+        Assert.Equal("Cancelled", cancelled.GetProperty("status").GetString());
+        Assert.Single(cancelled.GetProperty("items").EnumerateArray());
         await AssertStock(client, 10);
     }
 
@@ -138,11 +141,11 @@ public sealed class ApiTests : IDisposable
         using var client = await _api.AdminClient();
         object[] invalid =
         {
-            new { customerId = 3, items = Array.Empty<object>() },
-            new { customerId = 999, items = new[] { new { productId = 1, quantity = 1 } } },
-            new { customerId = 3, shippingOptionId = 999, items = new[] { new { productId = 1, quantity = 1 } } },
-            new { customerId = 3, items = new[] { new { productId = 1, quantity = 1 }, new { productId = 1, quantity = 1 } } },
-            new { customerId = 3, items = new[] { new { productId = 1, quantity = 1 }, new { productId = 999, quantity = 1 } } }
+            new { requestKey = Guid.NewGuid(), customerId = 3, items = Array.Empty<object>() },
+            new { requestKey = Guid.NewGuid(), customerId = 999, items = new[] { new { productId = 1, quantity = 1 } } },
+            new { requestKey = Guid.NewGuid(), customerId = 3, shippingOptionId = 999, items = new[] { new { productId = 1, quantity = 1 } } },
+            new { requestKey = Guid.NewGuid(), customerId = 3, items = new[] { new { productId = 1, quantity = 1 }, new { productId = 1, quantity = 1 } } },
+            new { requestKey = Guid.NewGuid(), customerId = 3, items = new[] { new { productId = 1, quantity = 1 }, new { productId = 999, quantity = 1 } } }
         };
         foreach (var body in invalid) Assert.Equal(HttpStatusCode.BadRequest, (await client.PostAsJsonAsync("/api/orders", body)).StatusCode);
         await AssertStock(client, 10);

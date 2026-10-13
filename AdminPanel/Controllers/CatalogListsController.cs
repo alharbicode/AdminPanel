@@ -44,7 +44,7 @@ public sealed class CatalogListsController(ApplicationDbContext db) : Controller
         return Ok(await PagedResult<ProductDto>.CreateAsync(ordered.Select(x => new ProductDto
         {
             Id = x.Id, Name = x.Name, Description = x.Description, CategoryId = x.CategoryId,
-            Price = x.Price, StockQuantity = x.StockQuantity, Unit = x.Unit, IsAvailable = x.IsAvailable, ImageUrl = x.ImageUrl
+            Price = x.Price, StockQuantity = x.StockQuantity, ExpectedStockQuantity = x.StockQuantity, Unit = x.Unit, IsAvailable = x.IsAvailable, ImageUrl = x.ImageUrl
         }), query, ct));
     }
 
@@ -73,6 +73,7 @@ public sealed class CatalogListsController(ApplicationDbContext db) : Controller
     }
 
     [HttpGet("/api/orders/admin/list")]
+    [ResponseCache(NoStore = true, Location = ResponseCacheLocation.None)]
     public async Task<IActionResult> Orders([FromQuery] AdminListQuery query, CancellationToken ct)
     {
         var rows = db.Orders.AsNoTracking();
@@ -80,7 +81,9 @@ public sealed class CatalogListsController(ApplicationDbContext db) : Controller
         {
             var term = query.Search.Trim();
             var orderId = int.TryParse(term, out var parsed) ? parsed : 0;
-            rows = rows.Where(x => x.Id == orderId || x.Customer!.Username.Contains(term) || x.Customer!.Email.Contains(term));
+            rows = rows.Where(x => x.Id == orderId || (x.ContactName != null && x.ContactName.Contains(term)) ||
+                (x.ContactEmail != null && x.ContactEmail.Contains(term)) || (x.Reference != null && x.Reference.Contains(term)) ||
+                (x.Customer != null && (x.Customer.Username.Contains(term) || x.Customer.Email.Contains(term))));
         }
         if (query.Status is not null) rows = rows.Where(x => x.Status == query.Status);
         if (query.From.HasValue)
@@ -101,7 +104,9 @@ public sealed class CatalogListsController(ApplicationDbContext db) : Controller
         };
         return Ok(await PagedResult<OrderDetailsDto>.CreateAsync(ordered.Select(x => new OrderDetailsDto
         {
-            Id = x.Id, CustomerName = x.Customer!.Username, CustomerEmail = x.Customer!.Email,
+            Id = x.Id, CustomerName = x.ContactName ?? (x.Customer == null ? "Guest" : x.Customer.Username),
+            CustomerEmail = x.ContactEmail ?? (x.Customer == null ? "" : x.Customer.Email),
+            IsGuest = x.CustomerId == null, Reference = x.Reference, Currency = x.Currency,
             Status = x.Status, OrderDate = x.OrderDate, TotalPrice = x.TotalPrice
         }), query, ct));
     }

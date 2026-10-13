@@ -1,6 +1,7 @@
 @model PagedList<ShippingOptionViewModel>
 @{ ViewData["Title"] = "Shipping options"; }
 <div class="d-flex flex-wrap justify-content-between align-items-center gap-2 mb-3"><h1>Shipping options</h1><a asp-action="Create" class="btn btn-primary">Create shipping option</a></div>
+<p>These are legacy administration shipping records. Configure storefront delivery destinations and YER rates in <a asp-controller="ShippingZones" asp-action="Index">Shipping zones</a>.</p>
 <div asp-validation-summary="All" class="text-danger" role="alert"></div>
 <form method="get" asp-action="Index" class="row g-3 mb-4">
     <div class="col-md-4"><label for="Search" class="form-label">Search</label><input id="Search" name="Search" value="@Model.Query.Search" maxlength="200" class="form-control" placeholder="Name or area" /></div>

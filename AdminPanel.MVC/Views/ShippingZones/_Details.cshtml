@@ -1,0 +1,8 @@
+@model ShippingZoneViewModel
+<dl class="row">
+    <dt class="col-sm-3">Country</dt><dd class="col-sm-9">Yemen</dd>
+    <dt class="col-sm-3">Governorate</dt><dd class="col-sm-9">@Model.Governorate</dd>
+    <dt class="col-sm-3">City</dt><dd class="col-sm-9">@(string.IsNullOrEmpty(Model.City) ? "Governorate-wide" : Model.City)</dd>
+    <dt class="col-sm-3">Shipping fee</dt><dd class="col-sm-9">@Model.Fee.ToString("N2") YER</dd>
+    <dt class="col-sm-3">Status</dt><dd class="col-sm-9">@(Model.Enabled ? "Enabled" : "Disabled")</dd>
+</dl>

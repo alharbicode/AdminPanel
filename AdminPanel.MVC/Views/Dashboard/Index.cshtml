@@ -11,7 +11,7 @@
     string StatusColor(string status) => status switch
     {
         "Pending" => "#b49aff", "Confirmed" => "#78a8ff",
-        "Shipped" => "#5dd6e1", "Delivered" => "#78dcb2", _ => "#9faabd"
+        "Preparing" => "#f2c078", "Shipped" => "#5dd6e1", "Delivered" => "#78dcb2", "Cancelled" => "#ec9ba9", _ => "#9faabd"
     };
     string StatusClass(string status) => status switch
     {
@@ -50,6 +50,7 @@
 
 <section class="resource-grid" aria-label="More administration records">
     @foreach (var card in new[] {
+        new { Label = "Shipping zones", Count = Model.ShippingZoneCount, Controller = "ShippingZones" },
         new { Label = "Shipping options", Count = Model.ShippingOptionCount, Controller = "ShippingOptions" },
         new { Label = "Discounts", Count = Model.DiscountCount, Controller = "Discounts" },
         new { Label = "Content pages", Count = Model.ContentPageCount, Controller = "ContentPages" } })
@@ -101,11 +102,11 @@
     {
         <div class="table-responsive" role="region" aria-label="Scrollable records" tabindex="0">
             <table class="table dashboard-table">
-                <caption>Five most recent orders. Totals are stored order amounts; currency is not configured.</caption>
+                <caption>Five most recent orders. Totals retain their recorded currency; older records without a currency snapshot are marked unspecified.</caption>
                 <thead><tr><th scope="col">Order</th><th scope="col">Customer</th><th scope="col">Date (UTC)</th><th scope="col">Status</th><th scope="col">Total</th></tr></thead>
                 <tbody>@foreach (var order in Model.RecentOrders)
                 {
-                    <tr><td><a class="order-id" asp-controller="Orders" asp-action="Details" asp-route-id="@order.Id">#@order.Id</a></td><td><span class="customer-cell"><span class="customer-avatar" aria-hidden="true">@(string.IsNullOrEmpty(order.CustomerName) ? "?" : order.CustomerName[..1].ToUpperInvariant())</span>@order.CustomerName</span></td><td class="order-date">@order.OrderDate.ToString("yyyy-MM-dd HH:mm")</td><td><span class="order-status status-@StatusClass(order.Status)"><span aria-hidden="true"></span>@order.Status</span></td><td class="order-total">@order.TotalPrice.ToString("N2")</td></tr>
+                    <tr><td><a class="order-id" asp-controller="Orders" asp-action="Details" asp-route-id="@order.Id">#@order.Id</a></td><td><span class="customer-cell"><span class="customer-avatar" aria-hidden="true">@(string.IsNullOrEmpty(order.CustomerName) ? "?" : order.CustomerName[..1].ToUpperInvariant())</span>@order.CustomerName</span></td><td class="order-date">@order.OrderDate.ToString("yyyy-MM-dd HH:mm")</td><td><span class="order-status status-@StatusClass(order.Status)"><span aria-hidden="true"></span>@order.Status</span></td><td class="order-total">@order.TotalPrice.ToString("N2") @(order.Currency ?? "(currency unspecified)")</td></tr>
                 }</tbody>
             </table>
         </div>

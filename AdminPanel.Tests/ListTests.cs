@@ -96,7 +96,7 @@ public sealed class ListTests : IDisposable
     [InlineData("CategoryId=0")]
     [InlineData("Available=invalid")]
     [InlineData("Stock=unknown")]
-    [InlineData("Status=Cancelled")]
+    [InlineData("Status=Invalid")]
     [InlineData("From=2030-02-01&To=2030-01-01")]
     public async Task Invalid_list_queries_are_rejected(string query)
     {
